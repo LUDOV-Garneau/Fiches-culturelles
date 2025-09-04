@@ -6,7 +6,7 @@
 ## Membres de l'équipe
 | Nom              | GitHub |
 |------------------|---------------|
-| Nour Dahbi       | [@Nour](https://github.com/Nour) |
+| Nour Dahbi       | [@Nour](https://github.com/Goldiino) |
 | Théo C. Moraes   | [@Theo](https://github.com/lykeru) |
 | Houssem Eddine   | [@Houssem](https://github.com/asbeth99) |
 | Ahmed Ezzi       | [@Ahmed](https://github.com/ezzi118) |
