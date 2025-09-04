@@ -1,4 +1,4 @@
-# Equipe B - Fiches de jeu
+# Equipe B - Fiches de jeux
 
 ## But du projet
 > Moderniser les fiches culturelles de jeux vidéo avec une nouvelle structure de données, une interface revue et une meilleure présentation visuelle
