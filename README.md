@@ -1,4 +1,8 @@
-# Equipe B - Fiches de jeux
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ebfd6e24-4949-4d30-9f27-f81a6e5f6915" alt="Logo Ludov" width="250"/>
+</p>
+
+<h1 align="center">Équipe B - Fiches de jeux</h1>
 
 ## But du projet
 > Moderniser les fiches culturelles de jeux vidéo avec une nouvelle structure de données, une interface revue et une meilleure présentation visuelle
