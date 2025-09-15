@@ -10,11 +10,11 @@
 ## Membres de l'équipe
 | Nom              | GitHub |
 |------------------|---------------|
-| Nour Dahbi       | [@Nour](https://github.com/Goldinoo) |
-| Théo C. Moraes   | [@Theo](https://github.com/lykeru) |
-| Houssem Eddine   | [@Houssem](https://github.com/asbeth99) |
-| Ahmed Ezzi       | [@Ahmed](https://github.com/ezzi118) |
-| Antoine Boudreau | [@Antoine](https://github.com/dev-t0ny) |
+| Nour Dahbi       | [@Goldinoo](https://github.com/Goldinoo) |
+| Théo C. Moraes   | [@lykeru](https://github.com/lykeru) |
+| Houssem Eddine   | [@asbeth99](https://github.com/asbeth99) |
+| Ahmed Ezzi       | [@ezzi118](https://github.com/ezzi118) |
+| Antoine Boudreau | [@dev-t0ny](https://github.com/dev-t0ny) |
 
 ## Pile technologique
 - [Nuxt](https://nuxt.com/)
