@@ -17,7 +17,13 @@
 | Antoine Boudreau | [@dev-t0ny](https://github.com/dev-t0ny) |
 
 ## Pile technologique
-- [Nuxt](https://nuxt.com/)
+### Frontend
+- [React](https://react.dev/)
+- [Tailwindcss](https://tailwindcss.com/)
+### Backend
+- [Nodejs](https://nodejs.org/en)
+- [ExpressJs](https://expressjs.com/)
+- [MongoDB](https://www.mongodb.com/)
 
 ## Liens utiles
 - [Gestion du projet - Trello](https://trello.com/b/0ybcWeiQ/ludov-fiche-technique)
