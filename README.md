@@ -25,6 +25,10 @@
 - [ExpressJs](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/)
 
+### Hébergement
+- [VPS Ubuntu - RackNerd](https://www.racknerd.com)
+
+
 ## Liens utiles
 - [Gestion du projet - Trello](https://trello.com/b/0ybcWeiQ/ludov-fiche-technique)
 - [Documentation de l'api de Koha](https://api.koha-community.org/)
