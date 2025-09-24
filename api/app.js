@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Test API");
+app.get("/api", (req, res) => {
+  res.send("Backend en ligne (route /api)");
 });
 
 app.listen(3000, () => {
