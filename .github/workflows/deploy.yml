@@ -45,7 +45,7 @@ jobs:
       if: steps.filter.outputs.frontend == 'true'
       run: |
         ssh -o StrictHostKeyChecking=no admin@72.11.148.122 "
-          cd /home/admin/Fiches-culturelles/src/mon_app &&
+          cd /home/admin/Fiches-culturelles/src/my-app &&
           git pull origin main &&
           npm ci &&
           npm run build &&
