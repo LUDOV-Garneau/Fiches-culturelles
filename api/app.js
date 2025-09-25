@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Backend en ligne (route /api) - test déploiement");
+  res.send("Backend en ligne (route /api) - test déploiement !");
 });
 
 app.listen(3000, () => {
