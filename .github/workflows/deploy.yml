@@ -49,5 +49,5 @@ jobs:
           git pull origin main &&
           npm ci &&
           npm run build &&
-          rsync -av --delete build/ /var/www/html/
+          rsync -av --delete build/client/ /var/www/html/
         "
