@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v5
+
+    - name: Detect changes
+      id: changes
+      run: |
+        echo "api_changed=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^api/' || true)" >> $GITHUB_ENV
+        echo "src_changed=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^src/' || true)" >> $GITHUB_ENV
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.9.1
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+    - name: Deploy API (if changed)
+      if: env.api_changed != ''
+      run: |
+        ssh -o StrictHostKeyChecking=no admin@72.11.148.122 "
+          cd /home/admin/Fiches-culturelles/api &&
+          git pull origin main &&
+          npm ci --omit=dev &&
+        pm2 reload all
+        "
+
+    - name: Deploy Frontend (if changed)
+      if: env.src_changed != ''
+      run: |
+        ssh -o StrictHostKeyChecking=no admin@72.11.148.122 "
+          cd /home/admin/Fiches-culturelles/api &&
+          git pull origin main &&
+          npm ci &&
+          npm run build &&
+          rsync -av --delete build/ /var/www/html/
+        "
