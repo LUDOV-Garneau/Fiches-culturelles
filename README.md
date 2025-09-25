@@ -24,9 +24,9 @@
 - [Nodejs](https://nodejs.org/en)
 - [ExpressJs](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/)
-
+  
 ### Hébergement
-- [VPS Ubuntu - RackNerd](https://www.racknerd.com)
+- [VPS Debian - RackNerd](https://www.racknerd.com)
 
 
 ## Liens utiles
