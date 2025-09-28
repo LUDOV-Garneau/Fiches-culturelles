@@ -100,3 +100,73 @@ function extraireDepuisAbstract(abstractBrut) {
     caracteristiques: Array.from(caracs),
   };
 }
+/**
+ * Mapping principal Koha - Jeu
+ * @param {object} k  
+ * @returns {object}
+ */
+function mapperKohaVersJeu(k) {
+  const plateformes = k.edition_statement ? [String(k.edition_statement).trim()] : undefined;
+
+  const annee =
+    k.copyright_date ??
+    k.publication_year ??
+    null;
+
+  const urls = decouperUrls(k.url);
+  const pages = k.pages ? Number(String(k.pages).replace(/[^\d]/g, "")) : null;
+
+  const devs = k.author
+    ? String(k.author).split(/;|,/).map(s => s.trim()).filter(Boolean)
+    : undefined;
+
+  const eds = k.publisher
+    ? String(k.publisher).split(/;|,/).map(s => s.trim()).filter(Boolean)
+    : undefined;
+
+  const { resume, caracteristiques } = extraireDepuisAbstract(k.abstract || "");
+
+  const estLieAuQuebec =
+    (devs && devs.some(d => /montr(e|é)al|qu(é|e)bec/i.test(d))) ||
+    (resume?.notes?.liensQuebec && resume.notes.liensQuebec.length > 0);
+
+  return {
+    // Principaux champs
+    titre: String(k.title || "").trim(),
+    plateformes,
+    anneeSortie: annee ? Number(annee) : null,
+    developpeurs: devs,
+    editeurs: eds,
+    typeMedia: k.item_type ?? null,
+    urls,
+    pages,
+
+    // Résumé et caracs
+    resume,
+    caracteristiques: caracteristiques.length ? caracteristiques : undefined,
+    estLieAuQuebec,
+
+    // Métadonnées / Traçabilité
+    identifiantsExternes: {
+      kohaBiblioId: k.biblio_id != null ? Number(k.biblio_id) : undefined,
+      ean: k.ean ?? null,
+      isbn: k.isbn ?? null,
+      issn: k.issn ?? null,
+      lc: k.lc_control_number ?? null,
+    },
+    source: { systeme: "koha", idCadre: k.framework_id ?? null },
+    ingestion: {
+      dateCreation: k.creation_date ? new Date(k.creation_date) : null,
+      horodatage: k.timestamp ? new Date(k.timestamp) : null,
+    },
+
+    original: k,
+  };
+}
+
+module.exports = {
+  decouperUrls,
+  detecterLangue,
+  extraireDepuisAbstract,
+  mapperKohaVersJeu,
+};
