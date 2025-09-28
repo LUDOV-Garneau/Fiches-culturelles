@@ -14,10 +14,10 @@
 /* base */
 html,
 body {
-  @apply bg-white dark:bg-gray-950 font-sans;
-  @media (prefers-color-scheme: dark) {
+  @apply bg-white /*dark:bg-gray-950*/ font-sans;
+  /*@media (prefers-color-scheme: dark) {
     color-scheme: dark;
-  }
+  }*/
 }
 
 /* pour un boutton si on a besoin plustard */
@@ -29,4 +29,32 @@ body {
 .btn-primary:focus-visible {
   outline: 2px solid var(--color-primary-blue);
   outline-offset: 2px;
+}
+
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 7.25%; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: white; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+.sidenav a {
+  padding: 6px 8px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+}
+
+.img_logo{
+  max-width: 50%;
+  height: auto;
+  display:block;
+  margin:auto;
 }
