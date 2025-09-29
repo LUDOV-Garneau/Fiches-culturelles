@@ -66,7 +66,11 @@ export default function App() {
       </main>
 
       <footer className="bg-white-100 text-center p-4">
-        <p>© Copyright {new Date().getFullYear()} LUDOV (Laboratoire universitaire de documentation et d'observation vidéoludiques) - Tous droits réservés</p>
+        <p className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600">
+          © Copyright {new Date().getFullYear()} LUDOV (Laboratoire
+          universitaire de documentation et d’observation vidéoludiques) – Tous
+          droits réservés
+        </p>
       </footer>
     </div>
   );

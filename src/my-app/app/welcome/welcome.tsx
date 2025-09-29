@@ -63,8 +63,8 @@ function Tabs({
             className={[
               "px-5 py-2 rounded-md border transition",
               isActive
-                ? "bg-[--color-primary-blue] border-[--color-primary-blue] text-white"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-[--color-primary-blue-10]",
+                ? "bg-primary-blue border-primary-blue text-white"
+                : "bg-white border-gray-300 text-gray-700 hover:bg-primary-blue-10",
             ].join(" ")}
           >
             {label}
@@ -251,13 +251,13 @@ export function Welcome() {
       </section>
 
       {/* Pied de page local (si pas déjà global) */}
-      <section className="border-t">
+      {/*<section className="border-t">
         <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600">
           © Copyright {new Date().getFullYear()} LUDOV (Laboratoire
           universitaire de documentation et d’observation vidéoludiques) – Tous
           droits réservés
         </div>
-      </section>
+      </section>*/}
     </main>
   );
 }

@@ -3,6 +3,7 @@
 /* === Thème global (v4) === */
 @theme {
   --color-primary-blue: #02dade;
+  --color-primary-gray: #e6e6e6;
  
   --color-primary-blue-90: color-mix(in oklab, var(--color-primary-blue) 90%, black);
   --color-primary-blue-10: color-mix(in oklab, var(--color-primary-blue) 10%, white);
@@ -14,7 +15,7 @@
 /* base */
 html,
 body {
-  @apply bg-white /*dark:bg-gray-950*/ font-sans;
+  @apply bg-primary-gray /*dark:bg-gray-950*/ font-sans;
   /*@media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }*/
@@ -33,7 +34,7 @@ body {
 
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 7.25%; /* Set the width of the sidebar */
+  width: 7.20%; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -43,13 +44,13 @@ body {
   padding-top: 20px;
 }
 .sidenav a {
-  padding: 6px 8px;
+  padding: 0px 8px;
   text-decoration: none;
-  font-size: 25px;
+  font-size: 30px;
   color: #818181;
   display: block;
   text-align: center;
-  font-weight: bold;
+  font-weight: bolder;
 }
 
 .img_logo{
