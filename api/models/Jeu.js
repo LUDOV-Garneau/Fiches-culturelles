@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 // Notes associées au résumé
 const NotesResumeSchema = new mongoose.Schema(
@@ -87,4 +87,4 @@ JeuSchema.index({
   caracteristiques: "text",
 });
 
-module.exports = mongoose.model("Jeu", JeuSchema);
+export default mongoose.model("Jeu", JeuSchema);

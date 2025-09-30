@@ -1,4 +1,4 @@
-const franc = require("franc-min");
+import { franc } from "franc-min";
 
 /**
  * Découpe un champ d'URLs Koha séparées par " | "
@@ -127,8 +127,13 @@ function mapperKohaVersJeu(k) {
   const { resume, caracteristiques } = extraireDepuisAbstract(k.abstract || "");
 
   const estLieAuQuebec =
-    (devs && devs.some(d => /montr(e|é)al|qu(é|e)bec/i.test(d))) ||
-    (resume?.notes?.liensQuebec && resume.notes.liensQuebec.length > 0);
+  (devs && devs.some(d => /montr(e|é)al|qu(é|e)bec/i.test(d))) ||
+  (resume?.notes?.liensQuebec && resume.notes.liensQuebec.length > 0) ||
+  (k.publication_place &&
+    /(montr(e|é)al|qu(é|e)bec|laval|sherbrooke|trois-rivi(è|e)res)/i.test(
+      k.publication_place
+    )) ||
+  (k.framework_id && k.framework_id.toUpperCase() === "QCTE");
 
   return {
     // Principaux champs
@@ -164,7 +169,7 @@ function mapperKohaVersJeu(k) {
   };
 }
 
-module.exports = {
+export {
   decouperUrls,
   detecterLangue,
   extraireDepuisAbstract,
