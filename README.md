@@ -24,6 +24,10 @@
 - [Nodejs](https://nodejs.org/en)
 - [ExpressJs](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/)
+  
+### Hébergement
+- [VPS Debian - RackNerd](https://www.racknerd.com)
+
 
 ## Liens utiles
 - [Gestion du projet - Trello](https://trello.com/b/0ybcWeiQ/ludov-fiche-technique)

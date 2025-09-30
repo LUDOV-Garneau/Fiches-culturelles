@@ -14,6 +14,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Backend en ligne (route /api) - test déploiement !");
+});
+
+
 app.use("/api/jeux", jeuxRoutes);
 
 const PORT = process.env.PORT || 3000;
