@@ -3,10 +3,11 @@
 
 
 /api/coverage/
+/api/*.svg
 
 /.vite/
 
-# React Router
+
 /.react-router/
 /build/
 /src/my-app/node_modules/
