@@ -4,6 +4,10 @@
 
 <h1 align="center">Équipe B - Fiches de jeux</h1>
 
+<p align="center">
+  <img src="api/coverage-badge.svg" alt="Code coverage badge"/>
+</p>
+
 ## But du projet
 > Moderniser les fiches culturelles de jeux vidéo avec une nouvelle structure de données, une interface revue et une meilleure présentation visuelle
 
