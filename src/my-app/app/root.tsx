@@ -4,7 +4,7 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
+  ScrollRestoration
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -42,7 +42,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return(
+    <div className="app-layout">
+      <header className="bg-gray-800 text-white p-4">
+        <nav className="flex gap-4 justify-end-safe">
+          <a href="/">Home</a>
+          <a href="/casa">Casa</a>
+          <a href="#">Contact</a>
+          <a href="#" className="bg-primary-blue text-white px-3 py-2 rounded hover:color-primary-blue/80">Français</a>
+        </nav>
+        <div className="sidenav">
+            <img className="img_logo" src="public/LUDOV_web_logo_final.png"></img>
+            <a href="#">L</a>
+            <a href="#">U</a>
+            <a href="#">D</a>
+            <a href="#">O</a>
+            <a href="#">V</a>
+        </div>
+      </header>
+
+      <main className="p-6">
+        <Outlet /> 
+      </main>
+
+      <footer className="bg-white-100 text-center p-4">
+        <p className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600">
+          © Copyright {new Date().getFullYear()} LUDOV (Laboratoire
+          universitaire de documentation et d’observation vidéoludiques) – Tous
+          droits réservés
+        </p>
+      </footer>
+    </div>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
