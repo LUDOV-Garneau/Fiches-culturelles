@@ -18,10 +18,8 @@ app.get("/", (req, res) => {
   res.send("Backend en ligne (route /api) - test déploiement !");
 });
 
+app.use("/jeux", jeuxRoutes);
 
-app.use("/api/jeux", jeuxRoutes);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(` Serveur lancé sur http://localhost:${PORT}`);
-});
+export default app; 
+// Jest nécessite qu'on sépare app et server pour fonctionner 
+// Source: https://www.albertgao.com/2017/05/24/how-to-test-expressjs-with-jest-and-supertest/

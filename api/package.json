@@ -14,9 +14,10 @@
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4"
   },
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage", 
+    "start": "node app.js", 
     "dev": "nodemon app.js"
   }
 }
