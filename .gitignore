@@ -1,12 +1,15 @@
 .DS_Store
 /node_modules/
-/src/my-app/node_modules/
+
+
+/api/coverage/
 
 /.vite/
 
 # React Router
 /.react-router/
 /build/
+/src/my-app/node_modules/
 
 logs/
 .env

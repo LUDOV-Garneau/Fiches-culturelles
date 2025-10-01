@@ -16,6 +16,32 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5.0.0
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install dependencies
+      run: |
+        cd api
+        npm ci
+
+    - name: Run tests (with coverage & badge)
+      run: |
+        cd api
+        npm run test
+
+    - name: Commit & push badge if changed
+      run: |
+        cd api
+        if [[ `git status --porcelain coverage-badge.svg` ]]; then
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add coverage-badge.svg
+          git commit -m "chore(ci): update coverage badge [skip ci]"
+          git push
+        fi
+
     - name: Setup SSH
       uses: webfactory/ssh-agent@v0.9.1
       with:
