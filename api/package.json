@@ -15,7 +15,7 @@
     "supertest": "^7.1.4"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+  "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage && node tests/genererBadgeTests.js",
     "start": "node app.js",
     "dev": "nodemon app.js"
   }

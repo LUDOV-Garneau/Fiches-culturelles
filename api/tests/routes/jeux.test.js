@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../../app.js"
+import mongoose from "mongoose";
 
 describe("Liste de jeux", () => {
   it("GET /jeux/quebec retourne une liste des jeux québécois dans la DB", async () => {
@@ -13,4 +14,8 @@ describe("Liste de jeux", () => {
       expect(game).toHaveProperty("estLieAuQuebec", true);
     }
   });
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
 });
