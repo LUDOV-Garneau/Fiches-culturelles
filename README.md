@@ -25,12 +25,32 @@
 - [React](https://react.dev/)
 - [Tailwindcss](https://tailwindcss.com/)
 ### Backend
+#### Serveur web
 - [Nodejs](https://nodejs.org/en)
 - [ExpressJs](https://expressjs.com/)
+#### Base de donnée
 - [MongoDB](https://www.mongodb.com/)
-  
+  - BD de test hébergé sur [Atlas](https://www.mongodb.com/products/platform/atlas-database)
+  - BD prod hébergé sur notre vps
+ #### Tests
+- [Jest](https://jestjs.io/)
+  - Génération du badge pour déterminer le code coverage (voir haut du readme.md)
+- [Supertest](https://www.npmjs.com/package/supertest)
+ 
+
+
+
 ### Hébergement
+#### Hardware
 - [VPS Debian - RackNerd](https://www.racknerd.com)
+
+#### Software
+- [Nginx](https://nginx.org/)
+  - Serveur HTTP et reverse proxy
+- [UFW](https://help.ubuntu.com/community/UFW)
+  - Pare-feu   
+  
+    
 
 
 ## Liens utiles

@@ -58,16 +58,12 @@ export default function App() {
         </nav>
 
         <div className="sidenav">
-          <img
-            className="img_logo"
-            src="public/LUDOV_web_logo_final.png"
-            alt="LUDOV Logo"
-          />
-          <a href="#">L</a>
-          <a href="#">U</a>
-          <a href="#">D</a>
-          <a href="#">O</a>
-          <a href="#">V</a>
+            <img className="img_logo" src="/LUDOV_web_logo_final.png"></img>
+            <a href="#">L</a>
+            <a href="#">U</a>
+            <a href="#">D</a>
+            <a href="#">O</a>
+            <a href="#">V</a>
         </div>
       </header>
 
