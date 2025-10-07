@@ -16,12 +16,18 @@ type Pages = {
   "/casa": {
     params: {};
   };
+  "/admin": {
+    params: {};
+  };
+  "/login": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/casa";
+    page: "/" | "/casa" | "/admin" | "/login";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -30,5 +36,13 @@ type RouteFiles = {
   "routes/casa.tsx": {
     id: "routes/casa";
     page: "/casa";
+  };
+  "routes/admin.tsx": {
+    id: "routes/admin";
+    page: "/admin";
+  };
+  "routes/login.tsx": {
+    id: "routes/login";
+    page: "/login";
   };
 };
