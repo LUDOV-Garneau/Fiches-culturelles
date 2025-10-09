@@ -33,17 +33,24 @@ body {
 }
 
 .sidenav {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 7.20%; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
+  height: 100%; 
+  width: 7.20%; 
+  position: fixed; 
+  z-index: 1; 
+  top: 0; 
   left: 0;
-  background-color: white; /* Black */
-  overflow-x: hidden; /* Disable horizontal scroll */
+  background-color: white; 
   padding-top: 20px;
 }
-.sidenav a {
+
+.img_logo{
+  max-width: 50%;
+  height: auto;
+  display:block;
+  margin:auto;
+}
+.sidediv {
+  position: relative;
   padding: 0px 8px;
   text-decoration: none;
   font-size: 30px;
@@ -52,10 +59,24 @@ body {
   text-align: center;
   font-weight: bolder;
 }
+.submenu {
+  position: absolute;
+  overflow: visible;
+  display: inline-block;
+  z-index: 5;
+  left: 100%;
+  top: 0;
+  background-color: var(--color-primary-blue);
+  color: black;
+  font-weight: normal;
+  font-size: 25px;
+  padding: 10px;
+}
 
-.img_logo{
-  max-width: 50%;
-  height: auto;
-  display:block;
-  margin:auto;
+.submenu li{
+  color:white;
+  font-size: 15px;
+  display: flex;
+  justify-content: left;
+  white-space: nowrap;
 }
