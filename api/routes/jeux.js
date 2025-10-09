@@ -1,5 +1,5 @@
 import express from "express";
-import { importerJeuxQuebec, getJeux, getJeu} from "../controllers/jeuController.js";
+import { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu} from "../controllers/jeuController.js";
 
 const router = express.Router();
 
@@ -7,15 +7,15 @@ const router = express.Router();
 router.get("/import/quebec", importerJeuxQuebec);
 
 // Obtenir tout les jeux
-router.get("/jeux", getJeux);
+router.get("/", getJeux);
 
 // Obtenir un jeu précis
-router.get("/jeux/:titre", getJeu);
+router.get("/:titre", getJeu);
 
 // Supprimer un jeu précis
-router.delete("/jeux/:id", deleteJeu);
+router.delete("/:id", deleteJeu);
 
 // Mettre à jour un jeu précis
-router.put("/jeux/:id", updateJeu);
+router.put("/:id", updateJeu);
 
 export default router;
