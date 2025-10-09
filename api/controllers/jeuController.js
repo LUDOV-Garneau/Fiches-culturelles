@@ -128,6 +128,80 @@ async function getJeu(req, res) {
   }
 }
 
+/**
+ * Supprimer un jeu par son ID
+ */
+async function deleteJeu(req, res) {
+  try {
+    const { id } = req.params;
 
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "L'ID du jeu est obligatoire.",
+      });
+    }
 
-export  { importerJeuxQuebec, getJeux, getJeu };
+    const jeu = await Jeu.findByIdAndDelete(id);
+
+    if (!jeu) {
+      return res.status(404).json({
+        success: false,
+        message: "Jeu non trouvé.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Jeu '${jeu.titre}' supprimé avec succès.`,
+    });
+  } catch (err) {
+    console.error("Erreur deleteJeu:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la suppression en BD.",
+    });
+  }
+}
+
+/**
+ * Modifier un jeu par son ID
+ */
+async function updateJeu(req, res) {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "L'ID du jeu est obligatoire.",
+      });
+    }
+
+    const jeu = await Jeu.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+
+    if (!jeu) {
+      return res.status(404).json({
+        success: false,
+        message: "Jeu non trouvé.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Jeu '${jeu.titre}' mis à jour avec succès.`,
+      data: jeu,
+    });
+  } catch (err) {
+    console.error("Erreur updateJeu:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la mise à jour en BD.",
+    });
+  }
+}
+
+export  { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };

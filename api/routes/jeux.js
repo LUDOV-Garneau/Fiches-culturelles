@@ -12,4 +12,10 @@ router.get("/jeux", getJeux);
 // Obtenir un jeu précis
 router.get("/jeux/:titre", getJeu);
 
+// Supprimer un jeu précis
+router.delete("/jeux/:id", deleteJeu);
+
+// Mettre à jour un jeu précis
+router.put("/jeux/:id", updateJeu);
+
 export default router;
