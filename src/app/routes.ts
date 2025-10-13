@@ -10,3 +10,4 @@ export default [index("routes/home.tsx"),
 
 
     ] satisfies RouteConfig;
+ 
