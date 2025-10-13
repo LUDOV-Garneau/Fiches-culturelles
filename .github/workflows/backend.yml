@@ -51,7 +51,7 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: antoineboudreau/fiches-backend:latest
+          tags: devtonyqc/fiches-backend:latest
 
   deploy:
     name: Deploy to VPS

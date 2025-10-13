@@ -27,7 +27,7 @@ jobs:
         with:
           context: ./src
           push: true
-          tags: antoineboudreau/fiches-frontend:latest
+          tags: devtonyqc/fiches-frontend:latest
 
   deploy:
     needs: build
