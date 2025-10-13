@@ -7,10 +7,10 @@ jest.unstable_mockModule("../../models/Jeu.js", () => ({
   find: jest.fn(),
 }));
 
-const { listerJeuxQuebec } = await import("../../controllers/jeuController.js");
+const { getJeux } = await import("../../controllers/jeuController.js");
 const Jeu = (await import("../../models/Jeu.js")).default;
 
-describe("listerJeuxQuebec", () => {
+describe("getJeux", () => {
   it("retourne la liste des jeux québécois", async () => {
     const req = {};
     const res = {
@@ -24,7 +24,7 @@ describe("listerJeuxQuebec", () => {
       sort: jest.fn().mockResolvedValue(fakeJeux),
     });
 
-    await listerJeuxQuebec(req, res);
+    await getJeux(req, res);
 
     expect(res.json).toHaveBeenCalledWith({
       success: true,
@@ -44,7 +44,7 @@ describe("listerJeuxQuebec", () => {
       throw new Error("Problème Base de données");
     });
 
-    await listerJeuxQuebec(req, res);
+    await getJeux(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
