@@ -4,11 +4,11 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
 } from "react-router";
-
 import type { Route } from "./+types/root";
 import "./app.css";
+
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -42,15 +42,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return(
+  return (
     <div className="app-layout">
       <header className="bg-gray-800 text-white p-4">
         <nav className="flex gap-4 justify-end-safe">
           <a href="/">Home</a>
           <a href="/casa">Casa</a>
           <a href="#">Contact</a>
-          <a href="#" className="bg-primary-blue text-white px-3 py-2 rounded hover:color-primary-blue/80">Français</a>
+          <a
+            href="/login"
+            className="btn-primary"
+          >
+            Login
+          </a>
         </nav>
+
         <div className="sidenav">
             <img className="img_logo" src="/LUDOV_web_logo_final.png"></img>
             <a href="#">L</a>
@@ -62,7 +68,7 @@ export default function App() {
       </header>
 
       <main className="p-6">
-        <Outlet /> 
+        <Outlet />
       </main>
 
       <footer className="bg-white-100 text-center p-4">
