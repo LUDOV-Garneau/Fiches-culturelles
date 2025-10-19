@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import jeuxRoutes from "./routes/jeux.js";
+import cors from "cors";
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Backend en ligne (route /api) - test déploiement !");
 });
-
+app.use(cors());
 app.use("/jeux", jeuxRoutes);
 
 export default app; 

@@ -6,38 +6,61 @@ export default function Admin() {
   const [jeux, setJeux] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modeAffichage, setModeAffichage] = useState<"card" | "compact">(
-    "card"
-  );
+  const [modeAffichage, setModeAffichage] = useState<"card" | "compact">("card");
 
+  // Charger les jeux depuis l’API
   useEffect(() => {
-    // 💾 Jeux simulés
-    const jeuxFictifs = [
-      { id: 1, nom: "The Messenger", genre: "Action / Plateforme" },
-      { id: 2, nom: "Kona", genre: "Aventure narrative" },
-      { id: 3, nom: "Tadpole Tap", genre: "Arcade" },
-      { id: 4, nom: "Jersey Devil", genre: "Plateforme 3D" },
-      {
-        id: 5,
-        nom: "Sang-Froid : Un conte de loups-garous",
-        genre: "Stratégie / Action",
-      },
-      { id: 6, nom: "Army of Two", genre: "Tir coopératif" },
-    ];
+    async function chargerJeux() {
+      try {
+        const response = await fetch("http://localhost:3000/jeux");
+        const data = await response.json();
 
-    setTimeout(() => {
-      setJeux(jeuxFictifs);
-      setLoading(false);
-    }, 800);
+        if (data.success) {
+          setJeux(data.data);
+        } else {
+          setError("Impossible de charger les jeux depuis la base de données.");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Erreur de connexion avec le serveur.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    chargerJeux();
   }, []);
 
+  // Supprimer un jeu
+  async function supprimerJeu(id: string, titre: string) {
+    if (!window.confirm(`Supprimer "${titre}" ?`)) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setJeux((prev) => prev.filter((j) => j._id !== id));
+        alert(`"${titre}" supprimé avec succès.`);
+      } else {
+        alert("Erreur : " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erreur de suppression côté serveur.");
+    }
+  }
+
+  // Basculer l’affichage (cartes <-> tableau)
   const toggleAffichage = () => {
     setModeAffichage((prev) => (prev === "card" ? "compact" : "card"));
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 w-200 mx-auto">
-      {/* Header */}
+      {/* HEADER */}
       <div className="p-3 bg-gray-800 text-white flex justify-between items-center">
         <h1 className="text-2xl font-bold">Page Admin</h1>
         <div className="space-x-3">
@@ -50,92 +73,120 @@ export default function Admin() {
         </div>
       </div>
 
+      {/* CONTENU */}
       <div className="flex flex-1">
+        {/* MENU LATÉRAL */}
         <aside className="w-1/4 bg-white border-r border-gray-200 p-6">
           <h2 className="text-xl font-semibold mb-4">Menu</h2>
           <ul className="space-y-3">
             <li>
-              <button className="w-full text-left px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded">
+              <button
+                onClick={() => navigate("/admin/jeux/ajouter")}
+                className="w-full text-left px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded"
+              >
                 Ajouter un jeu
               </button>
             </li>
           </ul>
         </aside>
 
+        {/* LISTE DES JEUX */}
         <main className="flex-1 p-6">
           <h2 className="text-xl font-semibold mb-4">Liste des jeux</h2>
-          <button className=" space-y-3 btn-primary mb-4">
-            Voir tous les jeux dans la base de données
-          </button>
 
           {loading && <p>Chargement des jeux...</p>}
           {error && <p className="text-red-500">{error}</p>}
 
-          {!loading && !error && (
+          {!loading && !error && jeux.length === 0 && (
+            <p>Aucun jeu trouvé dans la base de données.</p>
+          )}
+
+          {!loading && !error && jeux.length > 0 && (
             <>
               {modeAffichage === "card" ? (
+                // MODE "CARTE"
                 <div className="grid grid-cols-2 gap-4">
                   {jeux.map((jeu) => (
                     <div
-                      key={jeu.id}
+                      key={jeu._id}
                       className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
                     >
                       <img
-                        src="https://placehold.co/600x400"
-                        alt={jeu.nom}
+                        src={jeu.imageUrl || "https://placehold.co/600x400"}
+                        alt={jeu.titre}
                         className="w-full h-40 object-cover rounded mb-2"
                       />
-                      <h3 className="font-bold text-lg">{jeu.nom}</h3>
-                      <p className="text-gray-500 mb-2">Genre : {jeu.genre}</p>
-                      <button className="mt-1 px-3 py-1 bg-gray-800 text-white rounded hover:bg-blue-600">
+                      <h3 className="font-bold text-lg">{jeu.titre}</h3>
+                      <p className="text-gray-500 mb-1">
+                        Auteur :{" "}
+                        {jeu.developpeurs?.length
+                          ? jeu.developpeurs[0]
+                          : "Inconnu"}
+                      </p>
+                      <p className="text-gray-400 text-sm mb-2">
+                        {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
+                      </p>
+
+                      <button
+                        className="mt-1 px-3 py-1 bg-gray-800 text-white rounded hover:bg-blue-600"
+                        onClick={() => navigate(`/admin/jeux/edit/${jeu._id}`)}
+                      >
                         Modifier
                       </button>
+
                       <button
-                            className="px-3 ml-1 p-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 transition"
-                            onClick={() => alert(`Supprimer ${jeu.nom}`)}
-                          >
-                            Supprimer
-                          </button>
+                        className="px-3 ml-1 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 transition"
+                        onClick={() => supprimerJeu(jeu._id, jeu.titre)}
+                      >
+                        Supprimer
+                      </button>
                     </div>
                   ))}
                 </div>
               ) : (
-
-<table className="w-full border-collapse">
+                //  MODE "TABLEAU"
+                <table className="w-full border-collapse">
                   <thead className="bg-gray-100 text-left">
                     <tr>
-                      <th className="border-b p-2">Nom</th>
-                      <th className="border-b p-2">Genre</th>
-                      <th className="border-b p-2 text-right">Action</th>
+                      <th className="border-b p-2">Titre</th>
+                      <th className="border-b p-2">Auteur</th>
+                      <th className="border-b p-2">Année</th>
+                      <th className="border-b p-2 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {jeux.map((jeu, index) => (
                       <tr
-                        key={jeu.id || index}
+                        key={jeu._id || index}
                         className="group transition-all hover:bg-gray-100 hover:shadow-sm border-b border-gray-200"
                       >
-                        <td className="p-3 text-gray-500 w-12 text-center">
-                          {index + 1}
-                        </td>
-
                         <td className="p-3 font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">
-                          {jeu.nom}
+                          {jeu.titre}
                         </td>
 
-                        <td className="p-3 text-gray-600">{jeu.genre}</td>
+                        <td className="p-3 text-gray-600">
+                          {jeu.developpeurs?.length
+                            ? jeu.developpeurs[0]
+                            : "Inconnu"}
+                        </td>
+
+                        <td className="p-3 text-gray-600">
+                          {jeu.anneeSortie || "—"}
+                        </td>
 
                         <td className="p-3 text-right space-x-2">
                           <button
                             className="px-3 py-1 text-sm rounded bg-gray-800 text-white hover:bg-blue-600 transition"
-                            onClick={() => alert(`Modifier ${jeu.nom}`)}
+                            onClick={() =>
+                              navigate(`/admin/jeux/edit/${jeu._id}`)
+                            }
                           >
                             Modifier
                           </button>
 
                           <button
-                            className="px-3 mt-1 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 transition"
-                            onClick={() => alert(`Supprimer ${jeu.nom}`)}
+                            className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 transition"
+                            onClick={() => supprimerJeu(jeu._id, jeu.titre)}
                           >
                             Supprimer
                           </button>
