@@ -84,7 +84,7 @@ async function importerJeuxQuebec(req, res) {
 /**
  * Lister les jeux québécois déjà stockés en MongoDB
  */
-async function listerJeuxQuebec(req, res) {
+async function getJeux(req, res) {
   try {
     const jeux = await Jeu.find({ estLieAuQuebec: true }).sort({ anneeSortie: -1 });
     res.json({ success: true, count: jeux.length, data: jeux });
@@ -97,5 +97,111 @@ async function listerJeuxQuebec(req, res) {
   }
 }
 
+/**
+ * Liste un jeu spécifique
+ */
+async function getJeu(req, res) {
+  try {
+    const { titre } = req.params;
 
-export  { importerJeuxQuebec, listerJeuxQuebec };
+    if (!titre || titre.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Le paramètre 'titre' est obligatoire.",
+      });
+    }
+
+    const filtre = {
+      estLieAuQuebec: true,
+      titre: new RegExp(titre, "i"),
+    };
+
+    const jeux = await Jeu.find(filtre).sort({ anneeSortie: -1 });
+
+    res.json({ success: true, count: jeux.length, data: jeux });
+  } catch (err) {
+    console.error("Erreur getJeu:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la lecture en BD",
+    });
+  }
+}
+
+/**
+ * Supprimer un jeu par son ID
+ */
+async function deleteJeu(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "L'ID du jeu est obligatoire.",
+      });
+    }
+
+    const jeu = await Jeu.findByIdAndDelete(id);
+
+    if (!jeu) {
+      return res.status(404).json({
+        success: false,
+        message: "Jeu non trouvé.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Jeu '${jeu.titre}' supprimé avec succès.`,
+    });
+  } catch (err) {
+    console.error("Erreur deleteJeu:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la suppression en BD.",
+    });
+  }
+}
+
+/**
+ * Modifier un jeu par son ID
+ */
+async function updateJeu(req, res) {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "L'ID du jeu est obligatoire.",
+      });
+    }
+
+    const jeu = await Jeu.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+
+    if (!jeu) {
+      return res.status(404).json({
+        success: false,
+        message: "Jeu non trouvé.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Jeu '${jeu.titre}' mis à jour avec succès.`,
+      data: jeu,
+    });
+  } catch (err) {
+    console.error("Erreur updateJeu:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la mise à jour en BD.",
+    });
+  }
+}
+
+export  { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };

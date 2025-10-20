@@ -21,12 +21,18 @@ type Pages = {
       "id": string;
     };
   };
+  "/admin": {
+    params: {};
+  };
+  "/login": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/casa" | "/games/:id";
+    page: "/" | "/casa" | "/admin" | "/login"| "/games/:id";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -39,5 +45,12 @@ type RouteFiles = {
   "routes/games.$id.tsx": {
     id: "routes/games.$id";
     page: "/games/:id";
+  "routes/admin.tsx": {
+    id: "routes/admin";
+    page: "/admin";
   };
-};
+  "routes/login.tsx": {
+    id: "routes/login";
+    page: "/login";
+  };
+};}
