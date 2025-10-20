@@ -1,6 +1,7 @@
 import * as React from "react";
+import { Link } from "react-router";
 
-/** ========= Données  j ai hard coder pour le moment ========= */
+/** ========= Données (hardcodées pour le moment) ========= */
 const TABS = [
   "Accueil",
   "Sélection de jeux",
@@ -21,30 +22,30 @@ const SECTIONS: DecadeSection[] = [
   {
     decade: "1980-1989",
     items: [
-      { id: "g1", title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)" },
-      { id: "g2", title: "Mimi: Les aventures de Mimi la fourmi (1984)" },
-      { id: "g3", title: "Le fou du roi (Loto-Québec, 1989)" },
+      { id: "tetards", title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)" },
+      { id: "mimi", title: "Mimi: Les aventures de Mimi la fourmi (1984)" },
+      { id: "fou-du-roi", title: "Le fou du roi (Loto-Québec, 1989)" },
     ],
   },
   {
     decade: "1990-1999",
     items: [
-      { id: "g4", title: "Jeu 1990 – Lorem" },
-      { id: "g5", title: "Jeu 1994 – Ipsum" },
-      { id: "g6", title: "Jeu 1998 – Dolor" },
+      { id: "game-1990", title: "Jeu 1990 – Lorem" },
+      { id: "game-1994", title: "Jeu 1994 – Ipsum" },
+      { id: "game-1998", title: "Jeu 1998 – Dolor" },
     ],
   },
   {
     decade: "2000-2009",
     items: [
-      { id: "g7", title: "Jeu 2001 – Sit amet" },
-      { id: "g8", title: "Jeu 2005 – Consectetur" },
-      { id: "g9", title: "Jeu 2009 – Adipiscing" },
+      { id: "fez", title: "FEZ (placeholder)" }, // pour tester la page détail
+      { id: "game-2005", title: "Jeu 2005 – Consectetur" },
+      { id: "game-2009", title: "Jeu 2009 – Adipiscing" },
     ],
   },
 ];
 
-/**  Composants */
+/** ============ Composants ============ */
 function Tabs({
   active,
   onChange,
@@ -53,7 +54,7 @@ function Tabs({
   onChange: (index: number) => void;
 }) {
   return (
-    <nav className="flex flex-wrap gap-2 justify-center">
+    <nav className="flex flex-wrap justify-center gap-2">
       {TABS.map((label, i) => {
         const isActive = i === active;
         return (
@@ -76,24 +77,27 @@ function Tabs({
 }
 
 function GameCard({ item }: { item: GameItem }) {
+  // par défaut on envoie vers /games/:id (si un href custom existe, on l’utilise)
+  const to = item.href ?? `/games/${item.id}`;
+
   return (
     <article className="flex flex-col items-center">
-      {/* Placeholder image:  */}
-      <a
-        href={item.href || "#"}
-        className="block w-[220px] h-[160px] bg-gray-200 rounded shadow-sm hover:shadow md:w-[260px] md:h-[180px]"
+      {/* Vignette (placeholder si pas d'image) */}
+      <Link
+        to={to}
         aria-label={item.title}
+        className="block h-[160px] w-[220px] rounded bg-gray-200 shadow-sm hover:shadow md:h-[180px] md:w-[260px]"
       >
         {item.image ? (
-       
           <img
             src={item.image}
             alt={item.title}
-            className="w-full h-full object-cover rounded"
+            className="h-full w-full rounded object-cover"
           />
         ) : null}
-      </a>
-      <div className="mt-3 bg-white border rounded p-3 text-sm text-gray-800 max-w-[260px] text-center">
+      </Link>
+
+      <div className="mt-3 max-w-[260px] rounded border bg-white p-3 text-center text-sm text-gray-800">
         {item.title}
       </div>
     </article>
@@ -110,17 +114,17 @@ function AccordionSection({
   onToggle: () => void;
 }) {
   return (
-    <div className="border rounded-md overflow-hidden bg-white">
+    <div className="overflow-hidden rounded-md border bg-white">
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 border-b"
+        className="flex w-full items-center gap-3 border-b bg-gray-50 px-4 py-3 text-left hover:bg-gray-100"
       >
         <span
           className={[
             "inline-flex h-5 w-5 items-center justify-center rounded-sm border",
             open
-              ? "bg-gray-700 text-white border-gray-700"
-              : "bg-white text-gray-700 border-gray-400",
+              ? "border-gray-700 bg-gray-700 text-white"
+              : "border-gray-400 bg-white text-gray-700",
           ].join(" ")}
         >
           {open ? "−" : "+"}
@@ -141,16 +145,16 @@ function AccordionSection({
   );
 }
 
-/** Page Welcome ( jeu video) */
+/** ============ Page Welcome ============ */
 export function Welcome() {
-  // Onglet Sélection de jeux actif par défaut 
+  // Onglet “Sélection de jeux” actif par défaut
   const [activeTab, setActiveTab] = React.useState<number>(1);
 
-  // Accordeon ( la liste des jeux qui saffiche): premier ouvert par défaut
+  // Accordeon : le premier est ouvert par défaut
   const [openByDecade, setOpenByDecade] = React.useState<Record<string, boolean>>(
     () =>
       SECTIONS.reduce<Record<string, boolean>>((acc, s, idx) => {
-        acc[s.decade] = idx === 0; // premier ouvert
+        acc[s.decade] = idx === 0;
         return acc;
       }, {})
   );
@@ -160,11 +164,10 @@ export function Welcome() {
 
   return (
     <main className="min-h-[70vh]">
-
       {/* Bandeau + onglets */}
-      <section className="bg-gray-100 border-y">
-        <div className="max-w-6xl mx-auto px-4 py-10">
-          <h1 className="text-3xl md:text-4xl font-semibold text-gray-800">
+      <section className="border-y bg-gray-100">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <h1 className="text-3xl font-semibold text-gray-800 md:text-4xl">
             Le jeu vidéo au Québec
           </h1>
 
@@ -175,12 +178,10 @@ export function Welcome() {
       </section>
 
       {/* Contenu par onglet */}
-      <section className="max-w-6xl mx-auto px-4 py-10">
+      <section className="mx-auto max-w-6xl px-4 py-10">
         {activeTab === 0 && (
           <div className="prose max-w-none">
-            <p>
-              contenu d’accueil (placeholder). 
-            </p>
+            <p>Contenu d’accueil (placeholder).</p>
           </div>
         )}
 
@@ -227,37 +228,28 @@ export function Welcome() {
         {activeTab === 2 && (
           <div className="prose max-w-none">
             <h2>Publications et ressources</h2>
-            <p>lien vers word press.</p>
+            <p>lien vers WordPress.</p>
           </div>
         )}
         {activeTab === 3 && (
           <div className="prose max-w-none">
             <h2>Revue de presse</h2>
-            <p>lien vers word press.</p>
+            <p>lien vers WordPress.</p>
           </div>
         )}
         {activeTab === 4 && (
           <div className="prose max-w-none">
             <h2>Carte vidéoludiQC</h2>
-            <p>lien vers word press.</p>
+            <p>lien vers WordPress.</p>
           </div>
         )}
         {activeTab === 5 && (
           <div className="prose max-w-none">
             <h2>Pour participer</h2>
-            <p>lien vers word press.</p>
+            <p>lien vers WordPress.</p>
           </div>
         )}
       </section>
-
-      {/* Pied de page local (si pas déjà global) */}
-      {/*<section className="border-t">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600">
-          © Copyright {new Date().getFullYear()} LUDOV (Laboratoire
-          universitaire de documentation et d’observation vidéoludiques) – Tous
-          droits réservés
-        </div>
-      </section>*/}
     </main>
   );
 }
