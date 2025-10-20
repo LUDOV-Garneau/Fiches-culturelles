@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import { Sidenav } from "../components/sidenav";
+import { Sidenav } from "my-app/components/sidenav";
 import type { Route } from "./+types/root";
 import "./app.css";
 
