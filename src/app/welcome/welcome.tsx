@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 
 /** ========= Données (hardcodées pour le moment) ========= */
 const TABS = [
@@ -190,7 +191,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
               // centre plus grand
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
-
+              const [hovered, setHovered] = useState<string | null>(null);
               return (
                 <button
                   key={it.id}
@@ -204,6 +205,8 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     zIndex,
                   }}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
+                  //WIP!!!! - info resume quand on mouse hover
+                  onMouseEnter={() => {setHovered(it.id)}} onMouseLeave={() => setHovered(null)}
                 >
                   {it.image ? (
                     <img
@@ -212,6 +215,12 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                       className="w-full h-full object-cover"
                     />
                   ) : null}
+                  {hovered === it.id && (
+                    //WIP!!!! - info resume quand on mouse hover
+                    <div className="absolute inset-0 bg-black/70 text-white flex items-center justify-center">
+                      <p>Extra info about this image</p>
+                    </div>
+                  )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 text-center">
                     {it.title}
