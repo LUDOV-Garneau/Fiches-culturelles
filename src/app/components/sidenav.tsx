@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../app/app.css";
+import "../app.css";
 
 export function Sidenav(){
     const [hovered, setHovered] = useState<string | null>(null);
