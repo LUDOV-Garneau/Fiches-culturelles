@@ -145,7 +145,7 @@ function AccordionSection({
   );
 }
 
-/** Carousel style coverflow */
+/** Carousel style coverflow  a changer pour un zoom in*/
 function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
   const [active, setActive] = React.useState(0);
   const len = items.length;
@@ -153,14 +153,15 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
 
- 
+  
   React.useEffect(() => {
     const id = setInterval(next, 3500);
     return () => clearInterval(id);
   }, [len]);
 
   // Dimensions (~+20%)
-  const CARD_W = 216;     
+  //
+  const CARD_W = 218;     
   const CARD_H = 288;     
   const TRACK_H = 320;   
   const GAP_X   = 200;    
