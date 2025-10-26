@@ -63,6 +63,7 @@ const JeuSchema = new mongoose.Schema(
     typeMedia: { type: String, default: null },
     urls: { type: [String], default: undefined },
     pages: { type: Number, default: null },
+    imageUrl: { type: String, default: null },
 
     resume: { type: ResumeSchema, required: true },
     caracteristiques: { type: [String], default: undefined },

@@ -10,7 +10,7 @@ router.get("/import/quebec", importerJeuxQuebec);
 router.get("/", getJeux);
 
 // Obtenir un jeu précis
-router.get("/:titre", getJeu);
+router.get("/:id", getJeu);
 
 // Supprimer un jeu précis
 router.delete("/:id", deleteJeu);
