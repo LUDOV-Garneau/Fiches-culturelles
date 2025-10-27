@@ -1,5 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
+//WIP!!! - Hover card des detailles
+import { createPortal } from "react-dom";
+//Fin WIP
 
 /** ========= Données (hardcodées pour le moment) ========= */
 const TABS = [
@@ -191,7 +194,9 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
               // centre plus grand
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
+              //WIP!!! - Hover card des detailles
               const [hovered, setHovered] = useState<string | null>(null);
+              //Fin WIP
               return (
                 <button
                   key={it.id}
@@ -205,8 +210,9 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     zIndex,
                   }}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
-                  //WIP!!!! - info resume quand on mouse hover
+                  //WIP!!! - Hover card des detailles
                   onMouseEnter={() => {setHovered(it.id)}} onMouseLeave={() => setHovered(null)}
+                  //Fin WIP
                 >
                   {it.image ? (
                     <img
@@ -215,12 +221,26 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                       className="w-full h-full object-cover"
                     />
                   ) : null}
-                  {hovered === it.id && (
-                    //WIP!!!! - info resume quand on mouse hover
-                    <div className="absolute inset-0 bg-black/70 text-white flex items-center justify-center">
-                      <p>Extra info about this image</p>
-                    </div>
-                  )}
+                  {hovered === it.id &&
+                  //WIP!!! - Hover card des detailles
+                    createPortal(
+                      <div
+                        className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                        style={{
+                          top: '50%',         
+                          left: 'calc(50% + 200px)',  
+                          transform: 'translateY(-50%)',
+                          minWidth: '180px',
+                        }}
+                      >
+                        <p className="font-bold">{it.title}</p>
+                        <p>Extra info about this image</p>
+                      </div>,
+                      document.body
+                    )
+                    //Fin WIP
+                  }
+                  
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 text-center">
                     {it.title}
