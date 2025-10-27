@@ -144,17 +144,16 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
   const next = () => setActive((i) => (i + 1) % len);
   //WIP!!! - Hover card des detailles
   const [hovered, setHovered] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
   //Fin WIP
 
   
-React.useEffect(() => {
-  const id = setInterval(() => {
-    next();
-    setHovered(null); // close popup when carousel moves
-  }, 3500);
-  return () => clearInterval(id);
-}, [len]);
-const popupItem = items.find((item) => item.id === hovered) || items[active];
+  React.useEffect(() => {
+    if (isHovered) return; // pause the carousel while hovered
+    const id = setInterval(next, 3500);
+    return () => clearInterval(id);
+  }, [isHovered, len]);
+  const popupItem = items.find((item) => item.id === hovered) || items[active];
 
   // Dimensions (~+20%)
   //
@@ -168,7 +167,9 @@ const popupItem = items.find((item) => item.id === hovered) || items[active];
       
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
        
-        <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}>
+        <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
           <div className="absolute inset-0 flex items-center justify-center">
             {items.map((it, i) => {
               const offset = i - active;
