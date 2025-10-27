@@ -142,12 +142,19 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
+  //WIP!!! - Hover card des detailles
+  const [hovered, setHovered] = useState<string | null>(null);
+  //Fin WIP
 
   
-  React.useEffect(() => {
-    const id = setInterval(next, 3500);
-    return () => clearInterval(id);
-  }, [len]);
+React.useEffect(() => {
+  const id = setInterval(() => {
+    next();
+    setHovered(null); // close popup when carousel moves
+  }, 3500);
+  return () => clearInterval(id);
+}, [len]);
+const popupItem = items.find((item) => item.id === hovered) || items[active];
 
   // Dimensions (~+20%)
   //
@@ -181,9 +188,6 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
               // centre plus grand
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
-              //WIP!!! - Hover card des detailles
-              const [hovered, setHovered] = useState<string | null>(null);
-              //Fin WIP
               return (
                 <button
                   key={it.id}
@@ -220,8 +224,8 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                           minWidth: '180px',
                         }}
                       >
-                        <p className="font-bold">{it.title}</p>
-                        <p>Extra info about this image</p>
+                        <p>{popupItem.title}</p>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium quasi deserunt, aspernatur corporis libero dolore quod quidem voluptas et delectus fugit est placeat corrupti illo ex ipsa consectetur! Quasi, repellendus?</p>
                       </div>,
                       document.body
                     )
