@@ -1,5 +1,11 @@
+import * as React from "react";
 import { useState, useEffect } from "react";
 import { GameCard } from "~/components/gameCard";
+//WIP!!! - Hover card des detailles
+import { createPortal } from "react-dom";
+//Fin WIP
+
+/** ========= Données (hardcodées pour le moment) ========= */
 
 const TABS = [
   "Accueil",
@@ -11,11 +17,7 @@ const TABS = [
 ] as const;
 
 type GameItem = { id: string; title: string; image?: string; href?: string };
-
-type DecadeSection = {
-  decade: string;
-  items: GameItem[];
-};
+type DecadeSection = { decade: string; items: GameItem[] };
 
 const SECTIONS: DecadeSection[] = [
   {
@@ -47,9 +49,234 @@ const SECTIONS: DecadeSection[] = [
   },
 ];
 
+/** ========= Carousel (coverflow) ========= */
+type CarouselItem = { id: string; title: string; year?: number; image?: string; href?: string };
+
+const CAROUSEL_ITEMS: CarouselItem[] = [
+  { id: "c1", title: "Têtards", year: 1982 },
+  { id: "c2", title: "Mimi la fourmi", year: 1984 },
+  { id: "c3", title: "Le fou du roi", year: 1989 },
+  { id: "c4", title: "Titre 1990", year: 1990 },
+  { id: "c5", title: "Titre 1994", year: 1994 },
+  { id: "c6", title: "Titre 1998", year: 1998 },
+];
+
+/** ========= Composants ========= */
+
+function Tabs({
+  active,
+  onChange,
+}: {
+  active: number;
+  onChange: (index: number) => void;
+}) {
+  return (
+    <nav className="flex flex-wrap gap-2 justify-center">
+      {TABS.map((label, i) => {
+        const isActive = i === active;
+        return (
+          <button
+            key={label}
+            onClick={() => onChange(i)}
+            className={[
+              "px-5 py-2 rounded-md border transition",
+              isActive
+                ? "bg-[--color-primary-blue] border-[--color-primary-blue] text-white"
+                : "bg-white border-gray-300 text-gray-700 hover:bg-[--color-primary-blue-10]",
+            ].join(" ")}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+
+function AccordionSection({
+  section,
+  open,
+  onToggle,
+}: {
+  section: DecadeSection;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="border rounded-md overflow-hidden bg-white">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 border-b"
+      >
+        <span
+          className={[
+            "inline-flex h-5 w-5 items-center justify-center rounded-sm border",
+            open
+              ? "bg-gray-700 text-white border-gray-700"
+              : "bg-white text-gray-700 border-gray-400",
+          ].join(" ")}
+        >
+          {open ? "−" : "+"}
+        </span>
+        <span className="font-semibold text-gray-800">{section.decade}</span>
+      </button>
+
+      {open && (
+        <div className="p-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {section.items.map((g) => (
+              <GameCard key={g.id} item={g} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Carousel style coverflow  a changer pour un zoom in*/
+function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
+  const [active, setActive] = React.useState(0);
+  const len = items.length;
+
+  const prev = () => setActive((i) => (i - 1 + len) % len);
+  const next = () => setActive((i) => (i + 1) % len);
+
+  
+  React.useEffect(() => {
+    const id = setInterval(next, 3500);
+    return () => clearInterval(id);
+  }, [len]);
+
+  // Dimensions (~+20%)
+  //
+  const CARD_W = 218;     
+  const CARD_H = 288;     
+  const TRACK_H = 320;   
+  const GAP_X   = 200;    
+
+  return (
+    <div className="relative py-8">
+      
+      <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
+       
+        <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}>
+          <div className="absolute inset-0 flex items-center justify-center">
+            {items.map((it, i) => {
+              const offset = i - active;
+
+              // wrap pour boucle
+              const wrapped =
+                Math.abs(offset) > len / 2
+                  ? offset > 0
+                    ? offset - len
+                    : offset + len
+                  : offset;
+
+           
+              const translateX = wrapped * GAP_X;
+              const rotateY = wrapped * -18;
+
+              // centre plus grand
+              const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
+              const zIndex = 100 - Math.abs(wrapped);
+              //WIP!!! - Hover card des detailles
+              const [hovered, setHovered] = useState<string | null>(null);
+              //Fin WIP
+              return (
+                <button
+                  key={it.id}
+                  onClick={() => setActive(i)}
+                  className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden focus:outline-none bg-gray-200"
+                  style={{
+                    width: CARD_W,
+                    height: CARD_H,
+                    transform: `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`,
+                    transformStyle: "preserve-3d",
+                    zIndex,
+                  }}
+                  aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
+                  //WIP!!! - Hover card des detailles
+                  onMouseEnter={() => {setHovered(it.id)}} onMouseLeave={() => setHovered(null)}
+                  //Fin WIP
+                >
+                  {it.image ? (
+                    <img
+                      src={it.image}
+                      alt={it.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : null}
+                  {hovered === it.id &&
+                  //WIP!!! - Hover card des detailles
+                    createPortal(
+                      <div
+                        className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                        style={{
+                          top: '50%',         
+                          left: 'calc(50% + 200px)',  
+                          transform: 'translateY(-50%)',
+                          minWidth: '180px',
+                        }}
+                      >
+                        <p className="font-bold">{it.title}</p>
+                        <p>Extra info about this image</p>
+                      </div>,
+                      document.body
+                    )
+                    //Fin WIP
+                  }
+                  
+
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 text-center">
+                    {it.title}
+                    {it.year ? ` • ${it.year}` : ""}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Contrôles */}
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <button
+          onClick={prev}
+          className="px-3 py-2 rounded border bg-white hover:bg-[--color-primary-blue-10] border-gray-300"
+        >
+          ◀
+        </button>
+        <div className="flex gap-1">
+          {items.map((_, i) => (
+            <span
+              key={i}
+              className={[
+                "inline-block w-2 h-2 rounded-full",
+                i === active ? "bg-[--color-primary-blue]" : "bg-gray-300",
+              ].join(" ")}
+            />
+          ))}
+        </div>
+        <button
+          onClick={next}
+          className="px-3 py-2 rounded border bg-white hover:bg-[--color-primary-blue-10] border-gray-300"
+        >
+          ▶
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** ========= Page Welcome (jeu vidéo) ========= */
 export function Welcome() {
-  const [activeTab, setActiveTab] = useState<number>(1);
-  const [openByDecade, setOpenByDecade] = useState<Record<string, boolean>>(
+  // Onglet “Sélection de jeux” actif par défaut
+  const [activeTab, setActiveTab] = React.useState<number>(1);
+
+  // Accordéon : première section ouverte par défaut
+  const [openByDecade, setOpenByDecade] = React.useState<Record<string, boolean>>(
     () =>
       SECTIONS.reduce<Record<string, boolean>>((acc, s, idx) => {
         acc[s.decade] = idx === 0;
@@ -86,9 +313,10 @@ export function Welcome() {
 
   return (
     <main className="min-h-[70vh]">
-      <section className="border-y bg-gray-100">
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <h1 className="text-3xl font-semibold text-gray-800 md:text-4xl">
+      {/* Bandeau + onglets */}
+      <section className="bg-gray-100 border-y">
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <h1 className="text-3xl md:text-4xl font-semibold text-gray-800">
             Le jeu vidéo au Québec
           </h1>
           <div className="mt-6">
@@ -105,7 +333,7 @@ export function Welcome() {
         )}
 
         {activeTab === 1 && (
-          <div className="space-y-6">
+          <div className="space-y-12">{/* <-- plus d'espace entre blocs */}
             <header className="space-y-2">
               <h2 className="text-2xl font-semibold text-gray-900">
                 50 jeux vidéo québécois
@@ -131,6 +359,10 @@ export function Welcome() {
               </p>
             </header>
 
+            {/* ==== CAROUSEL COVERFLOW  ==== */}
+            <CoverflowCarousel items={CAROUSEL_ITEMS} />
+
+            {/* ==== SECTIONS PAR DÉCENNIES ==== */}
             <div className="space-y-4">
               {SECTIONS.map((s) => (
                 <AccordionSection
@@ -208,77 +440,6 @@ export function Welcome() {
         )}
       </section>
     </main>
-  );
-}
-
-function Tabs({
-  active,
-  onChange,
-}: {
-  active: number;
-  onChange: (index: number) => void;
-}) {
-  return (
-    <nav className="flex flex-wrap justify-center gap-2">
-      {TABS.map((label, i) => {
-        const isActive = i === active;
-        return (
-          <button
-            key={label}
-            onClick={() => onChange(i)}
-            className={[
-              "px-5 py-2 rounded-md border transition",
-              isActive
-                ? "bg-primary-blue border-primary-blue text-white"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-primary-blue-10",
-            ].join(" ")}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
-
-function AccordionSection({
-  section,
-  open,
-  onToggle,
-}: {
-  section: DecadeSection;
-  open: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <div className="overflow-hidden rounded-md border bg-white">
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center gap-3 border-b bg-gray-50 px-4 py-3 text-left hover:bg-gray-100"
-      >
-        <span
-          className={[
-            "inline-flex h-5 w-5 items-center justify-center rounded-sm border",
-            open
-              ? "border-gray-700 bg-gray-700 text-white"
-              : "border-gray-400 bg-white text-gray-700",
-          ].join(" ")}
-        >
-          {open ? "−" : "+"}
-        </span>
-        <span className="font-semibold text-gray-800">{section.decade}</span>
-      </button>
-
-      {open && (
-        <div className="p-4">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {section.items.map((g) => (
-              <GameCard key={g.id} item={g} />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 
