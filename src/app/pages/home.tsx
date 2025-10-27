@@ -223,6 +223,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                           left: 'calc(50% + 200px)',  
                           transform: 'translateY(-50%)',
                           minWidth: '180px',
+                          maxWidth:'400px',
                         }}
                       >
                         <p>{popupItem.title}</p>
