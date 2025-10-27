@@ -1,10 +1,10 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { Welcome } from "../pages/home";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Le jeu vidéo au québec - LUDOV" },
+    { name: "description", content: "Fiches d'informations sur une liste de jeux québécois" },
   ];
 }
 
