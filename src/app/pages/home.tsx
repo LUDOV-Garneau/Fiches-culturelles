@@ -1,7 +1,8 @@
 import * as React from "react";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { GameCard } from "~/components/gameCard";
 /** ========= Données (hardcodées pour le moment) ========= */
+
 const TABS = [
   "Accueil",
   "Sélection de jeux",
@@ -18,25 +19,28 @@ const SECTIONS: DecadeSection[] = [
   {
     decade: "1980-1989",
     items: [
-      { id: "g1", title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)" },
-      { id: "g2", title: "Mimi: Les aventures de Mimi la fourmi (1984)" },
-      { id: "g3", title: "Le fou du roi (Loto-Québec, 1989)" },
+      {
+        id: "tetards",
+        title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)",
+      },
+      { id: "mimi", title: "Mimi: Les aventures de Mimi la fourmi (1984)" },
+      { id: "fou-du-roi", title: "Le fou du roi (Loto-Québec, 1989)" },
     ],
   },
   {
     decade: "1990-1999",
     items: [
-      { id: "g4", title: "Jeu 1990 – Lorem" },
-      { id: "g5", title: "Jeu 1994 – Ipsum" },
-      { id: "g6", title: "Jeu 1998 – Dolor" },
+      { id: "game-1990", title: "Jeu 1990 – Lorem" },
+      { id: "game-1994", title: "Jeu 1994 – Ipsum" },
+      { id: "game-1998", title: "Jeu 1998 – Dolor" },
     ],
   },
   {
     decade: "2000-2009",
     items: [
-      { id: "g7", title: "Jeu 2001 – Sit amet" },
-      { id: "g8", title: "Jeu 2005 – Consectetur" },
-      { id: "g9", title: "Jeu 2009 – Adipiscing" },
+      { id: "fez", title: "FEZ (placeholder)" },
+      { id: "game-2005", title: "Jeu 2005 – Consectetur" },
+      { id: "game-2009", title: "Jeu 2009 – Adipiscing" },
     ],
   },
 ];
@@ -85,25 +89,6 @@ function Tabs({
   );
 }
 
-function GameCard({ item }: { item: GameItem }) {
-  return (
-    <article className="flex flex-col items-center">
-      {/* Placeholder image (remplacera par item.image plus tard) */}
-      <a
-        href={item.href || "#"}
-        className="block w-[220px] h-[160px] bg-gray-200 rounded shadow-sm hover:shadow md:w-[260px] md:h-[180px]"
-        aria-label={item.title}
-      >
-        {item.image ? (
-          <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded" />
-        ) : null}
-      </a>
-      <div className="mt-3 bg-white border rounded p-3 text-sm text-gray-800 max-w-[260px] text-center">
-        {item.title}
-      </div>
-    </article>
-  );
-}
 
 function AccordionSection({
   section,
@@ -278,6 +263,30 @@ export function Welcome() {
       }, {})
   );
 
+  const [jeux, setJeux] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function chargerJeux() {
+      try {
+        const response = await fetch("http://72.11.148.122/api/jeux");
+        // const response = await fetch("http://localhost:3000/jeux");
+        const data = await response.json();
+        if (data.success) {
+          setJeux(data.data);
+        } else {
+          setError("Impossible de charger les jeux depuis la base de données.");
+        }
+      } catch(error) {
+        setError("Erreur de connexion avec le serveur. ");
+      } finally {
+        setLoading(false);
+      }
+    }
+    chargerJeux();
+  }, []);
+
   const toggleDecade = (key: string) =>
     setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -289,15 +298,13 @@ export function Welcome() {
           <h1 className="text-3xl md:text-4xl font-semibold text-gray-800">
             Le jeu vidéo au Québec
           </h1>
-
           <div className="mt-6">
             <Tabs active={activeTab} onChange={setActiveTab} />
           </div>
         </div>
       </section>
 
-      {/* Contenu par onglet */}
-      <section className="max-w-6xl mx-auto px-4 py-10">
+      <section className="mx-auto max-w-6xl px-4 py-10">
         {activeTab === 0 && (
           <div className="prose max-w-none">
             <p>Contenu d’accueil (placeholder).</p>
@@ -344,6 +351,41 @@ export function Welcome() {
                   onToggle={() => toggleDecade(s.decade)}
                 />
               ))}
+              
+              <h2 className="pt-10 text-3xl font-semibold text-gray-900">Tout nos jeux</h2>
+
+              {loading && <p>Chargement des jeux...</p>}
+              {error && <p className="text-red-500">{error}</p>}
+              {!loading && !error && jeux.length === 0 && (
+                <p>Aucun jeu trouvé dans la base de données.</p>
+              )}
+
+              {!loading && !error && jeux.length > 0 && (
+                <div className="grid grid-cols-3 gap-4">
+                  {jeux.map((jeu) => (
+                    <div
+                      key={jeu._id}
+                      className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+                    >
+                      <img
+                        src={jeu.imageUrl || "https://placehold.co/600x400"}
+                        alt={jeu.titre}
+                        className="w-full h-40 object-cover rounded mb-2"
+                      />
+                      <h3 className="font-bold text-lg">{jeu.titre}</h3>
+                      <p className="text-gray-500 mb-1">
+                        Auteur :{" "}
+                        {jeu.developpeurs?.length
+                          ? jeu.developpeurs[0]
+                          : "Inconnu"}
+                      </p>
+                      <p className="text-gray-400 text-sm mb-2">
+                        {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -354,18 +396,21 @@ export function Welcome() {
             <p>lien vers WordPress.</p>
           </div>
         )}
+
         {activeTab === 3 && (
           <div className="prose max-w-none">
             <h2>Revue de presse</h2>
             <p>lien vers WordPress.</p>
           </div>
         )}
+
         {activeTab === 4 && (
           <div className="prose max-w-none">
             <h2>Carte vidéoludiQC</h2>
             <p>lien vers WordPress.</p>
           </div>
         )}
+
         {activeTab === 5 && (
           <div className="prose max-w-none">
             <h2>Pour participer</h2>

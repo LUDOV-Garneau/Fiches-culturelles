@@ -1,0 +1,1 @@
+import{p as t,w as e}from"./chunk-B7RQU5TL-C0eGi7nB.js";function n(){return t.jsxs("div",{children:[t.jsx("h1",{children:"About Page"}),t.jsx("p",{children:"This app uses React Router!"})]})}function a({}){return[{title:"New React Router App"},{name:"description",content:"Teste foda pra caralhho"}]}const o=e(function(){return t.jsx(n,{})});export{o as default,a as meta};
