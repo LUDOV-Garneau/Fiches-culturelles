@@ -3,7 +3,7 @@ import type { Route } from "./+types/games.$id";
 import { useParams, Link } from "react-router";
 
 
-import logo from "../welcome/logo-light.svg";
+
 
 type Game = {
   id: string;
@@ -145,7 +145,7 @@ export default function GameDetail() {
         <aside className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-950">
           <p className="text-sm font-semibold">Développeur:</p>
           <div className="mt-2 grid h-40 place-items-center rounded-lg border bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
-            <img src={logo} alt="Logo développeur" className="h-20" />
+            {/* <img src={logo} alt="Logo développeur" className="h-20" /> */}
           </div>
 
           <div className="mt-6">
