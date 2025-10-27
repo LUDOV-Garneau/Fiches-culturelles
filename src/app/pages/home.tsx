@@ -1,12 +1,11 @@
+
 import * as React from "react";
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
 import { GameCard } from "~/components/gameCard";
-//WIP!!! - Hover card des detailles
 import { createPortal } from "react-dom";
-//Fin WIP
 
 /** ========= Données (hardcodées pour le moment) ========= */
-
 const TABS = [
   "Accueil",
   "Sélection de jeux",
@@ -23,10 +22,7 @@ const SECTIONS: DecadeSection[] = [
   {
     decade: "1980-1989",
     items: [
-      {
-        id: "tetards",
-        title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)",
-      },
+      { id: "tetards", title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)" },
       { id: "mimi", title: "Mimi: Les aventures de Mimi la fourmi (1984)" },
       { id: "fou-du-roi", title: "Le fou du roi (Loto-Québec, 1989)" },
     ],
@@ -49,20 +45,23 @@ const SECTIONS: DecadeSection[] = [
   },
 ];
 
-/** ========= Carousel (coverflow) ========= */
-type CarouselItem = { id: string; title: string; year?: number; image?: string; href?: string };
+/** ========= Carousel (coverflow) branché vers /games/:id ========= */
+// IDs qui matchent la DB de routes/games.$id.tsx
+type CarouselItem = {
+  id: "tetards" | "mimi" | "fou-du-roi" | "fez";
+  title: string;
+  year?: number;
+  image?: string;
+};
 
 const CAROUSEL_ITEMS: CarouselItem[] = [
-  { id: "c1", title: "Têtards", year: 1982 },
-  { id: "c2", title: "Mimi la fourmi", year: 1984 },
-  { id: "c3", title: "Le fou du roi", year: 1989 },
-  { id: "c4", title: "Titre 1990", year: 1990 },
-  { id: "c5", title: "Titre 1994", year: 1994 },
-  { id: "c6", title: "Titre 1998", year: 1998 },
+  { id: "tetards",    title: "Têtards",        year: 1982, image: "https://placehold.co/640x360?text=Tetards" },
+  { id: "mimi",       title: "Mimi la fourmi", year: 1984, image: "https://placehold.co/640x360?text=Mimi" },
+  { id: "fou-du-roi", title: "Le fou du roi",  year: 1989, image: "https://placehold.co/640x360?text=Fou+du+Roi" },
+  { id: "fez",        title: "FEZ",            year: 2012, image: "https://placehold.co/640x360?text=FEZ" },
 ];
 
 /** ========= Composants ========= */
-
 function Tabs({
   active,
   onChange,
@@ -71,7 +70,7 @@ function Tabs({
   onChange: (index: number) => void;
 }) {
   return (
-    <nav className="flex flex-wrap gap-2 justify-center">
+    <nav className="flex flex-wrap justify-center gap-2">
       {TABS.map((label, i) => {
         const isActive = i === active;
         return (
@@ -93,7 +92,6 @@ function Tabs({
   );
 }
 
-
 function AccordionSection({
   section,
   open,
@@ -104,17 +102,17 @@ function AccordionSection({
   onToggle: () => void;
 }) {
   return (
-    <div className="border rounded-md overflow-hidden bg-white">
+    <div className="overflow-hidden rounded-md border bg-white">
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 border-b"
+        className="flex w-full items-center gap-3 border-b bg-gray-50 px-4 py-3 text-left hover:bg-gray-100"
       >
         <span
           className={[
             "inline-flex h-5 w-5 items-center justify-center rounded-sm border",
             open
-              ? "bg-gray-700 text-white border-gray-700"
-              : "bg-white text-gray-700 border-gray-400",
+              ? "border-gray-700 bg-gray-700 text-white"
+              : "border-gray-400 bg-white text-gray-700",
           ].join(" ")}
         >
           {open ? "−" : "+"}
@@ -135,38 +133,35 @@ function AccordionSection({
   );
 }
 
-/** Carousel style coverflow  a changer pour un zoom in*/
+/** Carousel style coverflow (corrigé + tooltip + liens) */
 function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
   const [active, setActive] = React.useState(0);
+  const [hovered, setHovered] = React.useState<string | null>(null); // <-- état déplacé ici
   const len = items.length;
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
 
-  
   React.useEffect(() => {
     const id = setInterval(next, 3500);
     return () => clearInterval(id);
   }, [len]);
 
   // Dimensions (~+20%)
-  //
-  const CARD_W = 218;     
-  const CARD_H = 288;     
-  const TRACK_H = 320;   
-  const GAP_X   = 200;    
+  const CARD_W = 218;
+  const CARD_H = 288;
+  const TRACK_H = 320;
+  const GAP_X   = 200;
 
   return (
     <div className="relative py-8">
-      
+      {/* container aligné au reste */}
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
-       
+        {/* piste 3D */}
         <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}>
           <div className="absolute inset-0 flex items-center justify-center">
             {items.map((it, i) => {
               const offset = i - active;
-
-              // wrap pour boucle
               const wrapped =
                 Math.abs(offset) > len / 2
                   ? offset > 0
@@ -174,20 +169,15 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     : offset + len
                   : offset;
 
-           
               const translateX = wrapped * GAP_X;
               const rotateY = wrapped * -18;
-
-              // centre plus grand
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
-              //WIP!!! - Hover card des detailles
-              const [hovered, setHovered] = useState<string | null>(null);
-              //Fin WIP
+
               return (
-                <button
+                <Link
                   key={it.id}
-                  onClick={() => setActive(i)}
+                  to={`/games/${it.id}`} // <-- ouvre la page détail /games/:id
                   className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden focus:outline-none bg-gray-200"
                   style={{
                     width: CARD_W,
@@ -196,44 +186,41 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     transformStyle: "preserve-3d",
                     zIndex,
                   }}
+                  onMouseEnter={() => setHovered(it.id)}
+                  onMouseLeave={() => setHovered(null)}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
-                  //WIP!!! - Hover card des detailles
-                  onMouseEnter={() => {setHovered(it.id)}} onMouseLeave={() => setHovered(null)}
-                  //Fin WIP
                 >
                   {it.image ? (
                     <img
                       src={it.image}
                       alt={it.title}
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                     />
                   ) : null}
+
+                  {/* Tooltip flottant */}
                   {hovered === it.id &&
-                  //WIP!!! - Hover card des detailles
                     createPortal(
                       <div
-                        className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                        className="fixed z-[9999] rounded-lg bg-black p-4 text-white shadow-lg"
                         style={{
-                          top: '50%',         
-                          left: 'calc(50% + 200px)',  
-                          transform: 'translateY(-50%)',
-                          minWidth: '180px',
+                          top: "50%",
+                          left: "calc(50% + 200px)",
+                          transform: "translateY(-50%)",
+                          minWidth: "180px",
                         }}
                       >
                         <p className="font-bold">{it.title}</p>
-                        <p>Extra info about this image</p>
+                        {it.year ? <p>{it.year}</p> : null}
                       </div>,
                       document.body
-                    )
-                    //Fin WIP
-                  }
-                  
+                    )}
 
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 text-center">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
                     {it.title}
                     {it.year ? ` • ${it.year}` : ""}
                   </div>
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -244,7 +231,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
       <div className="mt-6 flex items-center justify-center gap-4">
         <button
           onClick={prev}
-          className="px-3 py-2 rounded border bg-white hover:bg-[--color-primary-blue-10] border-gray-300"
+          className="rounded border border-gray-300 bg-white px-3 py-2 hover:bg-[--color-primary-blue-10]"
         >
           ◀
         </button>
@@ -253,7 +240,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
             <span
               key={i}
               className={[
-                "inline-block w-2 h-2 rounded-full",
+                "inline-block h-2 w-2 rounded-full",
                 i === active ? "bg-[--color-primary-blue]" : "bg-gray-300",
               ].join(" ")}
             />
@@ -261,7 +248,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
         </div>
         <button
           onClick={next}
-          className="px-3 py-2 rounded border bg-white hover:bg-[--color-primary-blue-10] border-gray-300"
+          className="rounded border border-gray-300 bg-white px-3 py-2 hover:bg-[--color-primary-blue-10]"
         >
           ▶
         </button>
@@ -292,14 +279,13 @@ export function Welcome() {
     async function chargerJeux() {
       try {
         const response = await fetch("http://72.11.148.122/api/jeux");
-        // const response = await fetch("http://localhost:3000/jeux");
         const data = await response.json();
         if (data.success) {
           setJeux(data.data);
         } else {
           setError("Impossible de charger les jeux depuis la base de données.");
         }
-      } catch(error) {
+      } catch (error) {
         setError("Erreur de connexion avec le serveur. ");
       } finally {
         setLoading(false);
@@ -314,9 +300,9 @@ export function Welcome() {
   return (
     <main className="min-h-[70vh]">
       {/* Bandeau + onglets */}
-      <section className="bg-gray-100 border-y">
-        <div className="max-w-6xl mx-auto px-4 py-10">
-          <h1 className="text-3xl md:text-4xl font-semibold text-gray-800">
+      <section className="border-y bg-gray-100">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <h1 className="text-3xl font-semibold text-gray-800 md:text-4xl">
             Le jeu vidéo au Québec
           </h1>
           <div className="mt-6">
@@ -333,7 +319,7 @@ export function Welcome() {
         )}
 
         {activeTab === 1 && (
-          <div className="space-y-12">{/* <-- plus d'espace entre blocs */}
+          <div className="space-y-12">
             <header className="space-y-2">
               <h2 className="text-2xl font-semibold text-gray-900">
                 50 jeux vidéo québécois
@@ -359,7 +345,7 @@ export function Welcome() {
               </p>
             </header>
 
-            {/* ==== CAROUSEL COVERFLOW  ==== */}
+            {/* ==== CAROUSEL COVERFLOW (cliquable) ==== */}
             <CoverflowCarousel items={CAROUSEL_ITEMS} />
 
             {/* ==== SECTIONS PAR DÉCENNIES ==== */}
@@ -372,8 +358,10 @@ export function Welcome() {
                   onToggle={() => toggleDecade(s.decade)}
                 />
               ))}
-              
-              <h2 className="pt-10 text-3xl font-semibold text-gray-900">Tout nos jeux</h2>
+
+              <h2 className="pt-10 text-3xl font-semibold text-gray-900">
+                Tous nos jeux
+              </h2>
 
               {loading && <p>Chargement des jeux...</p>}
               {error && <p className="text-red-500">{error}</p>}
@@ -382,25 +370,23 @@ export function Welcome() {
               )}
 
               {!loading && !error && jeux.length > 0 && (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                   {jeux.map((jeu) => (
                     <div
                       key={jeu._id}
-                      className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+                      className="rounded-lg border border-gray-300 bg-white p-4 shadow-sm transition hover:shadow-md"
                     >
                       <img
                         src={jeu.imageUrl || "https://placehold.co/600x400"}
                         alt={jeu.titre}
-                        className="w-full h-40 object-cover rounded mb-2"
+                        className="mb-2 h-40 w-full rounded object-cover"
                       />
-                      <h3 className="font-bold text-lg">{jeu.titre}</h3>
-                      <p className="text-gray-500 mb-1">
+                      <h3 className="text-lg font-bold">{jeu.titre}</h3>
+                      <p className="mb-1 text-gray-500">
                         Auteur :{" "}
-                        {jeu.developpeurs?.length
-                          ? jeu.developpeurs[0]
-                          : "Inconnu"}
+                        {jeu.developpeurs?.length ? jeu.developpeurs[0] : "Inconnu"}
                       </p>
-                      <p className="text-gray-400 text-sm mb-2">
+                      <p className="text-sm text-gray-400">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
                     </div>
