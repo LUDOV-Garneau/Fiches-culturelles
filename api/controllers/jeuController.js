@@ -1,14 +1,14 @@
 import axios from "axios";
 import Jeu from "../models/Jeu.js";
-import { mapperKohaVersJeu } from "../utils/kohaMappeur.js";
+import { mapperKohaVersJeu, obtenirImage } from "../utils/kohaMappeur.js";
 
 /**
  * Importer les jeux liés au Québec depuis Koha et les sauvegarder en MongoDB
  */
 async function importerJeuxQuebec(req, res) {
- try {
+  try {
     const token = Buffer.from(
-      `${process.env.KOHA_USERNAME}:${process.env.KOHA_PASSWORD}`
+      `${process.env.KOHA_USERNAME}:${process.env.KOHA_PASSWORD}`,
     ).toString("base64");
 
     const maxId = 10000;
@@ -17,20 +17,19 @@ async function importerJeuxQuebec(req, res) {
 
     for (let id = 1; id <= maxId; id++) {
       try {
-        const { data } = await axios.get(
-          `${process.env.KOHA_API_URL}/${id}`,
-          {
-            headers: {
-              Authorization: `Basic ${token}`,
-              Accept: "application/json",
-            },
-          }
-        );
+        const { data } = await axios.get(`${process.env.KOHA_API_URL}/${id}`, {
+          headers: {
+            Authorization: `Basic ${token}`,
+            Accept: "application/json",
+          },
+        });
 
         if (data) {
           const mapped = mapperKohaVersJeu(data);
 
           if (mapped.estLieAuQuebec) {
+            let img_url = await obtenirImage(mapped.titre);
+            mapped.img_url = img_url;
             batchOps.push({
               updateOne: {
                 filter: {
@@ -42,6 +41,7 @@ async function importerJeuxQuebec(req, res) {
               },
             });
 
+            console.log(`img ${id} : ${mapped.img_url}`);
             console.log(`Québec ID ${id} : ${mapped.titre}`);
           }
         }
@@ -80,13 +80,14 @@ async function importerJeuxQuebec(req, res) {
   }
 }
 
-
 /**
  * Lister les jeux québécois déjà stockés en MongoDB
  */
 async function getJeux(req, res) {
   try {
-    const jeux = await Jeu.find({ estLieAuQuebec: true }).sort({ anneeSortie: -1 });
+    const jeux = await Jeu.find({ estLieAuQuebec: true }).sort({
+      anneeSortie: -1,
+    });
     res.json({ success: true, count: jeux.length, data: jeux });
   } catch (err) {
     console.error("Erreur listerJeuxQuebec:", err.message);
@@ -204,4 +205,4 @@ async function updateJeu(req, res) {
   }
 }
 
-export  { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };
+export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };
