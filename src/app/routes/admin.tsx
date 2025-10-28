@@ -59,7 +59,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 w-200 mx-auto">
+    <div className="min-h-screen flex flex-col bg-gray-50 max-w-7xl mx-auto px-6">
       {/* HEADER */}
       <div className="p-3 bg-gray-800 text-white flex justify-between items-center">
         <h1 className="text-2xl font-bold">Page Admin</h1>
@@ -105,96 +105,122 @@ export default function Admin() {
             <>
               {modeAffichage === "card" ? (
                 // MODE "CARTE"
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   {jeux.map((jeu) => (
                     <div
                       key={jeu._id}
-                      className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+                      className="group border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                     >
-                      <img
-                        src={jeu.imageUrl || "https://placehold.co/600x400"}
-                        alt={jeu.titre}
-                        className="w-full h-40 object-cover rounded mb-2"
-                      />
-                      <h3 className="font-bold text-lg">{jeu.titre}</h3>
-                      <p className="text-gray-500 mb-1">
-                        Auteur :{" "}
-                        {jeu.developpeurs?.length
-                          ? jeu.developpeurs[0]
-                          : "Inconnu"}
-                      </p>
-                      <p className="text-gray-400 text-sm mb-2">
-                        {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
-                      </p>
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={jeu.imageUrl || "https://placehold.co/600x400"}
+                          alt={jeu.titre}
+                          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
 
-                      <button
-                        className="mt-1 px-3 py-1 bg-gray-800 text-white rounded hover:bg-blue-600"
-                        onClick={() => navigate(`/admin/jeux/edit/${jeu._id}`)}
-                      >
-                        Modifier
-                      </button>
-
-                      <button
-                        className="px-3 ml-1 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 transition"
-                        onClick={() => supprimerJeu(jeu._id, jeu.titre)}
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                //  MODE "TABLEAU"
-                <table className="w-full border-collapse">
-                  <thead className="bg-gray-100 text-left">
-                    <tr>
-                      <th className="border-b p-2">Titre</th>
-                      <th className="border-b p-2">Auteur</th>
-                      <th className="border-b p-2">Année</th>
-                      <th className="border-b p-2 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {jeux.map((jeu, index) => (
-                      <tr
-                        key={jeu._id || index}
-                        className="group transition-all hover:bg-gray-100 hover:shadow-sm border-b border-gray-200"
-                      >
-                        <td className="p-3 font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">
+                      <div className="p-5">
+                        <h3 className="font-bold text-xl mb-2 text-gray-800 line-clamp-1">
                           {jeu.titre}
-                        </td>
+                        </h3>
 
-                        <td className="p-3 text-gray-600">
-                          {jeu.developpeurs?.length
-                            ? jeu.developpeurs[0]
-                            : "Inconnu"}
-                        </td>
+                        <div className="space-y-1 mb-4">
+                          <p className="text-gray-500 text-sm flex items-center gap-2">
+                            <span className="font-medium">Auteur :</span>
+                            <span className="text-gray-600">
+                              {jeu.developpeurs?.length ? jeu.developpeurs[0] : "Inconnu"}
+                            </span>
+                          </p>
+                          {jeu.anneeSortie && (
+                            <p className="text-gray-400 text-sm flex items-center gap-2">
+                              <span className="font-medium">Année :</span>
+                              <span>{jeu.anneeSortie}</span>
+                            </p>
+                          )}
+                        </div>
 
-                        <td className="p-3 text-gray-600">
-                          {jeu.anneeSortie || "—"}
-                        </td>
-
-                        <td className="p-3 text-right space-x-2">
+                        <div className="flex gap-3 pt-3 border-t border-gray-100">
                           <button
-                            className="px-3 py-1 text-sm rounded bg-gray-800 text-white hover:bg-blue-600 transition"
-                            onClick={() =>
-                              navigate(`/admin/jeux/edit/${jeu._id}`)
-                            }
+                            className="flex-1 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors duration-200 text-sm font-semibold shadow-sm hover:shadow-md"
+                            onClick={() => navigate(`/admin/jeux/edit/${jeu._id}`)}
                           >
                             Modifier
                           </button>
 
                           <button
-                            className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 transition"
+                            className="flex-1 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm font-semibold shadow-sm hover:shadow-md"
                             onClick={() => supprimerJeu(jeu._id, jeu.titre)}
                           >
                             Supprimer
                           </button>
-                        </td>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                //  MODE "TABLEAU"
+                <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="p-4 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200">
+                          Titre
+                        </th>
+                        <th className="p-4 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200">
+                          Auteur
+                        </th>
+                        <th className="p-4 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200">
+                          Année
+                        </th>
+                        <th className="p-4 text-right text-sm font-semibold text-gray-700 border-b-2 border-gray-200">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {jeux.map((jeu, index) => (
+                        <tr
+                          key={jeu._id || index}
+                          className="group transition-all duration-200 hover:bg-gray-50"
+                        >
+                          <td className="p-4 font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
+                            {jeu.titre}
+                          </td>
+
+                          <td className="p-4 text-gray-600 text-sm">
+                            {jeu.developpeurs?.length
+                              ? jeu.developpeurs[0]
+                              : "Inconnu"}
+                          </td>
+
+                          <td className="p-4 text-gray-600 text-sm">
+                            {jeu.anneeSortie || "—"}
+                          </td>
+
+                          <td className="p-4">
+                            <div className="flex justify-end items-center gap-2">
+                              <button
+                                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-all duration-200 text-sm font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                                onClick={() => navigate(`/admin/jeux/edit/${jeu._id}`)}
+                              >
+                                Modifier
+                              </button>
+
+                              <button
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 text-sm font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                                onClick={() => supprimerJeu(jeu._id, jeu.titre)}
+                              >
+                                Supprimer
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </>
           )}
