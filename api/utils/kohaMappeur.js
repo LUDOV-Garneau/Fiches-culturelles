@@ -4,8 +4,8 @@ import axios from "axios";
 async function obtenirImage(nomJeu) {
   try {
     //setup de l'api igdb
-    const client_id = "s24gvi7bbmaouxtk48xr489eqdo91a";
-    const client_secret = "6a8p8ini9u76x9p4oqgg1foao161br";
+    const client_id = process.env.TWITCH_CLIENT_ID;
+    const client_secret = process.env.TWITCH_CLIENT_SECRET;
     const TWITCH_API_URL = `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`;
 
     const twitchResponse = await axios.post(TWITCH_API_URL);
