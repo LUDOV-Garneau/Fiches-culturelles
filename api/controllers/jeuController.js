@@ -29,7 +29,7 @@ async function importerJeuxQuebec(req, res) {
 
           if (mapped.estLieAuQuebec) {
             let img_url = await obtenirImage(mapped.titre);
-            mapped.img_url = img_url;
+            mapped.imageUrl = img_url;
             batchOps.push({
               updateOne: {
                 filter: {
@@ -41,7 +41,7 @@ async function importerJeuxQuebec(req, res) {
               },
             });
 
-            console.log(`img ${id} : ${mapped.img_url}`);
+            console.log(`img ${id} : ${mapped.imageUrl}`);
             console.log(`Québec ID ${id} : ${mapped.titre}`);
           }
         }
