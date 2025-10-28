@@ -1,20 +1,22 @@
 import { franc } from "franc-min";
+import axios from "axios";
 
 async function obtenirImage(nomJeu) {
   try {
     //setup de l'api igdb
     const client_id = "s24gvi7bbmaouxtk48xr489eqdo91a";
     const client_secret = "6a8p8ini9u76x9p4oqgg1foao161br";
-    const TWITCH_API_URL = `https://id.twitch.tv/oauth2/token?client_id=${client_id}client_secret=${client_secret}grant_type=client_credentials`;
+    const TWITCH_API_URL = `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`;
 
-    const { twitchResponse } = await axios.post(TWITCH_API_URL);
+    const twitchResponse = await axios.post(TWITCH_API_URL);
 
-    const twitchToken = twitchResponse.access_token;
+    const twitchToken = twitchResponse.data.access_token;
 
-    // fetch l'image
-    const { igdbResponse } = await axios.post(
+    const igdbResponse = await axios.post(
       "https://api.igdb.com/v4/games",
-      `fields name, cover; where name ~ *"${nomJeu}"*; limit 1;`,
+      `search "${nomJeu}";
+       fields name, cover.url;
+       limit 1;`,
       {
         headers: {
           "Client-ID": client_id,
@@ -24,10 +26,12 @@ async function obtenirImage(nomJeu) {
       },
     );
 
-    const igdbData = igdbResponse.data;
-    console.log("imgSRC = " + igdbData);
-  } catch {
-    console.log("Erreur sur le fetch de l'image");
+    return igdbResponse.data[0].cover.url
+      .slice(2)
+      .replace("t_thumb", "t_1080p");
+  } catch (err) {
+    console.error("Erreur IGDB:", err.response?.data || err.message);
+    return null;
   }
 }
 
