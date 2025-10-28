@@ -6,6 +6,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+
+import { Sidenav } from "~/components/sidenav";
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -56,15 +58,7 @@ export default function App() {
             Login
           </a>
         </nav>
-
-        <div className="sidenav">
-            <img className="img_logo" src="/LUDOV_web_logo_final.png"></img>
-            <a href="#">L</a>
-            <a href="#">U</a>
-            <a href="#">D</a>
-            <a href="#">O</a>
-            <a href="#">V</a>
-        </div>
+        <Sidenav/>
       </header>
 
       <main className="p-6">

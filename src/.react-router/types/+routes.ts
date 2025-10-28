@@ -13,9 +13,6 @@ type Pages = {
   "/": {
     params: {};
   };
-  "/casa": {
-    params: {};
-  };
   "/admin": {
     params: {};
   };
@@ -27,20 +24,21 @@ type Pages = {
       "id": string;
     };
   };
+  "/games/:id": {
+    params: {
+      "id": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/casa" | "/admin" | "/login" | "/admin/jeux/edit/:id";
+    page: "/" | "/admin" | "/login" | "/admin/jeux/edit/:id" | "/games/:id";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
-  };
-  "routes/casa.tsx": {
-    id: "routes/casa";
-    page: "/casa";
   };
   "routes/admin.tsx": {
     id: "routes/admin";
@@ -53,5 +51,9 @@ type RouteFiles = {
   "routes/admin.jeux.edit.$id.tsx": {
     id: "routes/admin.jeux.edit.$id";
     page: "/admin/jeux/edit/:id";
+  };
+  "routes/games.$id.tsx": {
+    id: "routes/games.$id";
+    page: "/games/:id";
   };
 };

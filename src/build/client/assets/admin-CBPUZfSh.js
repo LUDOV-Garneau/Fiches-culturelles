@@ -1,0 +1,1 @@
+import{w as n,x as s,p as t}from"./chunk-B7RQU5TL-C0eGi7nB.js";const o=n(function(){const e=s();return t.jsxs("div",{className:"p-8 text-center",children:[t.jsx("h1",{className:"text-3xl font-bold mb-4",children:"Page Admin"}),t.jsx("button",{onClick:()=>e("/"),className:"btn-primary",children:"Retour"})]})});export{o as default};
