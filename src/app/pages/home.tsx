@@ -1,9 +1,8 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { GameCard } from "~/components/gameCard";
-//WIP!!! - Hover card des detailles
 import { createPortal } from "react-dom";
-//Fin WIP
+
 
 /** ========= Données (hardcodées pour le moment) ========= */
 
@@ -142,10 +141,9 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
-  //WIP!!! - Hover card des detailles
+  /*Carte des details quand on hover*/
   const [hovered, setHovered] = useState<string | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
-  //Fin WIP
 
   
   React.useEffect(() => {
@@ -168,6 +166,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
        
         <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}
+        /*Carte des details quand on hover*/
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -202,9 +201,8 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     zIndex,
                   }}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
-                  //WIP!!! - Hover card des detailles
+                  /*Carte des details quand on hover*/
                   onMouseEnter={() => {setHovered(it.id)}} onMouseLeave={() => setHovered(null)}
-                  //Fin WIP
                 >
                   {it.image ? (
                     <img
@@ -213,8 +211,8 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                       className="w-full h-full object-cover"
                     />
                   ) : null}
+                  {/*Carte des details quand on hover*/}
                   {hovered === it.id &&
-                  //WIP!!! - Hover card des detailles
                     createPortal(
                       <div
                         className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
@@ -231,7 +229,6 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                       </div>,
                       document.body
                     )
-                    //Fin WIP
                   }
                   
 
@@ -316,6 +313,10 @@ export function Welcome() {
 
   const toggleDecade = (key: string) =>
     setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
+    /*Carte des details quand on hover*/
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   return (
     <main className="min-h-[70vh]">
@@ -388,10 +389,23 @@ export function Welcome() {
               )}
 
               {!loading && !error && jeux.length > 0 && (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-4"
+                /*Carte des details quand on hover*/
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
                   {jeux.map((jeu) => (
                     <div
                       key={jeu._id}
+                      /*Carte des details quand on hover*/
+                      onMouseEnter={(e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  setHovered(jeu._id);
+  setPopupPos({
+    top: rect.top + rect.height / 2, // middle of the card vertically
+    left: rect.right + 10,           // 10px to the right of the card
+  });
+}}
+onMouseLeave={() => setHovered(null)}
                       className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
                     >
                       <img
@@ -409,6 +423,25 @@ export function Welcome() {
                       <p className="text-gray-400 text-sm mb-2">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
+                      {/*Carte des details quand on hover*/}
+                  {hovered === jeu._id &&
+                    createPortal(
+                      <div
+                        className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                        style={{
+                          top: popupPos.top,
+                          left: popupPos.left,
+                          transform: 'translateY(-50%)',
+                          minWidth: '180px',
+                          maxWidth:'400px',
+                        }}
+                      >
+                        <p>{jeu.titre}</p>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium quasi deserunt, aspernatur corporis libero dolore quod quidem voluptas et delectus fugit est placeat corrupti illo ex ipsa consectetur! Quasi, repellendus?</p>
+                      </div>,
+                      document.body
+                    )
+                  }
                     </div>
                   ))}
                 </div>
