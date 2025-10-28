@@ -152,6 +152,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
     return () => clearInterval(id);
   }, [isHovered, len]);
   const popupItem = items.find((item) => item.id === hovered) || items[active];
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   // Dimensions (~+20%)
   //
@@ -202,7 +203,15 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                   }}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
                   /*Carte des details quand on hover*/
-                  onMouseEnter={() => {setHovered(it.id)}} onMouseLeave={() => setHovered(null)}
+                      onMouseEnter={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHovered(it.id);
+                        setPopupPos({
+                          top: rect.top + rect.height / 2, // middle of the card vertically
+                          left: rect.right + 10,           // 10px to the right of the card
+                        });
+                      }}
+                      onMouseLeave={() => setHovered(null)}
                 >
                   {it.image ? (
                     <img
@@ -217,8 +226,8 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                       <div
                         className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
                         style={{
-                          top: '50%',         
-                          left: 'calc(50% + 200px)',  
+                          top: popupPos.top,
+                          left: popupPos.left, 
                           transform: 'translateY(-50%)',
                           minWidth: '180px',
                           maxWidth:'400px',
