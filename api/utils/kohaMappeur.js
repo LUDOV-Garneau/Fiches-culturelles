@@ -26,9 +26,12 @@ async function obtenirImage(nomJeu) {
       },
     );
 
-    return igdbResponse.data[0].cover.url
-      .slice(2)
-      .replace("t_thumb", "t_1080p");
+    return (
+      "https://" +
+      igdbResponse.data[0].cover.url
+        .slice(2)
+        .replace("t_thumb", "t_1080p")
+    );
   } catch (err) {
     console.error("Erreur IGDB:", err.response?.data || err.message);
     return null;
