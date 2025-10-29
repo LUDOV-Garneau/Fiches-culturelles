@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { importerJeuxQuebec } from "../../controllers/jeuController.js";
 
 // Mocking
 jest.unstable_mockModule("axios", () => ({
@@ -20,12 +21,10 @@ jest.unstable_mockModule("../../utils/kohaMappeur.js", () => ({
   }),
 }));
 
-let importerJeuxQuebec;
 let axios;
 let Jeu;
 
 beforeAll(async () => {
-  ({ importerJeuxQuebec } = await import("../../controllers/jeuController.js"));
   axios = (await import("axios")).default;
   Jeu = (await import("../../models/Jeu.js")).default;
 });
