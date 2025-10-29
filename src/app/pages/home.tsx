@@ -136,7 +136,6 @@ function AccordionSection({
 /** Carousel style coverflow (corrigé + tooltip + liens) */
 function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
   const [active, setActive] = React.useState(0);
-  const [hovered, setHovered] = React.useState<string | null>(null); // <-- état déplacé ici
   const len = items.length;
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
@@ -194,8 +193,6 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     transformStyle: "preserve-3d",
                     zIndex,
                   }}
-                  onMouseEnter={() => setHovered(it.id)}
-                  onMouseLeave={() => setHovered(null)}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
                   /*Carte des details quand on hover*/
                       onMouseEnter={(e) => {
