@@ -141,11 +141,17 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
+  /*Carte des details quand on hover*/
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
 
   React.useEffect(() => {
+    if (isHovered) return; // pause the carousel while hovered
     const id = setInterval(next, 3500);
     return () => clearInterval(id);
-  }, [len]);
+  }, [isHovered, len]);
+  const popupItem = items.find((item) => item.id === hovered) || items[active];
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   // Dimensions (~+20%)
   const CARD_W = 218;
@@ -157,8 +163,11 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
     <div className="relative py-8">
       {/* container aligné au reste */}
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
-        {/* piste 3D */}
-        <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}>
+       
+        <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}
+        /*Carte des details quand on hover*/
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
           <div className="absolute inset-0 flex items-center justify-center">
             {items.map((it, i) => {
               const offset = i - active;
@@ -173,7 +182,6 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
               const rotateY = wrapped * -18;
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
-
               return (
                 <Link
                   key={it.id}
@@ -189,6 +197,16 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                   onMouseEnter={() => setHovered(it.id)}
                   onMouseLeave={() => setHovered(null)}
                   aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
+                  /*Carte des details quand on hover*/
+                      onMouseEnter={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHovered(it.id);
+                        setPopupPos({
+                          top: rect.top + rect.height / 2, // middle of the card vertically
+                          left: rect.right + 10,           // 10px to the right of the card
+                        });
+                      }}
+                      onMouseLeave={() => setHovered(null)}
                 >
                   {it.image ? (
                     <img
@@ -197,24 +215,26 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                       className="h-full w-full object-cover"
                     />
                   ) : null}
-
-                  {/* Tooltip flottant */}
+                  {/*Carte des details quand on hover*/}
                   {hovered === it.id &&
                     createPortal(
                       <div
                         className="fixed z-[9999] rounded-lg bg-black p-4 text-white shadow-lg"
                         style={{
-                          top: "50%",
-                          left: "calc(50% + 200px)",
-                          transform: "translateY(-50%)",
-                          minWidth: "180px",
+                          top: popupPos.top,
+                          left: popupPos.left, 
+                          transform: 'translateY(-50%)',
+                          minWidth: '180px',
+                          maxWidth:'400px',
                         }}
                       >
-                        <p className="font-bold">{it.title}</p>
-                        {it.year ? <p>{it.year}</p> : null}
+                        <p>{popupItem.title}</p>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium quasi deserunt, aspernatur corporis libero dolore quod quidem voluptas et delectus fugit est placeat corrupti illo ex ipsa consectetur! Quasi, repellendus?</p>
                       </div>,
                       document.body
-                    )}
+                    )
+                  }
+                  
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
                     {it.title}
@@ -296,6 +316,10 @@ export function Welcome() {
 
   const toggleDecade = (key: string) =>
     setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
+    /*Carte des details quand on hover*/
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   return (
     <main className="min-h-[70vh]">
@@ -370,11 +394,24 @@ export function Welcome() {
               )}
 
               {!loading && !error && jeux.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                <div className="grid grid-cols-3 gap-4"
+                /*Carte des details quand on hover*/
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
                   {jeux.map((jeu) => (
                     <div
                       key={jeu._id}
-                      className="rounded-lg border border-gray-300 bg-white p-4 shadow-sm transition hover:shadow-md"
+                      /*Carte des details quand on hover*/
+                      onMouseEnter={(e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  setHovered(jeu._id);
+  setPopupPos({
+    top: rect.top + rect.height / 2, // middle of the card vertically
+    left: rect.right + 10,           // 10px to the right of the card
+  });
+}}
+onMouseLeave={() => setHovered(null)}
+                      className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
                     >
                       <img
                         src={jeu.imageUrl || "https://placehold.co/600x400"}
@@ -389,6 +426,25 @@ export function Welcome() {
                       <p className="text-sm text-gray-400">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
+                      {/*Carte des details quand on hover*/}
+                  {hovered === jeu._id &&
+                    createPortal(
+                      <div
+                        className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                        style={{
+                          top: popupPos.top,
+                          left: popupPos.left,
+                          transform: 'translateY(-50%)',
+                          minWidth: '180px',
+                          maxWidth:'400px',
+                        }}
+                      >
+                        <p>{jeu.titre}</p>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium quasi deserunt, aspernatur corporis libero dolore quod quidem voluptas et delectus fugit est placeat corrupti illo ex ipsa consectetur! Quasi, repellendus?</p>
+                      </div>,
+                      document.body
+                    )
+                  }
                     </div>
                   ))}
                 </div>

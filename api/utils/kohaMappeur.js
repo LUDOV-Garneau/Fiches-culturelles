@@ -1,4 +1,42 @@
 import { franc } from "franc-min";
+import axios from "axios";
+
+async function obtenirImage(nomJeu) {
+  try {
+    //setup de l'api igdb
+    const client_id = process.env.TWITCH_CLIENT_ID;
+    const client_secret = process.env.TWITCH_CLIENT_SECRET;
+    const TWITCH_API_URL = `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`;
+
+    const twitchResponse = await axios.post(TWITCH_API_URL);
+
+    const twitchToken = twitchResponse.data.access_token;
+
+    const igdbResponse = await axios.post(
+      "https://api.igdb.com/v4/games",
+      `search "${nomJeu}";
+       fields name, cover.url;
+       limit 1;`,
+      {
+        headers: {
+          "Client-ID": client_id,
+          Authorization: `Bearer ${twitchToken}`,
+          Accept: "application/json",
+        },
+      },
+    );
+
+    return (
+      "https://" +
+      igdbResponse.data[0].cover.url
+        .slice(2)
+        .replace("t_thumb", "t_1080p")
+    );
+  } catch (err) {
+    console.error("Erreur IGDB:", err.response?.data || err.message);
+    return null;
+  }
+}
 
 /**
  * Découpe un champ d'URLs Koha séparées par " | "
@@ -7,7 +45,7 @@ function decouperUrls(champ) {
   if (!champ) return undefined;
   return String(champ)
     .split("|")
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean);
 }
 
@@ -33,8 +71,12 @@ function extraireDepuisAbstract(abstractBrut) {
     return { resume: { brut: "" }, caracteristiques: [] };
   }
 
-  const segments = brut.split("|").map(s => s.trim()).filter(Boolean);
-  let fr = null, en = null;
+  const segments = brut
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  let fr = null,
+    en = null;
 
   const notes = {
     credits: null,
@@ -52,13 +94,13 @@ function extraireDepuisAbstract(abstractBrut) {
     // Bloc résumé FR
     if (i === 0) {
       fr = s;
-      if (detecterLangue(s) === "en") en = s; 
+      if (detecterLangue(s) === "en") en = s;
     }
 
     // Bloc résumé EN
     else if (i === 1) {
       en = s;
-      if (detecterLangue(s) === "fr") fr = s; 
+      if (detecterLangue(s) === "fr") fr = s;
     }
 
     // Blocs  notes
@@ -66,25 +108,40 @@ function extraireDepuisAbstract(abstractBrut) {
       if (lower.startsWith("crédits")) {
         notes.credits = s.replace(/^crédits\s*:\s*/i, "").trim() || null;
       } else if (lower.startsWith("autres éditions")) {
-        notes.autresEditions = s.replace(/^autres éditions\s*:\s*/i, "").trim() || null;
+        notes.autresEditions =
+          s.replace(/^autres éditions\s*:\s*/i, "").trim() || null;
       } else if (lower.startsWith("étiquettes génériques")) {
         const reste = s.replace(/^étiquettes génériques\s*:\s*/i, "").trim();
         notes.etiquettesGeneriques = reste
-          ? reste.split(",").map(x => x.trim()).filter(Boolean)
+          ? reste
+              .split(",")
+              .map((x) => x.trim())
+              .filter(Boolean)
           : null;
       } else if (lower.startsWith("liens avec la culture québécoise")) {
-        notes.liensQuebec = s.replace(/^liens avec la culture québécoise\s*:\s*/i, "").trim() || null;
+        notes.liensQuebec =
+          s.replace(/^liens avec la culture québécoise\s*:\s*/i, "").trim() ||
+          null;
       }
     }
 
-    // Caractéristiques 
+    // Caractéristiques
     const motsCles = [
-      "coop", "cooperative", "multiplayer", "customizable weapons",
-      "cover", "parachute", "aggro", "warzone", "bounties", "extraction"
+      "coop",
+      "cooperative",
+      "multiplayer",
+      "customizable weapons",
+      "cover",
+      "parachute",
+      "aggro",
+      "warzone",
+      "bounties",
+      "extraction",
     ];
     for (const m of motsCles) if (lower.includes(m)) caracs.add(m);
     if (lower.includes("two man")) caracs.add("stratégies à deux");
-    if (lower.includes("4 players") || lower.includes("four players")) caracs.add("4 joueurs");
+    if (lower.includes("4 players") || lower.includes("four players"))
+      caracs.add("4 joueurs");
   }
 
   return {
@@ -93,7 +150,10 @@ function extraireDepuisAbstract(abstractBrut) {
       fr: fr || null,
       en: en || null,
       notes:
-        (notes.credits || notes.autresEditions || notes.etiquettesGeneriques || notes.liensQuebec)
+        notes.credits ||
+        notes.autresEditions ||
+        notes.etiquettesGeneriques ||
+        notes.liensQuebec
           ? notes
           : undefined,
     },
@@ -102,38 +162,43 @@ function extraireDepuisAbstract(abstractBrut) {
 }
 /**
  * Mapping principal Koha - Jeu
- * @param {object} k  
+ * @param {object} k
  * @returns {object}
  */
 function mapperKohaVersJeu(k) {
-  const plateformes = k.edition_statement ? [String(k.edition_statement).trim()] : undefined;
+  const plateformes = k.edition_statement
+    ? [String(k.edition_statement).trim()]
+    : undefined;
 
-  const annee =
-    k.copyright_date ??
-    k.publication_year ??
-    null;
+  const annee = k.copyright_date ?? k.publication_year ?? null;
 
   const urls = decouperUrls(k.url);
   const pages = k.pages ? Number(String(k.pages).replace(/[^\d]/g, "")) : null;
 
   const devs = k.author
-    ? String(k.author).split(/;|,/).map(s => s.trim()).filter(Boolean)
+    ? String(k.author)
+        .split(/;|,/)
+        .map((s) => s.trim())
+        .filter(Boolean)
     : undefined;
 
   const eds = k.publisher
-    ? String(k.publisher).split(/;|,/).map(s => s.trim()).filter(Boolean)
+    ? String(k.publisher)
+        .split(/;|,/)
+        .map((s) => s.trim())
+        .filter(Boolean)
     : undefined;
 
   const { resume, caracteristiques } = extraireDepuisAbstract(k.abstract || "");
 
   const estLieAuQuebec =
-  (devs && devs.some(d => /montr(e|é)al|qu(é|e)bec/i.test(d))) ||
-  (resume?.notes?.liensQuebec && resume.notes.liensQuebec.length > 0) ||
-  (k.publication_place &&
-    /(montr(e|é)al|qu(é|e)bec|laval|sherbrooke|trois-rivi(è|e)res)/i.test(
-      k.publication_place
-    )) ||
-  (k.framework_id && k.framework_id.toUpperCase() === "QCTE");
+    (devs && devs.some((d) => /montr(e|é)al|qu(é|e)bec/i.test(d))) ||
+    (resume?.notes?.liensQuebec && resume.notes.liensQuebec.length > 0) ||
+    (k.publication_place &&
+      /(montr(e|é)al|qu(é|e)bec|laval|sherbrooke|trois-rivi(è|e)res)/i.test(
+        k.publication_place,
+      )) ||
+    (k.framework_id && k.framework_id.toUpperCase() === "QCTE");
 
   return {
     // Principaux champs
@@ -173,5 +238,6 @@ export {
   decouperUrls,
   detecterLangue,
   extraireDepuisAbstract,
+  obtenirImage,
   mapperKohaVersJeu,
 };
