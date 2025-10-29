@@ -235,6 +235,6 @@ export {
   decouperUrls,
   detecterLangue,
   extraireDepuisAbstract,
-  mapperKohaVersJeu,
   obtenirImage,
+  mapperKohaVersJeu,
 };
