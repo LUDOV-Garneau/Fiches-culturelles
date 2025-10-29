@@ -19,6 +19,11 @@ type Pages = {
   "/login": {
     params: {};
   };
+  "/admin/jeux/edit/:id": {
+    params: {
+      "id": string;
+    };
+  };
   "/games/:id": {
     params: {
       "id": string;
@@ -29,7 +34,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/admin" | "/login" | "/games/:id";
+    page: "/" | "/admin" | "/login" | "/admin/jeux/edit/:id" | "/games/:id";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -42,6 +47,10 @@ type RouteFiles = {
   "routes/login.tsx": {
     id: "routes/login";
     page: "/login";
+  };
+  "routes/admin.jeux.edit.$id.tsx": {
+    id: "routes/admin.jeux.edit.$id";
+    page: "/admin/jeux/edit/:id";
   };
   "routes/games.$id.tsx": {
     id: "routes/games.$id";

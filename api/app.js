@@ -20,7 +20,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Backend en ligne (route /api) - test déploiement !");
 });
-
+app.use(cors());
 app.use("/jeux", jeuxRoutes);
 
 export default app; 

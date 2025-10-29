@@ -29,7 +29,7 @@ async function importerJeuxQuebec(req, res) {
 
           if (mapped.estLieAuQuebec) {
             let img_url = await obtenirImage(mapped.titre);
-            mapped.img_url = img_url;
+            mapped.imageUrl = img_url;
             batchOps.push({
               updateOne: {
                 filter: {
@@ -41,7 +41,7 @@ async function importerJeuxQuebec(req, res) {
               },
             });
 
-            console.log(`img ${id} : ${mapped.img_url}`);
+            console.log(`img ${id} : ${mapped.imageUrl}`);
             console.log(`Québec ID ${id} : ${mapped.titre}`);
           }
         }
@@ -103,23 +103,28 @@ async function getJeux(req, res) {
  */
 async function getJeu(req, res) {
   try {
-    const { titre } = req.params;
+    const { id } = req.params;
 
-    if (!titre || titre.trim() === "") {
+    if (!id) {
       return res.status(400).json({
         success: false,
-        message: "Le paramètre 'titre' est obligatoire.",
+        message: "L'ID du jeu est obligatoire.",
       });
     }
 
-    const filtre = {
-      estLieAuQuebec: true,
-      titre: new RegExp(titre, "i"),
-    };
+    const jeu = await Jeu.findById(id);
 
-    const jeux = await Jeu.find(filtre).sort({ anneeSortie: -1 });
+    if (!jeu) {
+      return res.status(404).json({
+        success: false,
+        message: "Jeu non trouvé.",
+      });
+    }
 
-    res.json({ success: true, count: jeux.length, data: jeux });
+    res.json({
+      success: true,
+      data: jeu,
+    });
   } catch (err) {
     console.error("Erreur getJeu:", err.message);
     res.status(500).json({
@@ -128,6 +133,7 @@ async function getJeu(req, res) {
     });
   }
 }
+
 
 /**
  * Supprimer un jeu par son ID
