@@ -3,8 +3,8 @@ import app from "../../app.js"
 import mongoose from "mongoose";
 
 describe("Liste de jeux", () => {
-  it("GET /jeux/quebec retourne une liste des jeux québécois dans la DB", async () => {
-    const res = await request(app).get("/jeux/quebec");
+  it("GET /jeux/ retourne une liste des jeux québécois dans la DB", async () => {
+    const res = await request(app).get("/jeux/");
     expect(res.statusCode).toBe(200);
 
     if (res.body.length > 0) {

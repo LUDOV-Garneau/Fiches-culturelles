@@ -5,13 +5,12 @@ import { mapperKohaVersJeu, obtenirImage } from "../utils/kohaMappeur.js";
 /**
  * Importer les jeux liés au Québec depuis Koha et les sauvegarder en MongoDB
  */
-async function importerJeuxQuebec(req, res) {
+async function importerJeuxQuebec(req, res, maxId = 10000) {
   try {
     const token = Buffer.from(
       `${process.env.KOHA_USERNAME}:${process.env.KOHA_PASSWORD}`,
     ).toString("base64");
 
-    const maxId = 10000;
     let totalImported = 0;
     const batchOps = [];
 
