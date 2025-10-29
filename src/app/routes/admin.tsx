@@ -6,13 +6,15 @@ export default function Admin() {
   const [jeux, setJeux] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modeAffichage, setModeAffichage] = useState<"card" | "compact">("card");
+  const [modeAffichage, setModeAffichage] = useState<"card" | "compact">(
+    "card",
+  );
 
   // Charger les jeux depuis l’API
   useEffect(() => {
     async function chargerJeux() {
       try {
-        const response = await fetch("http://localhost:3000/jeux");
+        const response = await fetch("http://72.11.148.122/api/jeux");
         const data = await response.json();
 
         if (data.success) {
@@ -36,7 +38,7 @@ export default function Admin() {
     if (!window.confirm(`Supprimer "${titre}" ?`)) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
         method: "DELETE",
       });
 
@@ -129,7 +131,9 @@ export default function Admin() {
                           <p className="text-gray-500 text-sm flex items-center gap-2">
                             <span className="font-medium">Auteur :</span>
                             <span className="text-gray-600">
-                              {jeu.developpeurs?.length ? jeu.developpeurs[0] : "Inconnu"}
+                              {jeu.developpeurs?.length
+                                ? jeu.developpeurs[0]
+                                : "Inconnu"}
                             </span>
                           </p>
                           {jeu.anneeSortie && (
@@ -143,7 +147,9 @@ export default function Admin() {
                         <div className="flex gap-3 pt-3 border-t border-gray-100">
                           <button
                             className="flex-1 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors duration-200 text-sm font-semibold shadow-sm hover:shadow-md"
-                            onClick={() => navigate(`/admin/jeux/edit/${jeu._id}`)}
+                            onClick={() =>
+                              navigate(`/admin/jeux/edit/${jeu._id}`)
+                            }
                           >
                             Modifier
                           </button>
@@ -203,7 +209,9 @@ export default function Admin() {
                             <div className="flex justify-end items-center gap-2">
                               <button
                                 className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-all duration-200 text-sm font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
-                                onClick={() => navigate(`/admin/jeux/edit/${jeu._id}`)}
+                                onClick={() =>
+                                  navigate(`/admin/jeux/edit/${jeu._id}`)
+                                }
                               >
                                 Modifier
                               </button>

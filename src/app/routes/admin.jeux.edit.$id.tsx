@@ -12,7 +12,7 @@ export default function ModifierJeu() {
   useEffect(() => {
     async function chargerJeu() {
       try {
-        const response = await fetch(`http://localhost:3000/jeux/${id}`);
+        const response = await fetch(`http://72.11.148.122/apijeux/${id}`);
         const data = await response.json();
 
         if (data.success && data.data) {
@@ -34,7 +34,7 @@ export default function ModifierJeu() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(jeu),
@@ -220,7 +220,9 @@ export default function ModifierJeu() {
           <div className="space-y-6">
             {/* Crédits */}
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Crédits</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Crédits
+              </label>
               <textarea
                 placeholder="Entrez les crédits..."
                 value={jeu.resume?.notes?.credits || ""}
@@ -268,7 +270,9 @@ export default function ModifierJeu() {
               </label>
               <textarea
                 placeholder="Entrez les étiquettes (séparées par des virgules)..."
-                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(", ")}
+                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(
+                  ", ",
+                )}
                 onChange={(e) =>
                   setJeu({
                     ...jeu,
@@ -301,7 +305,10 @@ export default function ModifierJeu() {
                     ...jeu,
                     resume: {
                       ...jeu.resume,
-                      notes: { ...jeu.resume?.notes, liensQuebec: e.target.value },
+                      notes: {
+                        ...jeu.resume?.notes,
+                        liensQuebec: e.target.value,
+                      },
                     },
                   })
                 }
