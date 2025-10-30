@@ -12,7 +12,7 @@ export default function ModifierJeu() {
   useEffect(() => {
     async function chargerJeu() {
       try {
-        const response = await fetch(`http://72.11.148.122/apijeux/${id}`);
+        const response = await fetch(`http://72.11.148.122/api/jeux/${id}`);
         const data = await response.json();
 
         if (data.success && data.data) {
