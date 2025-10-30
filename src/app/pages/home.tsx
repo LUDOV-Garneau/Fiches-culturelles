@@ -77,14 +77,23 @@ function Tabs({
 }
 
 function AccordionSection({
-  section,
+  decade,
+  jeux,
   open,
   onToggle,
 }: {
-  section: DecadeSection;
+  decade: string;
+  jeux: any[];
   open: boolean;
   onToggle: () => void;
 }) {
+  // filtre les jeux selon la décennie (par exemple 1980–1989)
+  const start = parseInt(decade.split("-")[0]);
+  const end = parseInt(decade.split("-")[1]);
+  const jeuxDecennie = jeux.filter(
+    (j) => j.anneeSortie >= start && j.anneeSortie <= end
+  );
+
   return (
     <div className="rounded-md border bg-white overflow-visible">
       <button
@@ -101,21 +110,38 @@ function AccordionSection({
         >
           {open ? "−" : "+"}
         </span>
-        <span className="font-semibold text-gray-800">{section.decade}</span>
+        <span className="font-semibold text-gray-800">{decade}</span>
       </button>
 
       {open && (
-        <div className="p-4">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {section.items.map((g) => (
-              <GameCard key={g.id} item={g} />
-            ))}
-          </div>
+        <div className="p-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {jeuxDecennie.length === 0 ? (
+            <p>Aucun jeu</p>
+          ) : (
+            jeuxDecennie.map((jeu) => (
+              <Link
+                key={jeu._id}
+                to={`/games/${jeu._id}`}
+                className="border border-gray-300 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition block"
+              >
+                <img
+                  src={jeu.imageUrl || "https://placehold.co/600x400"}
+                  alt={jeu.titre}
+                  className="mb-2 h-40 w-full rounded object-cover"
+                />
+                <h3 className="text-lg font-bold">{jeu.titre}</h3>
+                <p className="text-sm text-gray-400">
+                  {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
+                </p>
+              </Link>
+            ))
+          )}
         </div>
       )}
     </div>
   );
 }
+
 
 function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
@@ -345,13 +371,15 @@ export function Welcome() {
 
             <div className="space-y-4">
               {SECTIONS.map((s) => (
-                <AccordionSection
-                  key={s.decade}
-                  section={s}
-                  open={!!openByDecade[s.decade]}
-                  onToggle={() => toggleDecade(s.decade)}
-                />
-              ))}
+  <AccordionSection
+    key={s.decade}
+    decade={s.decade}
+    jeux={jeux}
+    open={!!openByDecade[s.decade]}
+    onToggle={() => toggleDecade(s.decade)}
+  />
+))}
+
 
               <h2 className="pt-10 text-3xl font-semibold text-gray-900">
                 Tous nos jeux
@@ -374,7 +402,7 @@ export function Welcome() {
                         const rect = e.currentTarget.getBoundingClientRect();
                         setHovered(jeu._id);
                         setPopupPos({
-                          top: rect.top + rect.height / 2, 
+                          top: rect.top + rect.height / 2, // middle of the card 
                           left: rect.right + 10,
                         });
                       }}
@@ -396,6 +424,7 @@ export function Welcome() {
                       <p className="text-sm text-gray-400">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
+                      {/*Carte des details quand on hover*/}
                       {hovered === jeu._id &&
                         createPortal(
                           <div
