@@ -1,11 +1,9 @@
-
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { GameCard } from "~/components/gameCard";
 import { createPortal } from "react-dom";
 
-/** ========= Données (hardcodées pour le moment) ========= */
 const TABS = [
   "Accueil",
   "Sélection de jeux",
@@ -22,7 +20,10 @@ const SECTIONS: DecadeSection[] = [
   {
     decade: "1980-1989",
     items: [
-      { id: "tetards", title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)" },
+      {
+        id: "tetards",
+        title: "Têtards (Marc-Antoine Parent & Vincent Côté, 1982)",
+      },
       { id: "mimi", title: "Mimi: Les aventures de Mimi la fourmi (1984)" },
       { id: "fou-du-roi", title: "Le fou du roi (Loto-Québec, 1989)" },
     ],
@@ -45,23 +46,6 @@ const SECTIONS: DecadeSection[] = [
   },
 ];
 
-/** ========= Carousel (coverflow) branché vers /games/:id ========= */
-// IDs qui matchent la DB de routes/games.$id.tsx
-type CarouselItem = {
-  id: "tetards" | "mimi" | "fou-du-roi" | "fez";
-  title: string;
-  year?: number;
-  image?: string;
-};
-
-const CAROUSEL_ITEMS: CarouselItem[] = [
-  { id: "tetards",    title: "Têtards",        year: 1982, image: "https://placehold.co/640x360?text=Tetards" },
-  { id: "mimi",       title: "Mimi la fourmi", year: 1984, image: "https://placehold.co/640x360?text=Mimi" },
-  { id: "fou-du-roi", title: "Le fou du roi",  year: 1989, image: "https://placehold.co/640x360?text=Fou+du+Roi" },
-  { id: "fez",        title: "FEZ",            year: 2012, image: "https://placehold.co/640x360?text=FEZ" },
-];
-
-/** ========= Composants ========= */
 function Tabs({
   active,
   onChange,
@@ -102,7 +86,7 @@ function AccordionSection({
   onToggle: () => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-md border bg-white">
+    <div className="rounded-md border bg-white overflow-visible">
       <button
         onClick={onToggle}
         className="flex w-full items-center gap-3 border-b bg-gray-50 px-4 py-3 text-left hover:bg-gray-100"
@@ -133,42 +117,38 @@ function AccordionSection({
   );
 }
 
-/** Carousel style coverflow (corrigé + tooltip + liens) */
-function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
-  const [active, setActive] = React.useState(0);
-  const len = items.length;
-
+function CoverflowCarousel({ jeux }: { jeux: any[] }) {
+  const [active, setActive] = useState(0);
+  const len = jeux.length;
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
-  /*Carte des details quand on hover*/
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [isHovered, setIsHovered] = React.useState(false);
 
-  React.useEffect(() => {
-    if (isHovered) return; // pause the carousel while hovered
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
+
+  useEffect(() => {
     const id = setInterval(next, 3500);
     return () => clearInterval(id);
-  }, [isHovered, len]);
-  const popupItem = items.find((item) => item.id === hovered) || items[active];
-  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  }, [len]);
 
-  // Dimensions (~+20%)
   const CARD_W = 218;
   const CARD_H = 288;
   const TRACK_H = 320;
-  const GAP_X   = 200;
+  const GAP_X = 200;
+
 
   return (
     <div className="relative py-8">
-      {/* container aligné au reste */}
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
-       
-        <div className="relative mx-auto max-w-4xl" style={{ perspective: "1200px", height: TRACK_H }}
-        /*Carte des details quand on hover*/
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}>
+        <div
+          className="relative mx-auto max-w-4xl"
+          style={{ perspective: "1200px", height: TRACK_H }}
+        >
           <div className="absolute inset-0 flex items-center justify-center">
-            {items.map((it, i) => {
+            {jeux.slice(0, 10).map((jeu, i) => {
               const offset = i - active;
               const wrapped =
                 Math.abs(offset) > len / 2
@@ -181,11 +161,12 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
               const rotateY = wrapped * -18;
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
+
               return (
                 <Link
-                  key={it.id}
-                  to={`/games/${it.id}`} // <-- ouvre la page détail /games/:id
-                  className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden focus:outline-none bg-gray-200"
+                  key={jeu._id}
+                  to={`/games/${jeu._id}`}
+                  className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden bg-gray-200"
                   style={{
                     width: CARD_W,
                     height: CARD_H,
@@ -193,49 +174,50 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
                     transformStyle: "preserve-3d",
                     zIndex,
                   }}
-                  aria-label={`${it.title}${it.year ? ` (${it.year})` : ""}`}
-                  /*Carte des details quand on hover*/
-                      onMouseEnter={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setHovered(it.id);
-                        setPopupPos({
-                          top: rect.top + rect.height / 2, // middle of the card vertically
-                          left: rect.right + 10,           // 10px to the right of the card
-                        });
-                      }}
-                      onMouseLeave={() => setHovered(null)}
+                  onMouseEnter={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setHovered(jeu._id);
+                    setPopupPos({
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 10,
+                    });
+                  }}
+                  onMouseLeave={() => setHovered(null)}
                 >
-                  {it.image ? (
-                    <img
-                      src={it.image}
-                      alt={it.title}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : null}
-                  {/*Carte des details quand on hover*/}
-                  {hovered === it.id &&
+                  <img
+                    src={
+                      jeu.imageUrl || "https://placehold.co/600x400?text=Jeu"
+                    }
+                    alt={jeu.titre}
+                    className="h-full w-full object-cover"
+                  />
+
+                  {hovered === jeu._id &&
                     createPortal(
                       <div
                         className="fixed z-[9999] rounded-lg bg-black p-4 text-white shadow-lg"
                         style={{
                           top: popupPos.top,
-                          left: popupPos.left, 
-                          transform: 'translateY(-50%)',
-                          minWidth: '180px',
-                          maxWidth:'400px',
+                          left: popupPos.left,
+                          transform: "translateY(-50%)",
+                          minWidth: "180px",
+                          maxWidth: "400px",
                         }}
                       >
-                        <p>{popupItem.title}</p>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium quasi deserunt, aspernatur corporis libero dolore quod quidem voluptas et delectus fugit est placeat corrupti illo ex ipsa consectetur! Quasi, repellendus?</p>
+                        <p className="font-semibold">{jeu.titre}</p>
+                        <p className="text-sm opacity-80">
+                          Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
+                        </p>
+                        <p className="mt-1 text-xs opacity-70">
+                          {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
+                        </p>
                       </div>,
                       document.body
-                    )
-                  }
-                  
+                    )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
-                    {it.title}
-                    {it.year ? ` • ${it.year}` : ""}
+                    {jeu.titre}
+                    {jeu.anneeSortie ? ` • ${jeu.anneeSortie}` : ""}
                   </div>
                 </Link>
               );
@@ -253,7 +235,7 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
           ◀
         </button>
         <div className="flex gap-1">
-          {items.map((_, i) => (
+          {jeux.slice(0, 10).map((_, i) => (
             <span
               key={i}
               className={[
@@ -274,13 +256,9 @@ function CoverflowCarousel({ items }: { items: CarouselItem[] }) {
   );
 }
 
-/** ========= Page Welcome (jeu vidéo) ========= */
 export function Welcome() {
-  // Onglet “Sélection de jeux” actif par défaut
-  const [activeTab, setActiveTab] = React.useState<number>(1);
-
-  // Accordéon : première section ouverte par défaut
-  const [openByDecade, setOpenByDecade] = React.useState<Record<string, boolean>>(
+  const [activeTab, setActiveTab] = useState<number>(1);
+  const [openByDecade, setOpenByDecade] = useState<Record<string, boolean>>(
     () =>
       SECTIONS.reduce<Record<string, boolean>>((acc, s, idx) => {
         acc[s.decade] = idx === 0;
@@ -291,19 +269,22 @@ export function Welcome() {
   const [jeux, setJeux] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
 
   useEffect(() => {
     async function chargerJeux() {
       try {
         const response = await fetch("http://72.11.148.122/api/jeux");
         const data = await response.json();
-        if (data.success) {
-          setJeux(data.data);
-        } else {
+        if (data.success) setJeux(data.data);
+        else
           setError("Impossible de charger les jeux depuis la base de données.");
-        }
-      } catch (error) {
-        setError("Erreur de connexion avec le serveur. ");
+      } catch {
+        setError("Erreur de connexion avec le serveur.");
       } finally {
         setLoading(false);
       }
@@ -313,14 +294,9 @@ export function Welcome() {
 
   const toggleDecade = (key: string) =>
     setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
-    /*Carte des details quand on hover*/
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [isHovered, setIsHovered] = React.useState(false);
-  const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   return (
     <main className="min-h-[70vh]">
-      {/* Bandeau + onglets */}
       <section className="border-y bg-gray-100">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <h1 className="text-3xl font-semibold text-gray-800 md:text-4xl">
@@ -338,7 +314,6 @@ export function Welcome() {
             <p>Contenu d’accueil (placeholder).</p>
           </div>
         )}
-
         {activeTab === 1 && (
           <div className="space-y-12">
             <header className="space-y-2">
@@ -366,10 +341,8 @@ export function Welcome() {
               </p>
             </header>
 
-            {/* ==== CAROUSEL COVERFLOW (cliquable) ==== */}
-            <CoverflowCarousel items={CAROUSEL_ITEMS} />
+            <CoverflowCarousel jeux={jeux} />
 
-            {/* ==== SECTIONS PAR DÉCENNIES ==== */}
             <div className="space-y-4">
               {SECTIONS.map((s) => (
                 <AccordionSection
@@ -391,23 +364,21 @@ export function Welcome() {
               )}
 
               {!loading && !error && jeux.length > 0 && (
-                <div className="grid grid-cols-3 gap-4"
-                /*Carte des details quand on hover*/
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}>
+                <div
+                  className="grid grid-cols-3 gap-4"                  
+                >
                   {jeux.map((jeu) => (
                     <div
                       key={jeu._id}
-                      /*Carte des details quand on hover*/
                       onMouseEnter={(e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-  setHovered(jeu._id);
-  setPopupPos({
-    top: rect.top + rect.height / 2, // middle of the card vertically
-    left: rect.right + 10,           // 10px to the right of the card
-  });
-}}
-onMouseLeave={() => setHovered(null)}
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHovered(jeu._id);
+                        setPopupPos({
+                          top: rect.top + rect.height / 2, 
+                          left: rect.right + 10,
+                        });
+                      }}
+                      onMouseLeave={() => setHovered(null)}
                       className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
                     >
                       <img
@@ -418,30 +389,36 @@ onMouseLeave={() => setHovered(null)}
                       <h3 className="text-lg font-bold">{jeu.titre}</h3>
                       <p className="mb-1 text-gray-500">
                         Auteur :{" "}
-                        {jeu.developpeurs?.length ? jeu.developpeurs[0] : "Inconnu"}
+                        {jeu.developpeurs?.length
+                          ? jeu.developpeurs[0]
+                          : "Inconnu"}
                       </p>
                       <p className="text-sm text-gray-400">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
-                      {/*Carte des details quand on hover*/}
-                  {hovered === jeu._id &&
-                    createPortal(
-                      <div
-                        className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
-                        style={{
-                          top: popupPos.top,
-                          left: popupPos.left,
-                          transform: 'translateY(-50%)',
-                          minWidth: '180px',
-                          maxWidth:'400px',
-                        }}
-                      >
-                        <p>{jeu.titre}</p>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium quasi deserunt, aspernatur corporis libero dolore quod quidem voluptas et delectus fugit est placeat corrupti illo ex ipsa consectetur! Quasi, repellendus?</p>
-                      </div>,
-                      document.body
-                    )
-                  }
+                      {hovered === jeu._id &&
+                        createPortal(
+                          <div
+                            className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                            style={{
+                              top: popupPos.top,
+                              left: popupPos.left,
+                              transform: "translateY(-50%)",
+                              minWidth: "180px",
+                              maxWidth: "400px",
+                            }}
+                          >
+                            <p>{jeu.titre}</p>
+                            <p>
+                              Lorem ipsum dolor sit amet consectetur adipisicing
+                              elit. Praesentium quasi deserunt, aspernatur
+                              corporis libero dolore quod quidem voluptas et
+                              delectus fugit est placeat corrupti illo ex ipsa
+                              consectetur! Quasi, repellendus?
+                            </p>
+                          </div>,
+                          document.body
+                        )}
                     </div>
                   ))}
                 </div>
