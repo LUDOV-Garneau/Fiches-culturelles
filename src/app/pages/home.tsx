@@ -87,7 +87,7 @@ function AccordionSection({
   open: boolean;
   onToggle: () => void;
 }) {
-  // filtre les jeux selon la décennie (par exemple 1980–1989)
+  // filtrage selon date (backlog)
   const start = parseInt(decade.split("-")[0]);
   const end = parseInt(decade.split("-")[1]);
   const jeuxDecennie = jeux.filter(
@@ -157,6 +157,10 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
   useEffect(() => {
     const id = setInterval(next, 3500);
+
+    //pour arreter slider
+      const stop = setTimeout(() => clearInterval(id), 20000);
+
     return () => clearInterval(id);
   }, [len]);
 
