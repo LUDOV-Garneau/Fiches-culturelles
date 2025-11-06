@@ -442,12 +442,9 @@ export function Welcome() {
                             }}
                           >
                             <p>{jeu.titre}</p>
-                            <p>
-                              Lorem ipsum dolor sit amet consectetur adipisicing
-                              elit. Praesentium quasi deserunt, aspernatur
-                              corporis libero dolore quod quidem voluptas et
-                              delectus fugit est placeat corrupti illo ex ipsa
-                              consectetur! Quasi, repellendus?
+                            <p>{jeu.resume.brut.length > 100 
+                              ? jeu.resume.brut.slice(0, 200) + "..." 
+                              : jeu.resume.brut}
                             </p>
                           </div>,
                           document.body
