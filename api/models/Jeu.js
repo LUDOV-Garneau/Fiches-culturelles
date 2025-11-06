@@ -52,10 +52,20 @@ const IngestionSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// Titre complet 
+const TitreSchema = new mongoose.Schema(
+  {
+    principal: { type: String, required: true },
+    sousTitre: { type: String, default: null },
+    alternatifs: { type: [String], default: [] },
+  },
+  { _id: false }
+);
+
 // Modèle principal Jeu
 const JeuSchema = new mongoose.Schema(
   {
-    titre: { type: String, required: true, trim: true },
+    titreComplet: { type: TitreSchema, required: true },
     plateformes: { type: [String], default: undefined }, 
     anneeSortie: { type: Number, default: null },
     developpeurs: { type: [String], default: undefined },
