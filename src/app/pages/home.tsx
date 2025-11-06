@@ -1,7 +1,5 @@
-import * as React from "react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { GameCard } from "~/components/gameCard";
 import { createPortal } from "react-dom";
 
 const TABS = [
@@ -87,11 +85,10 @@ function AccordionSection({
   open: boolean;
   onToggle: () => void;
 }) {
-  // filtrage selon date (backlog)
   const start = parseInt(decade.split("-")[0]);
   const end = parseInt(decade.split("-")[1]);
   const jeuxDecennie = jeux.filter(
-    (j) => j.anneeSortie >= start && j.anneeSortie <= end
+    (j) => j.anneeSortie >= start && j.anneeSortie <= end,
   );
 
   return (
@@ -142,7 +139,6 @@ function AccordionSection({
   );
 }
 
-
 function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
   const len = jeux.length;
@@ -157,10 +153,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
   useEffect(() => {
     const id = setInterval(next, 3500);
-
-    //pour arreter slider
-      const stop = setTimeout(() => clearInterval(id), 20000);
-
     return () => clearInterval(id);
   }, [len]);
 
@@ -168,7 +160,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const CARD_H = 288;
   const TRACK_H = 320;
   const GAP_X = 200;
-
 
   return (
     <div className="relative py-8">
@@ -242,7 +233,7 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                           {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                         </p>
                       </div>,
-                      document.body
+                      document.body,
                     )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
@@ -256,7 +247,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
         </div>
       </div>
 
-      {/* Contrôles */}
       <div className="mt-6 flex items-center justify-center gap-4">
         <button
           onClick={prev}
@@ -288,13 +278,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
 export function Welcome() {
   const [activeTab, setActiveTab] = useState<number>(1);
-  const [openByDecade, setOpenByDecade] = useState<Record<string, boolean>>(
-    () =>
-      SECTIONS.reduce<Record<string, boolean>>((acc, s, idx) => {
-        acc[s.decade] = idx === 0;
-        return acc;
-      }, {})
-  );
 
   const [jeux, setJeux] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -322,8 +305,7 @@ export function Welcome() {
     chargerJeux();
   }, []);
 
-  const toggleDecade = (key: string) =>
-    setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
+  const jeuxChoisis = jeux.filter((j) => j.estChoisi === true);
 
   return (
     <main className="min-h-[70vh]">
@@ -344,6 +326,7 @@ export function Welcome() {
             <p>Contenu d’accueil (placeholder).</p>
           </div>
         )}
+
         {activeTab === 1 && (
           <div className="space-y-12">
             <header className="space-y-2">
@@ -374,39 +357,27 @@ export function Welcome() {
             <CoverflowCarousel jeux={jeux} />
 
             <div className="space-y-4">
-              {SECTIONS.map((s) => (
-  <AccordionSection
-    key={s.decade}
-    decade={s.decade}
-    jeux={jeux}
-    open={!!openByDecade[s.decade]}
-    onToggle={() => toggleDecade(s.decade)}
-  />
-))}
-
-
               <h2 className="pt-10 text-3xl font-semibold text-gray-900">
-                Tous nos jeux
+                Jeux sélectionnés
               </h2>
 
               {loading && <p>Chargement des jeux...</p>}
               {error && <p className="text-red-500">{error}</p>}
-              {!loading && !error && jeux.length === 0 && (
-                <p>Aucun jeu trouvé dans la base de données.</p>
+              {!loading && !error && jeuxChoisis.length === 0 && (
+                <p className="text-gray-500 italic">
+                  Aucun jeu sélectionné pour cette section.
+                </p>
               )}
-
-              {!loading && !error && jeux.length > 0 && (
-                <div
-                  className="grid grid-cols-3 gap-4"                  
-                >
-                  {jeux.map((jeu) => (
+              {!loading && !error && jeuxChoisis.length > 0 && (
+                <div className="grid grid-cols-3 gap-4">
+                  {jeuxChoisis.map((jeu) => (
                     <div
                       key={jeu._id}
                       onMouseEnter={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         setHovered(jeu._id);
                         setPopupPos({
-                          top: rect.top + rect.height / 2, // middle of the card 
+                          top: rect.top + rect.height / 2,
                           left: rect.right + 10,
                         });
                       }}
@@ -418,18 +389,13 @@ export function Welcome() {
                         alt={jeu.titre}
                         className="mb-2 h-40 w-full rounded object-cover"
                       />
-                      {/*Modifier 'jeu.titre' pour 'jeu.principal'*/}
-                      <h3 className="text-lg font-bold">{jeu.titre} {jeu.soustitre}</h3>
+                      <h3 className="text-lg font-bold">{jeu.titre}</h3>
                       <p className="mb-1 text-gray-500">
-                        Auteur :{" "}
-                        {jeu.developpeurs?.length
-                          ? jeu.developpeurs[0]
-                          : "Inconnu"}
+                        Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
                       </p>
                       <p className="text-sm text-gray-400">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
-                      {/*Carte des details quand on hover*/}
                       {hovered === jeu._id &&
                         createPortal(
                           <div
@@ -442,14 +408,14 @@ export function Welcome() {
                               maxWidth: "400px",
                             }}
                           >
-                          {/*Modifier 'jeu.titre' pour 'jeu.principal'*/}
-                            <p>{jeu.titre} {jeu.subtitre}</p>
-                            <p>{jeu.resume.brut.length > 100 
-                              ? jeu.resume.brut.slice(0, 200) + "..." 
-                              : jeu.resume.brut}
+                            <p>{jeu.titre}</p>
+                            <p>
+                              {jeu.resume?.brut
+                                ? jeu.resume.brut.slice(0, 200) + "..."
+                                : ""}
                             </p>
                           </div>,
-                          document.body
+                          document.body,
                         )}
                     </div>
                   ))}
