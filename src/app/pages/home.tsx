@@ -153,6 +153,10 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
   useEffect(() => {
     const id = setInterval(next, 3500);
+
+    //pour arreter slider
+    const stop = setTimeout(() => clearInterval(id), 20000);
+
     return () => clearInterval(id);
   }, [len]);
 
@@ -280,6 +284,8 @@ export function Welcome() {
   const [activeTab, setActiveTab] = useState<number>(1);
 
   const [jeux, setJeux] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const JEUX_PAR_PAGE = 9;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -306,6 +312,11 @@ export function Welcome() {
   }, []);
 
   const jeuxChoisis = jeux.filter((j) => j.estChoisi === true);
+
+  const totalPages = Math.max(1, Math.ceil(jeuxChoisis.length / JEUX_PAR_PAGE));
+  const indexOfLast = page * JEUX_PAR_PAGE;
+  const indexOfFirst = indexOfLast - JEUX_PAR_PAGE;
+  const jeuxActuels = jeuxChoisis.slice(indexOfFirst, indexOfLast);
 
   return (
     <main className="min-h-[70vh]">
@@ -358,7 +369,7 @@ export function Welcome() {
 
             <div className="space-y-4">
               <h2 className="pt-10 text-3xl font-semibold text-gray-900">
-                Jeux sélectionnés
+                Nos collections
               </h2>
 
               {loading && <p>Chargement des jeux...</p>}
@@ -370,7 +381,7 @@ export function Welcome() {
               )}
               {!loading && !error && jeuxChoisis.length > 0 && (
                 <div className="grid grid-cols-3 gap-4">
-                  {jeuxChoisis.map((jeu) => (
+                  {jeuxActuels.map((jeu) => (
                     <div
                       key={jeu._id}
                       onMouseEnter={(e) => {
@@ -424,6 +435,30 @@ export function Welcome() {
             </div>
           </div>
         )}
+        
+{/* Pagination */}
+<div className="flex justify-center items-center gap-4 mt-6">
+  <button
+    onClick={() => setPage((p) => Math.max(p - 1, 1))}
+    disabled={page === 1}
+    className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-100"
+  >
+    Précédent
+  </button>
+
+  <span className="text-gray-700 font-medium">
+    Page {page} / {totalPages}
+  </span>
+
+  <button
+    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+    disabled={page === totalPages}
+    className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-100"
+  >
+    Suivant
+  </button>
+</div>
+
 
         {activeTab === 2 && (
           <div className="prose max-w-none">
