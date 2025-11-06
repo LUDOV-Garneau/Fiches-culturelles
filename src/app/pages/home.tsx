@@ -153,7 +153,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
   useEffect(() => {
     const id = setInterval(next, 3500);
-    const stop = setTimeout(() => clearInterval(id), 20000);
     return () => clearInterval(id);
   }, [len]);
 
@@ -279,13 +278,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
 export function Welcome() {
   const [activeTab, setActiveTab] = useState<number>(1);
-  const [openByDecade, setOpenByDecade] = useState<Record<string, boolean>>(
-    () =>
-      SECTIONS.reduce<Record<string, boolean>>((acc, s, idx) => {
-        acc[s.decade] = idx === 0;
-        return acc;
-      }, {}),
-  );
 
   const [jeux, setJeux] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -315,9 +307,6 @@ export function Welcome() {
 
   const jeuxChoisis = jeux.filter((j) => j.estChoisi === true);
 
-  const toggleDecade = (key: string) =>
-    setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
-
   return (
     <main className="min-h-[70vh]">
       <section className="border-y bg-gray-100">
@@ -337,6 +326,7 @@ export function Welcome() {
             <p>Contenu d’accueil (placeholder).</p>
           </div>
         )}
+
         {activeTab === 1 && (
           <div className="space-y-12">
             <header className="space-y-2">
@@ -367,96 +357,69 @@ export function Welcome() {
             <CoverflowCarousel jeux={jeux} />
 
             <div className="space-y-4">
-              {SECTIONS.map((s) => (
-                <AccordionSection
-                  key={s.decade}
-                  decade={s.decade}
-                  jeux={jeux}
-                  open={!!openByDecade[s.decade]}
-                  onToggle={() => toggleDecade(s.decade)}
-                />
-              ))}
-
               <h2 className="pt-10 text-3xl font-semibold text-gray-900">
-                Tous nos jeux
+                Jeux sélectionnés
               </h2>
 
               {loading && <p>Chargement des jeux...</p>}
               {error && <p className="text-red-500">{error}</p>}
-              {!loading && !error && jeux.length === 0 && (
-                <p>Aucun jeu trouvé dans la base de données.</p>
+              {!loading && !error && jeuxChoisis.length === 0 && (
+                <p className="text-gray-500 italic">
+                  Aucun jeu sélectionné pour cette section.
+                </p>
               )}
-
-              {!loading && !error && jeux.length > 0 && (
-                <>
-                  {jeuxChoisis.length === 0 ? (
-                    <p className="text-gray-500 italic">
-                      Aucun jeu n'est actuellement sélectionné pour cette
-                      section.
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-3 gap-4">
-                      {jeuxChoisis.map((jeu) => (
-                        <div
-                          key={jeu._id}
-                          onMouseEnter={(e) => {
-                            const rect =
-                              e.currentTarget.getBoundingClientRect();
-                            setHovered(jeu._id);
-                            setPopupPos({
-                              top: rect.top + rect.height / 2,
-                              left: rect.right + 10,
-                            });
-                          }}
-                          onMouseLeave={() => setHovered(null)}
-                          className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
-                        >
-                          <img
-                            src={jeu.imageUrl || "https://placehold.co/600x400"}
-                            alt={jeu.titre}
-                            className="mb-2 h-40 w-full rounded object-cover"
-                          />
-                          <h3 className="text-lg font-bold">{jeu.titre}</h3>
-                          <p className="mb-1 text-gray-500">
-                            Auteur :{" "}
-                            {jeu.developpeurs?.length
-                              ? jeu.developpeurs[0]
-                              : "Inconnu"}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {jeu.anneeSortie
-                              ? `Année : ${jeu.anneeSortie}`
-                              : ""}
-                          </p>
-                          {hovered === jeu._id &&
-                            createPortal(
-                              <div
-                                className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
-                                style={{
-                                  top: popupPos.top,
-                                  left: popupPos.left,
-                                  transform: "translateY(-50%)",
-                                  minWidth: "180px",
-                                  maxWidth: "400px",
-                                }}
-                              >
-                                <p>{jeu.titre}</p>
-                                <p>
-                                  Lorem ipsum dolor sit amet consectetur
-                                  adipisicing elit. Praesentium quasi deserunt,
-                                  aspernatur corporis libero dolore quod quidem
-                                  voluptas et delectus fugit est placeat
-                                  corrupti illo ex ipsa consectetur! Quasi,
-                                  repellendus?
-                                </p>
-                              </div>,
-                              document.body,
-                            )}
-                        </div>
-                      ))}
+              {!loading && !error && jeuxChoisis.length > 0 && (
+                <div className="grid grid-cols-3 gap-4">
+                  {jeuxChoisis.map((jeu) => (
+                    <div
+                      key={jeu._id}
+                      onMouseEnter={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHovered(jeu._id);
+                        setPopupPos({
+                          top: rect.top + rect.height / 2,
+                          left: rect.right + 10,
+                        });
+                      }}
+                      onMouseLeave={() => setHovered(null)}
+                      className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+                    >
+                      <img
+                        src={jeu.imageUrl || "https://placehold.co/600x400"}
+                        alt={jeu.titre}
+                        className="mb-2 h-40 w-full rounded object-cover"
+                      />
+                      <h3 className="text-lg font-bold">{jeu.titre}</h3>
+                      <p className="mb-1 text-gray-500">
+                        Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
+                      </p>
+                      {hovered === jeu._id &&
+                        createPortal(
+                          <div
+                            className="fixed bg-black text-white p-4 rounded-lg shadow-lg z-[9999]"
+                            style={{
+                              top: popupPos.top,
+                              left: popupPos.left,
+                              transform: "translateY(-50%)",
+                              minWidth: "180px",
+                              maxWidth: "400px",
+                            }}
+                          >
+                            <p>{jeu.titre}</p>
+                            <p>
+                              {jeu.resume?.brut
+                                ? jeu.resume.brut.slice(0, 200) + "..."
+                                : ""}
+                            </p>
+                          </div>,
+                          document.body,
+                        )}
                     </div>
-                  )}
-                </>
+                  ))}
+                </div>
               )}
             </div>
           </div>
