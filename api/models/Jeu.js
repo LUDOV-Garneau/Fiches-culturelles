@@ -5,7 +5,7 @@ const NotesResumeSchema = new mongoose.Schema(
   {
     credits: { type: String, default: null },
     autresEditions: { type: String, default: null },
-    etiquettesGeneriques: { type: [String], default: undefined },
+    etiquettesGeneriques: { type: [String], default: [] },
     liensQuebec: { type: String, default: null },
   },
   { _id: false }
@@ -52,6 +52,36 @@ const IngestionSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// Genres, thèmes, gameplay 
+const GenreSchema = new mongoose.Schema(
+  {
+    type: { type: String, required: true },
+    valeur: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+// Contenu physique 
+const ContenuPhysiqueSchema = new mongoose.Schema(
+  {
+    quantite: { type: Number, default: 1 },
+    type: { type: String, required: true },
+    materiaux: { type: String, default: null },
+  },
+  { _id: false }
+);
+
+// Métadonnées locales 
+const LocalisationSchema = new mongoose.Schema(
+  {
+    coteLocal: { type: String, default: null },
+    collection: { type: String, default: null },
+    localisation: { type: String, default: null },
+    sourceCatalogage: { type: String, default: null },
+  },
+  { _id: false }
+);
+
 // Titre complet 
 const TitreSchema = new mongoose.Schema(
   {
@@ -65,37 +95,45 @@ const TitreSchema = new mongoose.Schema(
 // Modèle principal Jeu
 const JeuSchema = new mongoose.Schema(
   {
+    // Informations de titre
     titreComplet: { type: TitreSchema, required: true },
-    plateformes: { type: [String], default: undefined }, 
+
+    // Informations générales
+    plateformes: { type: [String], default: [] },
     anneeSortie: { type: Number, default: null },
-    developpeurs: { type: [String], default: undefined },
-    editeurs: { type: [String], default: undefined },
+    developpeurs: { type: [String], default: [] },
+    editeurs: { type: [String], default: [] },
     typeMedia: { type: String, default: null },
-    urls: { type: [String], default: undefined },
+    urls: { type: [String], default: [] },
     pages: { type: Number, default: null },
     imageUrl: { type: String, default: null },
 
+    // Provenance et contexte
+    langue: { type: String, default: null },
+    lieuPublication: { type: String, default: null },
+    editeurPrincipal: { type: String, default: null },
+    formatSupport: { type: String, default: null },
+
+    // Description détaillée
     resume: { type: ResumeSchema, required: true },
-    caracteristiques: { type: [String], default: undefined },
+    caracteristiques: { type: [String], default: [] },
+    contenuPhysique: { type: [ContenuPhysiqueSchema], default: [] },
+    genres: { type: [GenreSchema], default: [] },
+    recompenses: { type: [String], default: [] },
+    sources: { type: [String], default: [] },
     estLieAuQuebec: { type: Boolean, default: false },
 
+    // Liens et identifiants
     identifiantsExternes: { type: IdentifiantsExternesSchema, default: undefined },
     source: { type: SourceSchema, default: undefined },
     ingestion: { type: IngestionSchema, default: undefined },
+    localisation: { type: LocalisationSchema, default: undefined },
 
+    // Données originales 
     original: { type: mongoose.Schema.Types.Mixed, required: true },
   },
   { timestamps: true, versionKey: false }
 );
 
-// Index texte basique
-JeuSchema.index({
-  titre: "text",
-  "resume.fr": "text",
-  "resume.en": "text",
-  developpeurs: "text",
-  editeurs: "text",
-  caracteristiques: "text",
-});
 
 export default mongoose.model("Jeu", JeuSchema);
