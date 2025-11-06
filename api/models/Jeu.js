@@ -135,5 +135,17 @@ const JeuSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
+// Index texte 
+JeuSchema.index({
+  "titreComplet.principal": "text",
+  "titreComplet.sousTitre": "text",
+  "titreComplet.alternatifs": "text",
+  "resume.fr": "text",
+  "resume.en": "text",
+  developpeurs: "text",
+  editeurs: "text",
+  caracteristiques: "text",
+  "genres.valeur": "text",
+});
 
 export default mongoose.model("Jeu", JeuSchema);
