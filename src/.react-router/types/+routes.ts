@@ -44,12 +44,12 @@ type RouteFiles = {
     id: "pages/login";
     page: "/login";
   };
-  "./pages/admin.tsx": {
-    id: "pages/admin";
+  "./pages/admin/admin.tsx": {
+    id: "pages/admin/admin";
     page: "/admin";
   };
-  "./pages/admin.jeux.edit.$id.tsx": {
-    id: "pages/admin.jeux.edit.$id";
+  "./pages/admin/admin.jeux.edit.$id.tsx": {
+    id: "pages/admin/admin.jeux.edit.$id";
     page: "/admin/jeux/edit/:id";
   };
   "./pages/games.$id.tsx": {
