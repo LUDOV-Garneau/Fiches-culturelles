@@ -418,7 +418,8 @@ export function Welcome() {
                         alt={jeu.titre}
                         className="mb-2 h-40 w-full rounded object-cover"
                       />
-                      <h3 className="text-lg font-bold">{jeu.titre}</h3>
+                      {/*Modifier 'jeu.titre' pour 'jeu.principal'*/}
+                      <h3 className="text-lg font-bold">{jeu.titre} {jeu.soustitre}</h3>
                       <p className="mb-1 text-gray-500">
                         Auteur :{" "}
                         {jeu.developpeurs?.length
@@ -441,13 +442,11 @@ export function Welcome() {
                               maxWidth: "400px",
                             }}
                           >
-                            <p>{jeu.titre}</p>
-                            <p>
-                              Lorem ipsum dolor sit amet consectetur adipisicing
-                              elit. Praesentium quasi deserunt, aspernatur
-                              corporis libero dolore quod quidem voluptas et
-                              delectus fugit est placeat corrupti illo ex ipsa
-                              consectetur! Quasi, repellendus?
+                          {/*Modifier 'jeu.titre' pour 'jeu.principal'*/}
+                            <p>{jeu.titre} {jeu.subtitre}</p>
+                            <p>{jeu.resume.brut.length > 100 
+                              ? jeu.resume.brut.slice(0, 200) + "..." 
+                              : jeu.resume.brut}
                             </p>
                           </div>,
                           document.body
