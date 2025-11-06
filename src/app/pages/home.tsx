@@ -142,7 +142,6 @@ function AccordionSection({
   );
 }
 
-
 function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
   const len = jeux.length;
@@ -159,7 +158,7 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
     const id = setInterval(next, 3500);
 
     //pour arreter slider
-      const stop = setTimeout(() => clearInterval(id), 20000);
+    const stop = setTimeout(() => clearInterval(id), 20000);
 
     return () => clearInterval(id);
   }, [len]);
@@ -168,7 +167,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const CARD_H = 288;
   const TRACK_H = 320;
   const GAP_X = 200;
-
 
   return (
     <div className="relative py-8">
@@ -297,6 +295,8 @@ export function Welcome() {
   );
 
   const [jeux, setJeux] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const JEUX_PAR_PAGE = 9;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -324,6 +324,11 @@ export function Welcome() {
 
   const toggleDecade = (key: string) =>
     setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const totalPages = Math.max(1, Math.ceil(jeux.length / JEUX_PAR_PAGE));
+  const indexOfLast = page * JEUX_PAR_PAGE;
+  const indexOfFirst = indexOfLast - JEUX_PAR_PAGE;
+  const jeuxActuels = jeux.slice(indexOfFirst, indexOfLast);
 
   return (
     <main className="min-h-[70vh]">
@@ -375,18 +380,17 @@ export function Welcome() {
 
             <div className="space-y-4">
               {SECTIONS.map((s) => (
-  <AccordionSection
-    key={s.decade}
-    decade={s.decade}
-    jeux={jeux}
-    open={!!openByDecade[s.decade]}
-    onToggle={() => toggleDecade(s.decade)}
-  />
-))}
-
+                <AccordionSection
+                  key={s.decade}
+                  decade={s.decade}
+                  jeux={jeux}
+                  open={!!openByDecade[s.decade]}
+                  onToggle={() => toggleDecade(s.decade)}
+                />
+              ))}
 
               <h2 className="pt-10 text-3xl font-semibold text-gray-900">
-                Tous nos jeux
+                Nos collections
               </h2>
 
               {loading && <p>Chargement des jeux...</p>}
@@ -396,17 +400,15 @@ export function Welcome() {
               )}
 
               {!loading && !error && jeux.length > 0 && (
-                <div
-                  className="grid grid-cols-3 gap-4"                  
-                >
-                  {jeux.map((jeu) => (
+                <div className="grid grid-cols-3 gap-4">
+                  {jeuxActuels.map((jeu) => (
                     <div
                       key={jeu._id}
                       onMouseEnter={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         setHovered(jeu._id);
                         setPopupPos({
-                          top: rect.top + rect.height / 2, // middle of the card 
+                          top: rect.top + rect.height / 2,
                           left: rect.right + 10,
                         });
                       }}
@@ -459,6 +461,30 @@ export function Welcome() {
             </div>
           </div>
         )}
+        
+{/* Pagination */}
+<div className="flex justify-center items-center gap-4 mt-6">
+  <button
+    onClick={() => setPage((p) => Math.max(p - 1, 1))}
+    disabled={page === 1}
+    className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-100"
+  >
+    Précédent
+  </button>
+
+  <span className="text-gray-700 font-medium">
+    Page {page} / {totalPages}
+  </span>
+
+  <button
+    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+    disabled={page === totalPages}
+    className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-100"
+  >
+    Suivant
+  </button>
+</div>
+
 
         {activeTab === 2 && (
           <div className="prose max-w-none">
