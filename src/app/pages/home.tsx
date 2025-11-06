@@ -1,7 +1,5 @@
-import * as React from "react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { GameCard } from "~/components/gameCard";
 import { createPortal } from "react-dom";
 
 const TABS = [
@@ -87,11 +85,10 @@ function AccordionSection({
   open: boolean;
   onToggle: () => void;
 }) {
-  // filtrage selon date (backlog)
   const start = parseInt(decade.split("-")[0]);
   const end = parseInt(decade.split("-")[1]);
   const jeuxDecennie = jeux.filter(
-    (j) => j.anneeSortie >= start && j.anneeSortie <= end
+    (j) => j.anneeSortie >= start && j.anneeSortie <= end,
   );
 
   return (
@@ -240,7 +237,7 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                           {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                         </p>
                       </div>,
-                      document.body
+                      document.body,
                     )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
@@ -254,7 +251,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
         </div>
       </div>
 
-      {/* Contrôles */}
       <div className="mt-6 flex items-center justify-center gap-4">
         <button
           onClick={prev}
@@ -286,13 +282,6 @@ function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
 export function Welcome() {
   const [activeTab, setActiveTab] = useState<number>(1);
-  const [openByDecade, setOpenByDecade] = useState<Record<string, boolean>>(
-    () =>
-      SECTIONS.reduce<Record<string, boolean>>((acc, s, idx) => {
-        acc[s.decade] = idx === 0;
-        return acc;
-      }, {})
-  );
 
   const [jeux, setJeux] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -322,13 +311,12 @@ export function Welcome() {
     chargerJeux();
   }, []);
 
-  const toggleDecade = (key: string) =>
-    setOpenByDecade((prev) => ({ ...prev, [key]: !prev[key] }));
+  const jeuxChoisis = jeux.filter((j) => j.estChoisi === true);
 
-  const totalPages = Math.max(1, Math.ceil(jeux.length / JEUX_PAR_PAGE));
+  const totalPages = Math.max(1, Math.ceil(jeuxChoisis.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
   const indexOfFirst = indexOfLast - JEUX_PAR_PAGE;
-  const jeuxActuels = jeux.slice(indexOfFirst, indexOfLast);
+  const jeuxActuels = jeuxChoisis.slice(indexOfFirst, indexOfLast);
 
   return (
     <main className="min-h-[70vh]">
@@ -349,6 +337,7 @@ export function Welcome() {
             <p>Contenu d’accueil (placeholder).</p>
           </div>
         )}
+
         {activeTab === 1 && (
           <div className="space-y-12">
             <header className="space-y-2">
@@ -379,27 +368,18 @@ export function Welcome() {
             <CoverflowCarousel jeux={jeux} />
 
             <div className="space-y-4">
-              {SECTIONS.map((s) => (
-                <AccordionSection
-                  key={s.decade}
-                  decade={s.decade}
-                  jeux={jeux}
-                  open={!!openByDecade[s.decade]}
-                  onToggle={() => toggleDecade(s.decade)}
-                />
-              ))}
-
               <h2 className="pt-10 text-3xl font-semibold text-gray-900">
                 Nos collections
               </h2>
 
               {loading && <p>Chargement des jeux...</p>}
               {error && <p className="text-red-500">{error}</p>}
-              {!loading && !error && jeux.length === 0 && (
-                <p>Aucun jeu trouvé dans la base de données.</p>
+              {!loading && !error && jeuxChoisis.length === 0 && (
+                <p className="text-gray-500 italic">
+                  Aucun jeu sélectionné pour cette section.
+                </p>
               )}
-
-              {!loading && !error && jeux.length > 0 && (
+              {!loading && !error && jeuxChoisis.length > 0 && (
                 <div className="grid grid-cols-3 gap-4">
                   {jeuxActuels.map((jeu) => (
                     <div
@@ -422,15 +402,11 @@ export function Welcome() {
                       />
                       <h3 className="text-lg font-bold">{jeu.titre}</h3>
                       <p className="mb-1 text-gray-500">
-                        Auteur :{" "}
-                        {jeu.developpeurs?.length
-                          ? jeu.developpeurs[0]
-                          : "Inconnu"}
+                        Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
                       </p>
                       <p className="text-sm text-gray-400">
                         {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                       </p>
-                      {/*Carte des details quand on hover*/}
                       {hovered === jeu._id &&
                         createPortal(
                           <div
@@ -445,14 +421,12 @@ export function Welcome() {
                           >
                             <p>{jeu.titre}</p>
                             <p>
-                              Lorem ipsum dolor sit amet consectetur adipisicing
-                              elit. Praesentium quasi deserunt, aspernatur
-                              corporis libero dolore quod quidem voluptas et
-                              delectus fugit est placeat corrupti illo ex ipsa
-                              consectetur! Quasi, repellendus?
+                              {jeu.resume?.brut
+                                ? jeu.resume.brut.slice(0, 200) + "..."
+                                : ""}
                             </p>
                           </div>,
-                          document.body
+                          document.body,
                         )}
                     </div>
                   ))}
