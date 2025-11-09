@@ -1,5 +1,7 @@
 import { franc } from "franc-min";
 import axios from "axios";
+import { XMLParser } from "fast-xml-parser";
+import he from "he";
 
 async function obtenirImage(nomJeu) {
   try {
@@ -288,6 +290,60 @@ async function extraireDepuisMarc(id) {
     const urls = get("856")
       .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "u")?.["#text"]))
       .filter(Boolean);
+
+     const resumes = get("520");
+    let resumeFR = null,
+      resumeEN = null;
+    const notes = {
+      credits: null,
+      autresEditions: null,
+      etiquettesGeneriques: [],
+      liensQuebec: null,
+    };
+
+    for (const champ of resumes) {
+      const subs = toArray(champ.subfield);
+      const subA = decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"]);
+      const subB = decode(subs.find((sf) => sf["@_code"] === "b")?.["#text"]);
+      const texte = [subA, subB].filter(Boolean).join(" ").trim();
+      if (!subA) continue;
+
+      // résumé FR
+      if (
+        !resumeFR &&
+        /jeu/i.test(subA) &&
+        !/développement|édition|autres|étiquettes|liens|crédits/i.test(subA)
+      ) {
+        resumeFR = texte;
+      }
+      // résumé EN
+      else if (
+        !resumeEN &&
+        /game/i.test(subA) &&
+        !/développement|édition|autres|étiquettes|liens|crédits/i.test(subA)
+      ) {
+        resumeEN = texte;
+      }
+      // notes
+      else if (/cr[eé]dits/i.test(subA))
+        notes.credits = texte.replace(/^cr[eé]dits\s*:\s*/i, "").trim();
+      else if (/autres éditions/i.test(subA))
+        notes.autresEditions = texte.replace(/^autres éditions\s*:\s*/i, "").trim();
+      else if (/autres remarques/i.test(subA))
+        notes.autresRemarques = texte.replace(/^autres remarques\s*:\s*/i, "").trim();
+      else if (/étiquettes|etiquettes/i.test(subA) || /étiquettes|etiquettes/i.test(subB)) {
+        const texteEtiquettes = subA.includes("Étiquettes") ? subB : subA;
+        notes.etiquettesGeneriques = texteEtiquettes
+          ? texteEtiquettes
+            .replace(/^étiquettes génériques\s*:\s*/i, "")
+            .split(/[;,]/)
+            .map((s) => he.decode(s.trim()))
+            .filter(Boolean)
+          : [];
+      } else if (/liens/i.test(subA)) {
+        notes.liensQuebec = texte.trim();
+      }
+    }
 
     
    
