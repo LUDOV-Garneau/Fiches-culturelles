@@ -166,28 +166,17 @@ function extraireDepuisAbstract(abstractBrut) {
  * @returns {object}
  */
 function mapperKohaVersJeu(k) {
-  const plateformes = k.edition_statement
-    ? [String(k.edition_statement).trim()]
-    : undefined;
-
+  const plateformes = k.edition_statement ? [String(k.edition_statement).trim()] : [];
   const annee = k.copyright_date ?? k.publication_year ?? null;
-
   const urls = decouperUrls(k.url);
   const pages = k.pages ? Number(String(k.pages).replace(/[^\d]/g, "")) : null;
 
   const devs = k.author
-    ? String(k.author)
-        .split(/;|,/)
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : undefined;
-
+    ? String(k.author).split(/;|,/).map((s) => s.trim()).filter(Boolean)
+    : [];
   const eds = k.publisher
-    ? String(k.publisher)
-        .split(/;|,/)
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : undefined;
+    ? String(k.publisher).split(/;|,/).map((s) => s.trim()).filter(Boolean)
+    : [];
 
   const { resume, caracteristiques } = extraireDepuisAbstract(k.abstract || "");
 
@@ -201,8 +190,11 @@ function mapperKohaVersJeu(k) {
     (k.framework_id && k.framework_id.toUpperCase() === "QCTE");
 
   return {
-    // Principaux champs
-    titre: String(k.title || "").trim(),
+    titreComplet: {
+      principal: String(k.title || "").trim(),
+      sousTitre: null,
+      alternatifs: [],
+    },
     plateformes,
     anneeSortie: annee ? Number(annee) : null,
     developpeurs: devs,
@@ -210,13 +202,9 @@ function mapperKohaVersJeu(k) {
     typeMedia: k.item_type ?? null,
     urls,
     pages,
-
-    // Résumé et caracs
     resume,
-    caracteristiques: caracteristiques.length ? caracteristiques : undefined,
+    caracteristiques,
     estLieAuQuebec,
-
-    // Métadonnées / Traçabilité
     identifiantsExternes: {
       kohaBiblioId: k.biblio_id != null ? Number(k.biblio_id) : undefined,
       ean: k.ean ?? null,
@@ -229,7 +217,6 @@ function mapperKohaVersJeu(k) {
       dateCreation: k.creation_date ? new Date(k.creation_date) : null,
       horodatage: k.timestamp ? new Date(k.timestamp) : null,
     },
-
     original: k,
   };
 }
