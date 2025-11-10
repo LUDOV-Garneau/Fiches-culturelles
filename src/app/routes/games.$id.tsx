@@ -35,7 +35,6 @@ export default function GameDetail() {
     fetchJeu();
   }, [id]);
 
-  /* --- Chargement --- */
   if (loading)
     return (
       <div className="mx-auto max-w-5xl px-6 py-16 animate-pulse space-y-6">
@@ -44,7 +43,6 @@ export default function GameDetail() {
       </div>
     );
 
-  /* --- Erreur --- */
   if (error || !jeu)
     return (
       <div className="mx-auto max-w-5xl px-6 py-20 text-center">
@@ -60,10 +58,9 @@ export default function GameDetail() {
       </div>
     );
 
-  /* --- Contenu principal --- */
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
-
+      {/* Bandeau supérieur */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white shadow-lg">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 py-10">
           <div>
@@ -91,9 +88,9 @@ export default function GameDetail() {
 
       {/* Contenu principal */}
       <div className="mx-auto max-w-6xl grid md:grid-cols-[1.4fr_0.6fr] gap-10 px-6 py-16">
-     
+        {/* Colonne gauche */}
         <div className="space-y-10">
-  
+          {/* Image */}
           <div className="relative overflow-hidden rounded-3xl shadow-md bg-gray-200">
             {jeu.imageUrl ? (
               <img
@@ -127,7 +124,7 @@ export default function GameDetail() {
                 "Aucune description fournie pour ce jeu pour le moment."}
             </p>
             <p className="mt-5 text-xs text-gray-400">
-              Source : base de données LUDOV
+              Source : base de données LUDOV  
             </p>
           </div>
         </div>
@@ -146,32 +143,10 @@ export default function GameDetail() {
             </p>
           </div>
 
-          <div className="rounded-3xl bg-white p-6 shadow-sm hover:shadow-md transition">
-            <p className="text-xs uppercase font-semibold text-gray-400">
-              Informations
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
-              <li className="flex justify-between border-b border-gray-100 pb-2">
-                <span>ID en base</span>
-                <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">
-                  {jeu._id}
-                </code>
-              </li>
-              {jeu.anneeSortie && (
-                <li className="flex justify-between">
-                  <span>Année</span>
-                  <span>{jeu.anneeSortie}</span>
-                </li>
-              )}
-            </ul>
-          </div>
-
+          {/* Bloc " pour retourner" */}
           <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-md hover:bg-slate-800 transition">
-            <h4 className="text-lg font-semibold">Besoin d’en voir plus ?</h4>
-            <p className="text-sm text-white/70 mt-2 leading-relaxed">
-              Les fiches complètes et médias seront intégrés dans les
-              prochaines versions du site.
-            </p>
+            <h4 className="text-lg font-semibold">vous voulez voir plus de jeux  ?</h4>
+         
             <Link
               to="/"
               className="mt-5 inline-block rounded-full bg-white/10 px-5 py-2 text-sm hover:bg-white/20 transition"
