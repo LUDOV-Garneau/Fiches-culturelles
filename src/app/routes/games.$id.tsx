@@ -124,37 +124,52 @@ export default function GameDetail() {
                 "Aucune description fournie pour ce jeu pour le moment."}
             </p>
             <p className="mt-5 text-xs text-gray-400">
-              Source : base de données LUDOV  
+              Source : base de données LUDOV
             </p>
           </div>
         </div>
 
-        {/* Colonne droite */}
+        {/* Colonne droite : développeur seulement */}
         <aside className="space-y-6">
-          <div className="rounded-3xl bg-white p-6 shadow-sm hover:shadow-md transition">
-            <p className="text-xs uppercase font-semibold text-gray-400">
+          <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-md transition">
+            <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide">
               Développeur
             </p>
-            <h3 className="text-xl font-bold text-gray-900 mt-2">
+            <h3 className="text-2xl font-bold text-gray-900 mt-3">
               {jeu.developpeurs?.[0] ?? "Inconnu"}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
-              {jeu.anneeSortie ? `Projet ${jeu.anneeSortie}` : ""}
+              {jeu.anneeSortie ? `Projet ${jeu.anneeSortie}` : "Année inconnue"}
+            </p>
+
+            {/* petit séparateur */}
+            <div className="mt-5 h-px bg-gray-100" />
+
+            <p className="mt-4 text-sm text-gray-500">
+              Cette fiche présente un jeu québécois archivé dans LUDOV.
             </p>
           </div>
-
-          {/* Bloc " pour retourner" */}
-          <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-md hover:bg-slate-800 transition">
-            <h4 className="text-lg font-semibold">vous voulez voir plus de jeux  ?</h4>
-         
-            <Link
-              to="/"
-              className="mt-5 inline-block rounded-full bg-white/10 px-5 py-2 text-sm hover:bg-white/20 transition"
-            >
-              ← Retour aux jeux
-            </Link>
-          </div>
         </aside>
+      </div>
+
+      {/* Bloc retour (désormais sous le texte) */}
+      <div className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-md hover:bg-slate-800 transition flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h4 className="text-lg font-semibold">
+              Vous voulez voir plus de jeux ?
+            </h4>
+            <p className="text-sm text-white/70 mt-1">
+              Revenez à la collection pour consulter les autres titres.
+            </p>
+          </div>
+          <Link
+            to="/"
+            className="inline-block rounded-full bg-white/10 px-5 py-2 text-sm hover:bg-white/20 transition"
+          >
+            ← Retour aux jeux
+          </Link>
+        </div>
       </div>
     </div>
   );
