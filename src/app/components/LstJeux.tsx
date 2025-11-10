@@ -3,17 +3,34 @@ import { createPortal } from "react-dom";
 
 export default function JeuxGrid({ jeux, loading, error }: any) {
   const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const JEUX_PAR_PAGE = 9;
 
   const jeuxChoisis = useMemo(
     () => jeux.filter((j: any) => j.estChoisi === true),
-    [jeux]
+    [jeux],
   );
 
-  const totalPages = Math.max(1, Math.ceil(jeuxChoisis.length / JEUX_PAR_PAGE));
+  const jeuxFiltres = useMemo(() => {
+    let filtered = [...jeuxChoisis];
+
+    if (searchTerm.trim()) {
+      const lower = searchTerm.toLowerCase();
+      filtered = filtered.filter((jeu) =>
+        [jeu.titre, jeu.resume?.brut, ...(jeu.developpeurs || [])]
+          .join(" ")
+          .toLowerCase()
+          .includes(lower),
+      );
+    }
+
+    return filtered;
+  }, [jeuxChoisis, searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(jeuxFiltres.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
   const indexOfFirst = indexOfLast - JEUX_PAR_PAGE;
-  const jeuxActuels = jeuxChoisis.slice(indexOfFirst, indexOfLast);
+  const jeuxActuels = jeuxFiltres.slice(indexOfFirst, indexOfLast);
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({
@@ -23,7 +40,6 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
 
   if (page > totalPages) setPage(totalPages);
 
-  // smooth effect
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
@@ -32,17 +48,30 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="pt-10 text-3xl font-semibold text-gray-900">
         Nos collections
       </h2>
 
-      {jeuxChoisis.length === 0 ? (
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <input
+          type="text"
+          placeholder="Rechercher un jeu, un développeur..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(1);
+          }}
+          className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/2 focus:outline-none focus:ring focus:ring-gray-200"
+        />
+      </div>
+
+      {jeuxFiltres.length === 0 ? (
         <p className="text-gray-500 italic">
-          Aucun jeu sélectionné pour cette section.
+          Aucun jeu ne correspond à votre recherche.
         </p>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {jeuxActuels.map((jeu: any) => (
             <div
               key={jeu._id}
@@ -82,22 +111,21 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                       maxWidth: "400px",
                     }}
                   >
-                    <p>{jeu.titre}</p>
-                    <p>
+                    <p className="font-semibold">{jeu.titre}</p>
+                    <p className="text-sm text-gray-200 mt-1">
                       {jeu.resume?.brut
                         ? jeu.resume.brut.slice(0, 200) + "..."
                         : ""}
                     </p>
                   </div>,
-                  document.body
+                  document.body,
                 )}
             </div>
           ))}
         </div>
       )}
 
-      {/* Pagination */}
-      {jeuxChoisis.length > JEUX_PAR_PAGE && (
+      {jeuxFiltres.length > JEUX_PAR_PAGE && (
         <div className="flex justify-center items-center gap-4 mt-6">
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
