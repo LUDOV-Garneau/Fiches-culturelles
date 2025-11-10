@@ -344,9 +344,35 @@ async function extraireDepuisMarc(id) {
         notes.liensQuebec = texte.trim();
       }
     }
+     const contenusPhysiques = get("300").map((f) => {
+      const subs = toArray(f.subfield);
+      const quantite = Number(decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"])) || 1;
+      const type = decode(subs.find((sf) => sf["@_code"] === "f")?.["#text"]);
+      const materiaux = decode(subs.find((sf) => sf["@_code"] === "b")?.["#text"]);
+      return type ? { quantite, type, materiaux } : null;
+    }).filter(Boolean);
 
-    
-   
+    const recompenses = get("586")
+      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]))
+      .filter(Boolean);
+
+    const sources = get("588")
+      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]))
+      .filter(Boolean);
+
+    const genres = get("655")
+      .map((f) => {
+        const subs = toArray(f.subfield);
+        const type = decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"]);
+        const valeur = decode(subs.find((sf) => sf["@_code"] === "v")?.["#text"]);
+        return type && valeur ? { type, valeur } : null;
+      })
+      .filter(Boolean);
+
+    const langue = marc?.record?.controlfield?.find(
+      (c) => c["@_tag"] === "008"
+    )?.["#text"]?.slice(35, 38) || null;
+
     return {
       titreComplet: {
         principal: titrePrincipal,
