@@ -24,12 +24,9 @@ export default function GameDetail() {
 
     async function fetchJeu() {
       try {
-  
         const resp = await fetch(`http://72.11.148.122/api/jeux/${id}`);
-
-      
-
         const data = await resp.json();
+
         if (data.success && data.data) {
           setJeu(data.data);
         } else {
@@ -45,7 +42,6 @@ export default function GameDetail() {
 
     fetchJeu();
   }, [id]);
-
 
   if (loading) {
     return (
@@ -71,20 +67,6 @@ export default function GameDetail() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
-      {/* petites pills comme avant */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {["Accueil", "Selection", "Publication", "Revue", "Carte", "Participer"].map(
-          (t) => (
-            <span
-              key={t}
-              className="rounded-full bg-gray-200 px-3 py-1 text-sm dark:bg-gray-800"
-            >
-              {t}
-            </span>
-          )
-        )}
-      </div>
-
       <h1 className="text-4xl font-black tracking-tight">
         {jeu.titre ?? "Jeu sans titre"}
       </h1>
@@ -107,7 +89,6 @@ export default function GameDetail() {
           </div>
 
           <p className="mt-4 text-gray-700 dark:text-gray-300">
-         
             {jeu.resume?.brut
               ? jeu.resume.brut
               : "Aucune description fournie pour ce jeu."}
@@ -139,7 +120,6 @@ export default function GameDetail() {
           <div className="mt-6">
             <p className="text-sm font-semibold">Genres:</p>
             <ul className="mt-1 list-disc pl-5 text-sm text-gray-700 dark:text-gray-300">
-              {/* si ya pa de genre jai mis un fallback */}
               <li>Indie</li>
             </ul>
           </div>
