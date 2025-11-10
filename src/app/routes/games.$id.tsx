@@ -91,7 +91,7 @@ export default function GameDetail() {
     <div className="mx-auto max-w-5xl px-4 py-6">
       {/* petites “pills” de navigation (visuelles) */}
       <div className="mb-4 flex flex-wrap gap-2">
-        {["Accueil", "Selection", "Publication", "Revue", "Carte", "Participer"].map((t) => (
+        {[].map((t) => (
           <span
             key={t}
             className="rounded-full bg-gray-200 px-3 py-1 text-sm dark:bg-gray-800"
