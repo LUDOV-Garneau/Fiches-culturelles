@@ -49,7 +49,7 @@ export default function App() {
       <header className="bg-gray-800 text-white p-4">
         <nav className="flex gap-4 justify-end-safe">
           <a href="/">Home</a>
-          <a href="/casa">Casa</a>
+          <a href="/admin">Admin</a>
           <a href="#">Contact</a>
           <a
             href="/login"
