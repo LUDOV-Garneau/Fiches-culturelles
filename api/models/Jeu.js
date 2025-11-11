@@ -8,7 +8,7 @@ const NotesResumeSchema = new mongoose.Schema(
     etiquettesGeneriques: { type: [String], default: [] },
     liensQuebec: { type: String, default: null },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Résumé (FR, EN, brut)
@@ -19,7 +19,7 @@ const ResumeSchema = new mongoose.Schema(
     en: { type: String, default: null },
     notes: { type: NotesResumeSchema, default: undefined },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Identifiants externes (Koha, ISBN, etc.)
@@ -31,7 +31,7 @@ const IdentifiantsExternesSchema = new mongoose.Schema(
     issn: { type: String, default: null },
     lc: { type: String, default: null },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Source du document
@@ -40,7 +40,7 @@ const SourceSchema = new mongoose.Schema(
     systeme: { type: String, default: "koha" },
     idCadre: { type: String, default: null },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Infos d’ingestion
@@ -49,7 +49,7 @@ const IngestionSchema = new mongoose.Schema(
     dateCreation: { type: Date, default: null },
     horodatage: { type: Date, default: null },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Genres, thèmes, gameplay 
@@ -131,8 +131,14 @@ const JeuSchema = new mongoose.Schema(
 
     // Données originales 
     original: { type: mongoose.Schema.Types.Mixed, required: true },
+
+    estChoisi: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );
 
 // Index texte 
