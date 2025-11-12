@@ -272,33 +272,50 @@ async function exporterJeuPdf(req, res) {
     const jeu = await Jeu.findById(id);
 
     if (!jeu) {
-      return res.status(404).json({
-        success: false,
-        message: "Jeu non trouvé.",
-      });
+      return res.status(404).json({ success: false, message: "Jeu non trouvé." });
     }
 
     const dossier = "exports";
     if (!fs.existsSync(dossier)) fs.mkdirSync(dossier);
 
     const filePath = path.join(dossier, `jeu_${jeu._id}.pdf`);
-    const doc = new PDFDocument({ margin: 40 });
+    const doc = new PDFDocument({ margin: 50 });
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
+    // === EN-TÊTE BLEU FONCÉ ===
+    doc.rect(0, 0, doc.page.width, 60).fill("#2C3E50");
+    doc.fillColor("#ECF0F1").fontSize(20).text("Catalogue LUDOV - Jeu Québécois", 50, 20);
+    doc.moveDown(2);
+    doc.fillColor("black");
+
     // === TITRE ===
-    doc
-      .fontSize(22)
-      .text(jeu.titreComplet.principal, { align: "center", underline: true })
-      .moveDown(0.5);
+    doc.fontSize(22).fillColor("#1A5276").text(jeu.titreComplet.principal, { align: "center" });
+    if (jeu.titreComplet.sousTitre) {
+      doc.fontSize(14).fillColor("#34495E").text(jeu.titreComplet.sousTitre, { align: "center" });
+    }
+    doc.moveDown(1.5);
 
-    if (jeu.titreComplet.sousTitre)
-      doc.fontSize(14).text(jeu.titreComplet.sousTitre, { align: "center" });
+    // === IMAGE (centrée) ===
+    if (jeu.imageUrl) {
+      try {
+        const imgPath = path.join(dossier, `${jeu._id}.jpg`);
+        const { data } = await axios.get(jeu.imageUrl, { responseType: "arraybuffer" });
+        fs.writeFileSync(imgPath, data);
+        doc.image(imgPath, { fit: [200, 200], align: "center" });
+        fs.unlinkSync(imgPath);
+        doc.moveDown(1);
+      } catch {
+        doc.fillColor("#7F8C8D").text("(Image non disponible)", { align: "center" });
+        doc.moveDown(1);
+      }
+    }
 
-    doc.moveDown(1);
+    // === SECTION INFO GÉNÉRALES ===
+    doc.fontSize(16).fillColor("#1A5276").text("Informations générales", { underline: true });
+    doc.moveDown(0.3);
+    doc.fontSize(12).fillColor("black");
 
-    // === INFORMATIONS GÉNÉRALES ===
-    doc.fontSize(12);
     const infos = [
       ["Année de sortie", jeu.anneeSortie],
       ["Développeurs", jeu.developpeurs.join(", ")],
@@ -318,16 +335,19 @@ async function exporterJeuPdf(req, res) {
 
     // === RÉSUMÉ ===
     if (jeu.resume?.fr || jeu.resume?.en) {
-      doc.fontSize(14).text("Résumé", { underline: true });
+      doc.fontSize(16).fillColor("#1A5276").text("Résumé", { underline: true });
       doc.moveDown(0.3);
-      doc.fontSize(12).text(jeu.resume.fr || jeu.resume.en);
+      doc.fontSize(12).fillColor("black");
+      doc.text(jeu.resume.fr || jeu.resume.en, { align: "justify" });
       doc.moveDown(1);
     }
 
     // === NOTES ===
     if (jeu.resume?.notes) {
       const n = jeu.resume.notes;
-      doc.fontSize(14).text("Notes", { underline: true }).moveDown(0.3);
+      doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
       if (n.credits) doc.text(`Crédits : ${n.credits}`);
       if (n.autresEditions) doc.text(`Autres éditions : ${n.autresEditions}`);
       if (n.etiquettesGeneriques?.length)
@@ -338,64 +358,52 @@ async function exporterJeuPdf(req, res) {
 
     // === GENRES ===
     if (jeu.genres?.length) {
-      doc.fontSize(14).text("Genres / Thèmes", { underline: true });
+      doc.fontSize(16).fillColor("#1A5276").text("Genres / Thèmes", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
       jeu.genres.forEach((g) => {
-        doc.fontSize(12).text(`• ${g.type} : ${g.valeur}`);
+        doc.text(`• ${g.type} : ${g.valeur}`);
       });
       doc.moveDown(1);
     }
 
-        // === CONTENU PHYSIQUE ===
+    // === CONTENU PHYSIQUE ===
     if (jeu.contenuPhysique?.length) {
-      doc.fontSize(14).text("Contenu physique", { underline: true });
+      doc.fontSize(16).fillColor("#1A5276").text("Contenu physique", { underline: true });
       doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
       jeu.contenuPhysique.forEach((c) => {
         const quantite = c.quantite || 1;
         const type = c.type || "Inconnu";
         const mat = c.materiaux ? ` (${c.materiaux})` : "";
-        doc.fontSize(12).text(`• ${quantite} × ${type}${mat}`);
+        doc.text(`• ${quantite} × ${type}${mat}`);
       });
       doc.moveDown(1);
     }
 
     // === RÉCOMPENSES ===
     if (jeu.recompenses?.length) {
-      doc.fontSize(14).text("Récompenses", { underline: true });
+      doc.fontSize(16).fillColor("#1A5276").text("Récompenses", { underline: true });
       doc.moveDown(0.3);
-      jeu.recompenses.forEach((r) => doc.fontSize(12).text(`• ${r}`));
+      doc.fontSize(12).fillColor("black");
+      jeu.recompenses.forEach((r) => doc.text(`• ${r}`));
       doc.moveDown(1);
     }
 
-    // === SOURCES ===
+    // === SOURCES / RÉFÉRENCES ===
     if (jeu.sources?.length) {
-      doc.fontSize(14).text("Sources / Références", { underline: true });
+      doc.fontSize(16).fillColor("#1A5276").text("Sources / Références", { underline: true });
       doc.moveDown(0.3);
-      jeu.sources.forEach((s) => doc.fontSize(12).text(`• ${s}`));
+      doc.fontSize(10).fillColor("#2C3E50");
+      jeu.sources.forEach((s) => doc.text(`• ${s}`, { width: 500 }));
       doc.moveDown(1);
     }
 
-
-    // === IMAGE ===
-    if (jeu.imageUrl) {
-      try {
-        const imgPath = path.join(dossier, `${jeu._id}.jpg`);
-        const { data } = await axios.get(jeu.imageUrl, {
-          responseType: "arraybuffer",
-        });
-        fs.writeFileSync(imgPath, data);
-        doc.image(imgPath, { fit: [250, 250], align: "center" });
-        fs.unlinkSync(imgPath);
-      } catch {
-        doc.text("Image non disponible.");
-      }
-      doc.moveDown(1);
-    }
-
-    // === FOOTER ===
-    doc
-      .fontSize(10)
-      .moveDown(2)
-      .text("Catalogue LUDOV - Jeux québécois", { align: "center" });
+    // === PIED DE PAGE ===
+    doc.moveDown(2);
+    doc.rect(0, doc.page.height - 40, doc.page.width, 40).fill("#2C3E50");
+    doc.fillColor("white").fontSize(10)
+      .text("Catalogue LUDOV - Jeux québécois", 50, doc.page.height - 30, { align: "center" });
 
     doc.end();
 
@@ -414,7 +422,4 @@ async function exporterJeuPdf(req, res) {
   }
 }
 
-export { exporterJeuPdf };
-
-
-export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };
+export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu, exporterJeuPdf };
