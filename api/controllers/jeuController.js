@@ -349,17 +349,37 @@ async function exporterJeuPdf(req, res) {
 
     // === NOTES ===
     if (jeu.resume?.notes) {
-      const n = jeu.resume.notes;
-      doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(12).fillColor("black");
-      if (n.credits) doc.text(`Crédits : ${n.credits}`);
-      if (n.autresEditions) doc.text(`Autres éditions : ${n.autresEditions}`);
-      if (n.etiquettesGeneriques?.length)
-        doc.text(`Étiquettes : ${n.etiquettesGeneriques.join(", ")}`);
-      if (n.liensQuebec) doc.text(`Lien Québec : ${n.liensQuebec}`);
-      doc.moveDown(1);
-    }
+  const n = jeu.resume.notes;
+  doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
+  doc.moveDown(0.4);
+
+  const maxWidth = 500;
+
+  // Fonction utilitaire pour mise en forme
+  const renderNote = (label, text) => {
+    if (!text) return;
+    doc.fontSize(12)
+      .fillColor("#154360")
+      .font("Helvetica-Bold")
+      .text(`${label}`, { continued: true })
+      .fillColor("black")
+      .font("Helvetica")
+      .text(` ${text}`, {
+        width: maxWidth,
+        align: "justify",
+        indent: 15,
+      });
+    doc.moveDown(0.6);
+  };
+
+  renderNote("Crédits :", n.credits);
+  renderNote("Autres éditions :", n.autresEditions);
+  if (n.etiquettesGeneriques?.length)
+    renderNote("Étiquettes :", n.etiquettesGeneriques.join(", "));
+  renderNote("Lien Québec :", n.liensQuebec);
+
+  doc.moveDown(0.5);
+}
 
     // === GENRES ===
     if (jeu.genres?.length) {
