@@ -1,6 +1,9 @@
 import axios from "axios";
 import Jeu from "../models/Jeu.js";
 import { mapperKohaVersJeu, obtenirImage } from "../utils/kohaMappeur.js";
+import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
 
 /**
  * Importer les jeux liés au Québec depuis Koha et les sauvegarder en MongoDB
@@ -259,5 +262,159 @@ async function updateJeu(req, res) {
     });
   }
 }
+
+/**
+ * Exporter un jeu en PDF
+ */
+async function exporterJeuPdf(req, res) {
+  try {
+    const { id } = req.params;
+    const jeu = await Jeu.findById(id);
+
+    if (!jeu) {
+      return res.status(404).json({
+        success: false,
+        message: "Jeu non trouvé.",
+      });
+    }
+
+    const dossier = "exports";
+    if (!fs.existsSync(dossier)) fs.mkdirSync(dossier);
+
+    const filePath = path.join(dossier, `jeu_${jeu._id}.pdf`);
+    const doc = new PDFDocument({ margin: 40 });
+    const stream = fs.createWriteStream(filePath);
+    doc.pipe(stream);
+
+    // === TITRE ===
+    doc
+      .fontSize(22)
+      .text(jeu.titreComplet.principal, { align: "center", underline: true })
+      .moveDown(0.5);
+
+    if (jeu.titreComplet.sousTitre)
+      doc.fontSize(14).text(jeu.titreComplet.sousTitre, { align: "center" });
+
+    doc.moveDown(1);
+
+    // === INFORMATIONS GÉNÉRALES ===
+    doc.fontSize(12);
+    const infos = [
+      ["Année de sortie", jeu.anneeSortie],
+      ["Développeurs", jeu.developpeurs.join(", ")],
+      ["Éditeurs", jeu.editeurs.join(", ")],
+      ["Plateformes", jeu.plateformes.join(", ")],
+      ["Langue", jeu.langue],
+      ["Lieu de publication", jeu.lieuPublication],
+      ["Éditeur principal", jeu.editeurPrincipal],
+      ["Format / support", jeu.formatSupport],
+    ];
+
+    infos.forEach(([label, val]) => {
+      if (val) doc.text(`${label} : ${val}`);
+    });
+
+    doc.moveDown(1);
+
+    // === RÉSUMÉ ===
+    if (jeu.resume?.fr || jeu.resume?.en) {
+      doc.fontSize(14).text("Résumé", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).text(jeu.resume.fr || jeu.resume.en);
+      doc.moveDown(1);
+    }
+
+    // === NOTES ===
+    if (jeu.resume?.notes) {
+      const n = jeu.resume.notes;
+      doc.fontSize(14).text("Notes", { underline: true }).moveDown(0.3);
+      if (n.credits) doc.text(`Crédits : ${n.credits}`);
+      if (n.autresEditions) doc.text(`Autres éditions : ${n.autresEditions}`);
+      if (n.etiquettesGeneriques?.length)
+        doc.text(`Étiquettes : ${n.etiquettesGeneriques.join(", ")}`);
+      if (n.liensQuebec) doc.text(`Lien Québec : ${n.liensQuebec}`);
+      doc.moveDown(1);
+    }
+
+    // === GENRES ===
+    if (jeu.genres?.length) {
+      doc.fontSize(14).text("Genres / Thèmes", { underline: true });
+      jeu.genres.forEach((g) => {
+        doc.fontSize(12).text(`• ${g.type} : ${g.valeur}`);
+      });
+      doc.moveDown(1);
+    }
+
+        // === CONTENU PHYSIQUE ===
+    if (jeu.contenuPhysique?.length) {
+      doc.fontSize(14).text("Contenu physique", { underline: true });
+      doc.moveDown(0.3);
+      jeu.contenuPhysique.forEach((c) => {
+        const quantite = c.quantite || 1;
+        const type = c.type || "Inconnu";
+        const mat = c.materiaux ? ` (${c.materiaux})` : "";
+        doc.fontSize(12).text(`• ${quantite} × ${type}${mat}`);
+      });
+      doc.moveDown(1);
+    }
+
+    // === RÉCOMPENSES ===
+    if (jeu.recompenses?.length) {
+      doc.fontSize(14).text("Récompenses", { underline: true });
+      doc.moveDown(0.3);
+      jeu.recompenses.forEach((r) => doc.fontSize(12).text(`• ${r}`));
+      doc.moveDown(1);
+    }
+
+    // === SOURCES ===
+    if (jeu.sources?.length) {
+      doc.fontSize(14).text("Sources / Références", { underline: true });
+      doc.moveDown(0.3);
+      jeu.sources.forEach((s) => doc.fontSize(12).text(`• ${s}`));
+      doc.moveDown(1);
+    }
+
+
+    // === IMAGE ===
+    if (jeu.imageUrl) {
+      try {
+        const imgPath = path.join(dossier, `${jeu._id}.jpg`);
+        const { data } = await axios.get(jeu.imageUrl, {
+          responseType: "arraybuffer",
+        });
+        fs.writeFileSync(imgPath, data);
+        doc.image(imgPath, { fit: [250, 250], align: "center" });
+        fs.unlinkSync(imgPath);
+      } catch {
+        doc.text("Image non disponible.");
+      }
+      doc.moveDown(1);
+    }
+
+    // === FOOTER ===
+    doc
+      .fontSize(10)
+      .moveDown(2)
+      .text("Catalogue LUDOV - Jeux québécois", { align: "center" });
+
+    doc.end();
+
+    stream.on("finish", () => {
+      res.download(filePath, `jeu_${jeu._id}.pdf`, () => {
+        fs.unlinkSync(filePath);
+      });
+    });
+  } catch (err) {
+    console.error("Erreur exporterJeuPdf:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la génération du PDF.",
+      error: err.message,
+    });
+  }
+}
+
+export { exporterJeuPdf };
+
 
 export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };
