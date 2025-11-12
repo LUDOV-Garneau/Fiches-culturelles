@@ -278,7 +278,12 @@ async function exporterJeuPdf(req, res) {
     const dossier = "exports";
     if (!fs.existsSync(dossier)) fs.mkdirSync(dossier);
 
-    const filePath = path.join(dossier, `jeu_${jeu._id}.pdf`);
+    const nomFichierJeu = jeu.titreComplet.principal
+      .replace(/[^a-zA-Z0-9_\- ]/g, "")  
+      .replace(/\s+/g, "_")              
+      .substring(0, 80);                
+    const nomPdf = `${nomFichierJeu || "jeu"}.pdf`;
+    const filePath = path.join(dossier, nomPdf);
     const doc = new PDFDocument({ margin: 50 });
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
@@ -408,7 +413,7 @@ async function exporterJeuPdf(req, res) {
     doc.end();
 
     stream.on("finish", () => {
-      res.download(filePath, `jeu_${jeu._id}.pdf`, () => {
+      res.download(filePath, nomPdf, () => {
         fs.unlinkSync(filePath);
       });
     });
