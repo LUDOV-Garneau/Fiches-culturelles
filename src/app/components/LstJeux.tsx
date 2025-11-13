@@ -4,12 +4,24 @@ import { createPortal } from "react-dom";
 export default function JeuxGrid({ jeux, loading, error }: any) {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [decennieFiltre, setDecennieFiltre] = useState("toutes");
   const JEUX_PAR_PAGE = 9;
 
   const jeuxChoisis = useMemo(
     () => jeux.filter((j: any) => j.estChoisi === true),
     [jeux],
   );
+
+  const decenniesDisponibles = useMemo(() => {
+    const set = new Set<number>();
+    jeuxChoisis.forEach((j: any) => {
+      if (j.anneeSortie) {
+        const dec = Math.floor(j.anneeSortie / 10) * 10;
+        set.add(dec);
+      }
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [jeuxChoisis]);
 
   const jeuxFiltres = useMemo(() => {
     let filtered = [...jeuxChoisis];
@@ -24,8 +36,16 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
       );
     }
 
+    if (decennieFiltre !== "toutes") {
+      const dec = parseInt(decennieFiltre);
+      filtered = filtered.filter(
+        (j: any) =>
+          j.anneeSortie && Math.floor(j.anneeSortie / 10) * 10 === dec,
+      );
+    }
+
     return filtered;
-  }, [jeuxChoisis, searchTerm]);
+  }, [jeuxChoisis, searchTerm, decennieFiltre]);
 
   const totalPages = Math.max(1, Math.ceil(jeuxFiltres.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
@@ -64,6 +84,24 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
           }}
           className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/2 focus:outline-none focus:ring focus:ring-gray-200"
         />
+
+        {decenniesDisponibles.length > 0 && (
+          <select
+            value={decennieFiltre}
+            onChange={(e) => {
+              setDecennieFiltre(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-gray-200"
+          >
+            <option value="toutes">Toutes les décennies</option>
+            {decenniesDisponibles.map((d) => (
+              <option key={d} value={d}>
+                {d}s
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {jeuxFiltres.length === 0 ? (
