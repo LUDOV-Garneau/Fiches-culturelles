@@ -1,11 +1,12 @@
-import { type RouteConfig, route, index } from "@react-router/dev/routes";
+import { type RouteConfig, index } from "@react-router/dev/routes";
 
-export default [
-  index("./pages/home.tsx"),
+export default [index("routes/home.tsx"), 
+    { path: "/admin", file: "routes/admin.tsx"},
+    { path: "/login", file: "routes/login.tsx", },
 
-  route("login", "./pages/login.tsx"),
-  route("admin", "./pages/admin/admin.tsx"),
+    { path: "/admin/jeux/edit/:id", file: "routes/admin.jeux.edit.$id.tsx" },
 
-  route("admin/jeux/edit/:id", "./pages/admin/admin.jeux.edit.$id.tsx"),
-  route("games/:id", "./pages/games.$id.tsx"),
-] satisfies RouteConfig;
+    { path: "/games/:id", file: "routes/games.$id.tsx" },
+
+    ] satisfies RouteConfig;
+ 

@@ -13,10 +13,10 @@ type Pages = {
   "/": {
     params: {};
   };
-  "/login": {
+  "/admin": {
     params: {};
   };
-  "/admin": {
+  "/login": {
     params: {};
   };
   "/admin/jeux/edit/:id": {
@@ -34,26 +34,26 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/admin" | "/admin/jeux/edit/:id" | "/games/:id";
+    page: "/" | "/admin" | "/login" | "/admin/jeux/edit/:id" | "/games/:id";
   };
-  "./pages/home.tsx": {
-    id: "pages/home";
+  "routes/home.tsx": {
+    id: "routes/home";
     page: "/";
   };
-  "./pages/login.tsx": {
-    id: "pages/login";
-    page: "/login";
-  };
-  "./pages/admin/admin.tsx": {
-    id: "pages/admin/admin";
+  "routes/admin.tsx": {
+    id: "routes/admin";
     page: "/admin";
   };
-  "./pages/admin/admin.jeux.edit.$id.tsx": {
-    id: "pages/admin/admin.jeux.edit.$id";
+  "routes/login.tsx": {
+    id: "routes/login";
+    page: "/login";
+  };
+  "routes/admin.jeux.edit.$id.tsx": {
+    id: "routes/admin.jeux.edit.$id";
     page: "/admin/jeux/edit/:id";
   };
-  "./pages/games.$id.tsx": {
-    id: "pages/games.$id";
+  "routes/games.$id.tsx": {
+    id: "routes/games.$id";
     page: "/games/:id";
   };
 };

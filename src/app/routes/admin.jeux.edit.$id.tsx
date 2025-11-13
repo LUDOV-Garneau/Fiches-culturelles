@@ -52,33 +52,6 @@ export default function ModifierJeu() {
     }
   }
 
-  async function toggleChoisi(id: string, estChoisiActuel: boolean) {
-    try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ estChoisi: !estChoisiActuel }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setJeu((prev: any) =>
-          prev.map((j: any) =>
-            j._id === id ? { ...j, estChoisi: !estChoisiActuel } : j,
-          ),
-        );
-      } else {
-        alert("Erreur : " + data.message);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Erreur lors de la mise à jour du jeu.");
-    }
-  }
-
   if (loading) return <p className="p-4">Chargement du jeu...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
   if (!jeu) return null;
