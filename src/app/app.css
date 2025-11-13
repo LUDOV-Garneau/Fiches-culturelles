@@ -3,7 +3,7 @@
 /* === Thème global (v4) === */
 @theme {
   --color-primary-blue: #02dade;
-  --color-primary-gray: #e6e6e6;
+  --color-primary-gray: #E6E6E6;
  
   --color-primary-blue-90: color-mix(in oklab, var(--color-primary-blue) 90%, black);
   --color-primary-blue-10: color-mix(in oklab, var(--color-primary-blue) 10%, white);
@@ -23,7 +23,8 @@ body {
 
 /* pour un boutton si on a besoin plustard */
 .btn-primary {
-  @apply text-white rounded px-4 py-2 inline-flex items-center justify-center;
+  @apply text-white inline-flex items-center justify-center p-2 w-15 h-8;
+  @apply text-[0.7rem];
   background: var(--color-primary-blue);
 }
 .btn-primary:hover { background: var(--color-primary-blue-90); }
