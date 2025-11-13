@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router";
 
 export default function JeuxGrid({ jeux, loading, error }: any) {
   const [page, setPage] = useState(1);
@@ -111,7 +112,8 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {jeuxActuels.map((jeu: any) => (
-            <div
+            <Link
+              to={`/games/${jeu._id}`}
               key={jeu._id}
               onMouseEnter={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -158,7 +160,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                   </div>,
                   document.body,
                 )}
-            </div>
+            </Link>
           ))}
         </div>
       )}
