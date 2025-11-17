@@ -1,6 +1,9 @@
 import axios from "axios";
 import Jeu from "../models/Jeu.js";
 import { mapperKohaVersJeu, obtenirImage } from "../utils/kohaMappeur.js";
+import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
 
 /**
  * Importer les jeux liés au Québec depuis Koha et les sauvegarder en MongoDB
@@ -260,4 +263,188 @@ async function updateJeu(req, res) {
   }
 }
 
-export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu };
+/**
+ * Exporter un jeu en PDF
+ */
+async function exporterJeuPdf(req, res) {
+  try {
+    const { id } = req.params;
+    const jeu = await Jeu.findById(id);
+
+    if (!jeu) {
+      return res.status(404).json({ success: false, message: "Jeu non trouvé." });
+    }
+
+    const dossier = "exports";
+    if (!fs.existsSync(dossier)) fs.mkdirSync(dossier);
+
+    const nomFichierJeu = jeu.titreComplet.principal
+      .replace(/[^a-zA-Z0-9_\- ]/g, "")  
+      .replace(/\s+/g, "_")              
+      .substring(0, 80);                
+    const nomPdf = `${nomFichierJeu || "jeu"}.pdf`;
+    const filePath = path.join(dossier, nomPdf);
+    const doc = new PDFDocument({ margin: 50 });
+    const stream = fs.createWriteStream(filePath);
+    doc.pipe(stream);
+
+    // === EN-TÊTE BLEU FONCÉ ===
+    doc.rect(0, 0, doc.page.width, 60).fill("#2C3E50");
+    doc.fillColor("#ECF0F1").fontSize(20).text("Catalogue LUDOV - Jeu Québécois", 50, 20);
+    doc.moveDown(2);
+    doc.fillColor("black");
+
+    // === TITRE ===
+    doc.fontSize(22).fillColor("#1A5276").text(jeu.titreComplet.principal, { align: "center" });
+    if (jeu.titreComplet.sousTitre) {
+      doc.fontSize(14).fillColor("#34495E").text(jeu.titreComplet.sousTitre, { align: "center" });
+    }
+    doc.moveDown(1.5);
+
+    // === IMAGE (centrée) ===
+    if (jeu.imageUrl) {
+      try {
+        const imgPath = path.join(dossier, `${jeu._id}.jpg`);
+        const { data } = await axios.get(jeu.imageUrl, { responseType: "arraybuffer" });
+        fs.writeFileSync(imgPath, data);
+        doc.image(imgPath, { fit: [200, 200], align: "center" });
+        fs.unlinkSync(imgPath);
+        doc.moveDown(1);
+      } catch {
+        doc.fillColor("#7F8C8D").text("(Image non disponible)", { align: "center" });
+        doc.moveDown(1);
+      }
+    }
+
+    // === SECTION INFO GÉNÉRALES ===
+    doc.fontSize(16).fillColor("#1A5276").text("Informations générales", { underline: true });
+    doc.moveDown(0.3);
+    doc.fontSize(12).fillColor("black");
+
+    const infos = [
+      ["Année de sortie", jeu.anneeSortie],
+      ["Développeurs", jeu.developpeurs.join(", ")],
+      ["Éditeurs", jeu.editeurs.join(", ")],
+      ["Plateformes", jeu.plateformes.join(", ")],
+      ["Langue", jeu.langue],
+      ["Lieu de publication", jeu.lieuPublication],
+      ["Éditeur principal", jeu.editeurPrincipal],
+      ["Format / support", jeu.formatSupport],
+    ];
+
+    infos.forEach(([label, val]) => {
+      if (val) doc.text(`${label} : ${val}`);
+    });
+
+    doc.moveDown(1);
+
+    // === RÉSUMÉ ===
+    if (jeu.resume?.fr || jeu.resume?.en) {
+      doc.fontSize(16).fillColor("#1A5276").text("Résumé", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
+      doc.text(jeu.resume.fr || jeu.resume.en, { align: "justify" });
+      doc.moveDown(1);
+    }
+
+    // === NOTES ===
+    if (jeu.resume?.notes) {
+  const n = jeu.resume.notes;
+  doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
+  doc.moveDown(0.4);
+
+  const maxWidth = 500;
+
+  // Fonction utilitaire pour mise en forme
+  const renderNote = (label, text) => {
+    if (!text) return;
+    doc.fontSize(12)
+      .fillColor("#154360")
+      .font("Helvetica-Bold")
+      .text(`${label}`, { continued: true })
+      .fillColor("black")
+      .font("Helvetica")
+      .text(` ${text}`, {
+        width: maxWidth,
+        align: "justify",
+        indent: 15,
+      });
+    doc.moveDown(0.6);
+  };
+
+  renderNote("Crédits :", n.credits);
+  renderNote("Autres éditions :", n.autresEditions);
+  if (n.etiquettesGeneriques?.length)
+    renderNote("Étiquettes :", n.etiquettesGeneriques.join(", "));
+  renderNote("Lien Québec :", n.liensQuebec);
+
+  doc.moveDown(0.5);
+}
+
+    // === GENRES ===
+    if (jeu.genres?.length) {
+      doc.fontSize(16).fillColor("#1A5276").text("Genres / Thèmes", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
+      jeu.genres.forEach((g) => {
+        doc.text(`• ${g.type} : ${g.valeur}`);
+      });
+      doc.moveDown(1);
+    }
+
+    // === CONTENU PHYSIQUE ===
+    if (jeu.contenuPhysique?.length) {
+      doc.fontSize(16).fillColor("#1A5276").text("Contenu physique", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
+      jeu.contenuPhysique.forEach((c) => {
+        const quantite = c.quantite || 1;
+        const type = c.type || "Inconnu";
+        const mat = c.materiaux ? ` (${c.materiaux})` : "";
+        doc.text(`• ${quantite} × ${type}${mat}`);
+      });
+      doc.moveDown(1);
+    }
+
+    // === RÉCOMPENSES ===
+    if (jeu.recompenses?.length) {
+      doc.fontSize(16).fillColor("#1A5276").text("Récompenses", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black");
+      jeu.recompenses.forEach((r) => doc.text(`• ${r}`));
+      doc.moveDown(1);
+    }
+
+    // === SOURCES / RÉFÉRENCES ===
+    if (jeu.sources?.length) {
+      doc.fontSize(16).fillColor("#1A5276").text("Sources / Références", { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(10).fillColor("#2C3E50");
+      jeu.sources.forEach((s) => doc.text(`• ${s}`, { width: 500 }));
+      doc.moveDown(1);
+    }
+
+    // === PIED DE PAGE ===
+    doc.moveDown(2);
+    doc.rect(0, doc.page.height - 40, doc.page.width, 40).fill("#2C3E50");
+    doc.fillColor("white").fontSize(10)
+      .text("Catalogue LUDOV - Jeux québécois", 50, doc.page.height - 30, { align: "center" });
+
+    doc.end();
+
+    stream.on("finish", () => {
+      res.download(filePath, nomPdf, () => {
+        fs.unlinkSync(filePath);
+      });
+    });
+  } catch (err) {
+    console.error("Erreur exporterJeuPdf:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la génération du PDF.",
+      error: err.message,
+    });
+  }
+}
+
+export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu, exporterJeuPdf };
