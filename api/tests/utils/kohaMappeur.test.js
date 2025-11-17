@@ -38,7 +38,7 @@ describe("mapperKohaVersJeu", () => {
       publication_place: "Montréal"
     });
 
-    expect(jeu.titre).toBe("Mon jeu");
+    expect(jeu.titreComplet.principal).toBe("Mon jeu");
     expect(jeu.plateformes).toEqual(["PS5"]);
     expect(jeu.anneeSortie).toBe(2024);
     expect(jeu.developpeurs).toContain("Ubisoft");
