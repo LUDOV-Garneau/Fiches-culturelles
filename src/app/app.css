@@ -3,13 +3,22 @@
 /* === Thème global (v4) === */
 @theme {
   --color-primary-blue: #02dade;
-  --color-primary-gray: #E6E6E6;
- 
-  --color-primary-blue-90: color-mix(in oklab, var(--color-primary-blue) 90%, black);
-  --color-primary-blue-10: color-mix(in oklab, var(--color-primary-blue) 10%, white);
+  --color-primary-gray: #e6e6e6;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-primary-blue-90: color-mix(
+    in oklab,
+    var(--color-primary-blue) 90%,
+    black
+  );
+  --color-primary-blue-10: color-mix(
+    in oklab,
+    var(--color-primary-blue) 10%,
+    white
+  );
+
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /* base */
@@ -27,28 +36,30 @@ body {
   @apply text-[0.7rem];
   background: var(--color-primary-blue);
 }
-.btn-primary:hover { background: var(--color-primary-blue-90); }
+.btn-primary:hover {
+  background: var(--color-primary-blue-90);
+}
 .btn-primary:focus-visible {
   outline: 2px solid var(--color-primary-blue);
   outline-offset: 2px;
 }
 
 .sidenav {
-  height: 100%; 
-  width: 7.20%; 
-  position: fixed; 
-  z-index: 1; 
-  top: 0; 
+  height: 100%;
+  width: 7.2%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
   left: 0;
-  background-color: white; 
+  background-color: white;
   padding-top: 20px;
 }
 
-.img_logo{
+.img_logo {
   max-width: 50%;
   height: auto;
-  display:block;
-  margin:auto;
+  display: block;
+  margin: auto;
 }
 .sidediv {
   position: relative;
@@ -74,8 +85,8 @@ body {
   padding: 10px;
 }
 
-.submenu li{
-  color:white;
+.submenu li {
+  color: white;
   font-size: 15px;
   display: flex;
   justify-content: left;

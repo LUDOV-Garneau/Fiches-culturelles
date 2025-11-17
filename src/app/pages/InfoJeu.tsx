@@ -109,7 +109,11 @@ function DevCard({
       <h3 className="mb-3 font-semibold text-gray-900">Développeur:</h3>
       <div className="mx-auto mb-3 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
         {logo ? (
-          <img src={logo} alt={developer} className="h-24 w-24 object-contain" />
+          <img
+            src={logo}
+            alt={developer}
+            className="h-24 w-24 object-contain"
+          />
         ) : (
           <span className="text-xs text-gray-400">logo</span>
         )}

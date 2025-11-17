@@ -1,5 +1,7 @@
 import { franc } from "franc-min";
 import axios from "axios";
+import { XMLParser } from "fast-xml-parser";
+import he from "he";
 
 async function obtenirImage(nomJeu) {
   try {
@@ -166,28 +168,17 @@ function extraireDepuisAbstract(abstractBrut) {
  * @returns {object}
  */
 function mapperKohaVersJeu(k) {
-  const plateformes = k.edition_statement
-    ? [String(k.edition_statement).trim()]
-    : undefined;
-
+  const plateformes = k.edition_statement ? [String(k.edition_statement).trim()] : [];
   const annee = k.copyright_date ?? k.publication_year ?? null;
-
   const urls = decouperUrls(k.url);
   const pages = k.pages ? Number(String(k.pages).replace(/[^\d]/g, "")) : null;
 
   const devs = k.author
-    ? String(k.author)
-        .split(/;|,/)
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : undefined;
-
+    ? String(k.author).split(/;|,/).map((s) => s.trim()).filter(Boolean)
+    : [];
   const eds = k.publisher
-    ? String(k.publisher)
-        .split(/;|,/)
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : undefined;
+    ? String(k.publisher).split(/;|,/).map((s) => s.trim()).filter(Boolean)
+    : [];
 
   const { resume, caracteristiques } = extraireDepuisAbstract(k.abstract || "");
 
@@ -201,8 +192,11 @@ function mapperKohaVersJeu(k) {
     (k.framework_id && k.framework_id.toUpperCase() === "QCTE");
 
   return {
-    // Principaux champs
-    titre: String(k.title || "").trim(),
+    titreComplet: {
+      principal: String(k.title || "").trim(),
+      sousTitre: null,
+      alternatifs: [],
+    },
     plateformes,
     anneeSortie: annee ? Number(annee) : null,
     developpeurs: devs,
@@ -210,13 +204,9 @@ function mapperKohaVersJeu(k) {
     typeMedia: k.item_type ?? null,
     urls,
     pages,
-
-    // Résumé et caracs
     resume,
-    caracteristiques: caracteristiques.length ? caracteristiques : undefined,
+    caracteristiques,
     estLieAuQuebec,
-
-    // Métadonnées / Traçabilité
     identifiantsExternes: {
       kohaBiblioId: k.biblio_id != null ? Number(k.biblio_id) : undefined,
       ean: k.ean ?? null,
@@ -229,10 +219,190 @@ function mapperKohaVersJeu(k) {
       dateCreation: k.creation_date ? new Date(k.creation_date) : null,
       horodatage: k.timestamp ? new Date(k.timestamp) : null,
     },
-
     original: k,
   };
 }
+
+/* Extraction depuis MARC */
+async function extraireDepuisMarc(id) {
+  try {
+    const url = `https://ludov.inlibro.net/cgi-bin/koha/opac-export.pl?op=export&bib=${id}&format=marcxml`;
+    const { data } = await axios.get(url);
+    const parser = new XMLParser({ ignoreAttributes: false });
+    const marc = parser.parse(data);
+
+    if (!marc?.record?.datafield) {
+      console.warn(`Notice MARC vide pour ID ${id}`);
+      return null;
+    }
+
+    const champs = marc.record.datafield;
+    const get = (tag) => champs.filter((c) => c["@_tag"] === tag);
+    const toArray = (sf) => (Array.isArray(sf) ? sf : sf ? [sf] : []);
+    const decode = (txt) => {
+      try {
+        if (!txt) return null;
+        if (typeof txt === "object") {
+          if (txt["#text"]) txt = txt["#text"];
+          else return null;
+        }
+        if (Array.isArray(txt)) txt = txt[0];
+        return he.decode(String(txt).trim());
+      } catch {
+        return null;
+      }
+    };
+
+    /*Titre, sous-titre, variantes */
+    const champ245 = get("245")[0];
+    const titrePrincipal = champ245
+      ? decode(toArray(champ245.subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      : null;
+    const sousTitre = champ245
+      ? decode(toArray(champ245.subfield).find((sf) => sf["@_code"] === "b")?.["#text"])
+      : null;
+
+    const titresAlternatifs = get("246").map((c) =>
+      decode(toArray(c.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]),
+    ).filter(Boolean);
+
+    /*Développeur / Éditeur */
+    const developpeur = get("100")[0]
+      ? decode(toArray(get("100")[0].subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      : null;
+
+    const editeurPrincipal = get("264")[0]
+      ? decode(toArray(get("264")[0].subfield).find((sf) => sf["@_code"] === "b")?.["#text"])
+      : null;
+
+    const lieuPublication = get("264")[0]
+      ? decode(toArray(get("264")[0].subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      : null;
+
+    const annee = get("264")[0]
+      ? decode(toArray(get("264")[0].subfield).find((sf) => sf["@_code"] === "c")?.["#text"])
+      : null;
+
+    const plateforme = get("250")[0]
+      ? decode(toArray(get("250")[0].subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      : null;
+
+    const urls = get("856")
+      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "u")?.["#text"]))
+      .filter(Boolean);
+
+     const resumes = get("520");
+    let resumeFR = null,
+      resumeEN = null;
+    const notes = {
+      credits: null,
+      autresEditions: null,
+      etiquettesGeneriques: [],
+      liensQuebec: null,
+    };
+
+    for (const champ of resumes) {
+      const subs = toArray(champ.subfield);
+      const subA = decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"]);
+      const subB = decode(subs.find((sf) => sf["@_code"] === "b")?.["#text"]);
+      const texte = [subA, subB].filter(Boolean).join(" ").trim();
+      if (!subA) continue;
+
+      // résumé FR
+      if (
+        !resumeFR &&
+        /jeu/i.test(subA) &&
+        !/développement|édition|autres|étiquettes|liens|crédits/i.test(subA)
+      ) {
+        resumeFR = texte;
+      }
+      // résumé EN
+      else if (
+        !resumeEN &&
+        /game/i.test(subA) &&
+        !/développement|édition|autres|étiquettes|liens|crédits/i.test(subA)
+      ) {
+        resumeEN = texte;
+      }
+      // notes
+      else if (/cr[eé]dits/i.test(subA))
+        notes.credits = texte.replace(/^cr[eé]dits\s*:\s*/i, "").trim();
+      else if (/autres éditions/i.test(subA))
+        notes.autresEditions = texte.replace(/^autres éditions\s*:\s*/i, "").trim();
+      else if (/autres remarques/i.test(subA))
+        notes.autresRemarques = texte.replace(/^autres remarques\s*:\s*/i, "").trim();
+      else if (/étiquettes|etiquettes/i.test(subA) || /étiquettes|etiquettes/i.test(subB)) {
+        const texteEtiquettes = subA.includes("Étiquettes") ? subB : subA;
+        notes.etiquettesGeneriques = texteEtiquettes
+          ? texteEtiquettes
+            .replace(/^étiquettes génériques\s*:\s*/i, "")
+            .split(/[;,]/)
+            .map((s) => he.decode(s.trim()))
+            .filter(Boolean)
+          : [];
+      } else if (/liens/i.test(subA)) {
+        notes.liensQuebec = texte.trim();
+      }
+    }
+     const contenusPhysiques = get("300").map((f) => {
+      const subs = toArray(f.subfield);
+      const quantite = Number(decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"])) || 1;
+      const type = decode(subs.find((sf) => sf["@_code"] === "f")?.["#text"]);
+      const materiaux = decode(subs.find((sf) => sf["@_code"] === "b")?.["#text"]);
+      return type ? { quantite, type, materiaux } : null;
+    }).filter(Boolean);
+
+    const recompenses = get("586")
+      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]))
+      .filter(Boolean);
+
+    const sources = get("588")
+      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]))
+      .filter(Boolean);
+
+    const genres = get("655")
+      .map((f) => {
+        const subs = toArray(f.subfield);
+        const type = decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"]);
+        const valeur = decode(subs.find((sf) => sf["@_code"] === "v")?.["#text"]);
+        return type && valeur ? { type, valeur } : null;
+      })
+      .filter(Boolean);
+
+    const langue = marc?.record?.controlfield?.find(
+      (c) => c["@_tag"] === "008"
+    )?.["#text"]?.slice(35, 38) || null;
+
+    return {
+      titreComplet: {
+        principal: titrePrincipal,
+        sousTitre,
+        alternatifs: titresAlternatifs,
+      },
+      developpeur,
+      editeurPrincipal,
+      lieuPublication,
+      annee: annee ? Number(annee) : null,
+      plateforme,
+      langue,
+      resume: {
+        brut: [resumeFR, resumeEN].filter(Boolean).join(" | "),
+        fr: resumeFR,
+        en: resumeEN,
+        notes,
+      },
+      contenuPhysique: contenusPhysiques,
+      recompenses,
+      sources,
+      genres,
+      urls,
+    };
+  } catch (err) {
+    console.error(`Erreur MARC ID ${id}:`, err.message);
+    return null;
+  }
+}
+
 
 export {
   decouperUrls,
@@ -240,4 +410,5 @@ export {
   extraireDepuisAbstract,
   obtenirImage,
   mapperKohaVersJeu,
+  extraireDepuisMarc
 };

@@ -11,10 +11,9 @@ async function importerJeuxQuebec(req, res) {
       `${process.env.KOHA_USERNAME}:${process.env.KOHA_PASSWORD}`,
     ).toString("base64");
 
+    const maxId = 10000;
     let totalImported = 0;
     const batchOps = [];
-
-    let maxId = 10000
 
     for (let id = 1; id <= maxId; id++) {
       try {
@@ -25,42 +24,91 @@ async function importerJeuxQuebec(req, res) {
           },
         });
 
-        if (data) {
-          const mapped = mapperKohaVersJeu(data);
+        if (!data) continue;
 
-          if (mapped.estLieAuQuebec) {
-            let img_url = await obtenirImage(mapped.titre);
-            mapped.imageUrl = img_url;
-            batchOps.push({
-              updateOne: {
-                filter: {
-                  "identifiantsExternes.kohaBiblioId":
-                    mapped.identifiantsExternes.kohaBiblioId,
-                },
-                update: { $set: mapped },
-                upsert: true,
-              },
-            });
+        // xtraction depuis Koha JSON
+        const mapped = mapperKohaVersJeu(data);
+        if (!mapped.estLieAuQuebec) continue;
 
-            console.log(`img ${id} : ${mapped.imageUrl}`);
-            console.log(`Québec ID ${id} : ${mapped.titre}`);
+        //Lecture MARC 
+        const marc = await extraireDepuisMarc(id);
+        if (marc) {
+          // Titre 
+          if (marc.titreComplet) mapped.titreComplet = marc.titreComplet;
+
+          // Informations contextuelles
+          mapped.langue = marc.langue || mapped.langue;
+          mapped.lieuPublication = marc.lieuPublication || mapped.lieuPublication;
+          mapped.editeurPrincipal = marc.editeurPrincipal || mapped.editeurPrincipal;
+          mapped.anneeSortie = marc.annee || mapped.anneeSortie;
+          mapped.plateformes = marc.plateforme ? [marc.plateforme] : mapped.plateformes;
+
+          // Champs ++
+          mapped.contenuPhysique = marc.contenuPhysique?.length ? marc.contenuPhysique : [];
+          mapped.genres = marc.genres?.length ? marc.genres : [];
+          mapped.recompenses = marc.recompenses?.length ? marc.recompenses : [];
+          mapped.sources = marc.sources?.length ? marc.sources : [];
+
+          // Fusion des notes MARC dans le résumé Koha 
+          if (marc.resume?.notes) {
+            const notesMarc = marc.resume.notes;
+            if (!mapped.resume.notes) mapped.resume.notes = {};
+
+            mapped.resume.notes = {
+              credits: notesMarc.credits || mapped.resume.notes.credits || null,
+              autresEditions: notesMarc.autresEditions || mapped.resume.notes.autresEditions || null,
+              etiquettesGeneriques: notesMarc.etiquettesGeneriques?.length
+                ? notesMarc.etiquettesGeneriques
+                : mapped.resume.notes.etiquettesGeneriques || [],
+              liensQuebec: notesMarc.liensQuebec || mapped.resume.notes.liensQuebec || null,
+            };
+
+            // Si le MARC signale un lien Québec, on le conserve
+            if (notesMarc.liensQuebec) mapped.estLieAuQuebec = true;
+          }
+
+          //Fusion des URLs (Koha + MARC)
+          if (marc.urls?.length) {
+            const toutes = new Set([...(mapped.urls || []), ...marc.urls]);
+            mapped.urls = Array.from(toutes);
           }
         }
+
+        //Image IGDB
+        const titreImage = mapped.titreComplet?.principal || mapped.titre;
+        mapped.imageUrl = await obtenirImage(titreImage);
+
+        // upsert Mongo
+        batchOps.push({
+          updateOne: {
+            filter: {
+              "identifiantsExternes.kohaBiblioId":
+                mapped.identifiantsExternes.kohaBiblioId,
+            },
+            update: { $set: mapped },
+            upsert: true,
+          },
+        });
+
+        console.log(`Québec ID ${id} : ${titreImage}`);
+        console.log(`Image : ${mapped.imageUrl}`);
+
+        // --- Sauvegarde par batch ---
+        if (batchOps.length >= 50) {
+          await Jeu.bulkWrite(batchOps);
+          totalImported += batchOps.length;
+          batchOps.length = 0;
+        }
       } catch (err) {
-        if (err.response && err.response.status === 404) {
-          console.log(` Pas de notice pour ID ${id}`);
+        if (err.response?.status === 404) {
+          console.log(`Pas de notice pour ID ${id}`);
         } else {
           console.error(`Erreur ID ${id}:`, err.message);
         }
       }
-
-      if (batchOps.length >= 50) {
-        await Jeu.bulkWrite(batchOps);
-        totalImported += batchOps.length;
-        batchOps.length = 0;
-      }
     }
 
+    // Dernier batch restant
     if (batchOps.length > 0) {
       await Jeu.bulkWrite(batchOps);
       totalImported += batchOps.length;
@@ -75,7 +123,7 @@ async function importerJeuxQuebec(req, res) {
     console.error("Erreur importerJeuxQuebec:", err.message);
     res.status(500).json({
       success: false,
-      message: "Erreur lors de l'import Québec",
+      message: "Erreur lors de l'import des jeux québécois",
       error: err.message,
     });
   }
