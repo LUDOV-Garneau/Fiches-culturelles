@@ -81,3 +81,8 @@ body {
   justify-content: left;
   white-space: nowrap;
 }
+.text {
+  color: #333333;
+  font-size: 1.875rem;
+  font: 200;
+}
