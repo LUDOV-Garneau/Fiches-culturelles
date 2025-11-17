@@ -33,6 +33,8 @@ useEffect(() => {
         <div
           className="relative mx-auto max-w-4xl"
           style={{ perspective: "1200px", height: TRACK_H }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           <div className="absolute inset-0 flex items-center justify-center">
             {jeux.slice(0, 10).map((jeu, i) => {
