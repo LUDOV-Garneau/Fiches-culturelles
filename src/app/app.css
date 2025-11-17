@@ -32,7 +32,8 @@ body {
 
 /* pour un boutton si on a besoin plustard */
 .btn-primary {
-  @apply text-white rounded px-4 py-2 inline-flex items-center justify-center;
+  @apply text-white inline-flex items-center justify-center p-2 w-15 h-8;
+  @apply text-[0.7rem];
   background: var(--color-primary-blue);
 }
 .btn-primary:hover {
@@ -90,4 +91,9 @@ body {
   display: flex;
   justify-content: left;
   white-space: nowrap;
+}
+.text {
+  color: #333333;
+  font-size: 1.875rem;
+  font: 200;
 }

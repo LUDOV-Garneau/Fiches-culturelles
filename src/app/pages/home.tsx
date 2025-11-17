@@ -29,12 +29,12 @@ export function Welcome() {
   }, []);
 
   return (
-    <main className="min-h-[70vh]">
-      <section className="border-y bg-gray-100">
+    <main className="min-h-[70vh] ">
+      <section>
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h1 className="text-3xl font-semibold text-gray-800 md:text-4xl">
+          <h2 className=" font-size  text font-sans ">
             Le jeu vidéo au Québec
-          </h1>
+          </h2>
           <div className="mt-6">
             <Tabs active={activeTab} onChange={setActiveTab} />
           </div>
