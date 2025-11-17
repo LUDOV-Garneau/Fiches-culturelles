@@ -4,21 +4,23 @@ import { Link } from "react-router";
 
 export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
-  const len = jeux.length;
+  const display = jeux.slice(0, 10);
+  const len = display.length;
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
 
+  const [isHovered, setIsHovered] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [popupPos, setPopupPos] = useState<{ top: number; left: number }>({
     top: 0,
     left: 0,
   });
 
-  useEffect(() => {
-    const id = setInterval(next, 3500);
-
-    return () => clearInterval(id);
-  }, [len]);
+useEffect(() => {
+  if (isHovered) return; // pause the carousel while hovered
+  const id = setInterval(next, 3500);
+  return () => clearInterval(id);
+}, [isHovered, len]);
 
   const CARD_W = 218;
   const CARD_H = 288;
@@ -43,7 +45,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                   : offset;
 
               const translateX = wrapped * GAP_X;
-              const rotateY = wrapped * -18;
+              const rotateY = wrapped * -10;
               const scale = 1.18 - Math.min(Math.abs(wrapped) * 0.12, 0.24);
               const zIndex = 100 - Math.abs(wrapped);
 
