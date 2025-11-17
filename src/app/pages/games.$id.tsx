@@ -14,7 +14,6 @@ type ApiJeu = {
   resume?: { brut?: string };
 };
 
-
 export default function GameDetail() {
   const { id } = useParams();
   const [jeu, setJeu] = React.useState<ApiJeu | null>(null);
