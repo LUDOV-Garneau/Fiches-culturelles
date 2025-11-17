@@ -11,7 +11,6 @@ import { Sidenav } from "~/components/sidenav";
 import type { Route } from "./+types/root";
 import "./app.css";
 
-
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -49,16 +48,13 @@ export default function App() {
       <header className="bg-gray-800 text-white p-4">
         <nav className="flex gap-4 justify-end-safe">
           <a href="/">Home</a>
-          <a href="/casa">Casa</a>
+          <a href="/admin">Admin</a>
           <a href="#">Contact</a>
-          <a
-            href="/login"
-            className="btn-primary"
-          >
+          <a href="/login" className="btn-primary">
             Login
           </a>
         </nav>
-        <Sidenav/>
+        <Sidenav />
       </header>
 
       <main className="p-6">
