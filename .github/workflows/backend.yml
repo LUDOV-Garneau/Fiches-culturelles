@@ -3,8 +3,14 @@ name: Build, Test & Deploy Backend
 on:
   push:
     paths:
-      - 'api/**'
-    branches: [ main ]
+      - "src/**"
+    branches: [main]
+
+  pull_request:
+    paths:
+      - "src/**"
+    branches: [main]
+
   workflow_dispatch:
 
 jobs:
