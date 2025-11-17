@@ -52,15 +52,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <div className="app-layout">
-      <header className="bg-gray-800 text-white p-4">
-        <nav className="flex gap-4 justify-end-safe">
-          <a href="/">Home</a>
-          <a href="/admin">Admin</a>
-          <a href="#">Contact</a>
-          <a href="/login" className="btn-primary">
-            Login
-          </a>
-        </nav>
+      <header className=" text-white p-4">
+        <NavSection />
         <Sidenav />
       </header>
 
