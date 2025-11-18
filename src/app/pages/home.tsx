@@ -5,9 +5,7 @@ import Tabs from "../components/Tabs";
 
 export function Welcome() {
   const [activeTab, setActiveTab] = useState<number>(1);
-
   const [jeux, setJeux] = useState<any[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,37 +27,88 @@ export function Welcome() {
   }, []);
 
   return (
-    <main className="min-h-[70vh] ">
+    <main className="min-h-[70vh]">
+      {/* SECTION TITRE PRINCIPAL */}
       <section>
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h2 className=" font-size  text font-sans ">
+
+          {/* TITRE IDENTIQUE AU SITE LUDOV */}
+          <h2
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "30px",       // EXACT LUDOV
+              fontWeight: 300,        // ROBOTO LIGHT
+              color: "#5e5e5eff",
+              lineHeight: 1.3,
+              marginBottom: "20px",
+            }}
+          >
             Le jeu vidéo au Québec
           </h2>
-          <div className="mt-6">
+
+          {/* TABS */}
+          <div
+            className="mt-6"
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "15px",
+              fontWeight: 400,
+              color: "#4f4f4f",
+              lineHeight: 1.5,
+            }}
+          >
             <Tabs active={activeTab} onChange={setActiveTab} />
           </div>
         </div>
       </section>
 
+      {/* SECTION CONTENU DES TABS */}
       <section className="mx-auto max-w-6xl px-4 py-10">
         {activeTab === 0 && (
-          <div className="prose max-w-none">
+          <div
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "15px",
+              color: "#4f4f4f",
+              lineHeight: 1.5,
+            }}
+          >
             <p>Contenu d’accueil (placeholder).</p>
           </div>
         )}
 
         {activeTab === 1 && (
           <div className="space-y-12">
+
+            {/* TITRE + DESCRIPTION EXACTEMENT STYLE LUDOV */}
             <header className="space-y-2">
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2
+                style={{
+                  fontFamily: '"Roboto", sans-serif',
+                  fontSize: "24px",
+                  fontWeight: 600,
+                  color: "#333333",
+                  lineHeight: 1.3,
+                }}
+              >
                 50 jeux vidéo québécois
               </h2>
-              <p className="text-gray-700">
-                Le projet archivera la jouabilité de 50 jeux vidéo québécois
-                selon le protocole établi (voir{" "}
+
+              <p
+                style={{
+                  fontFamily: '"Roboto", sans-serif',
+                  fontSize: "15px",
+                  fontWeight: 400,
+                  color: "#4f4f4f",
+                  lineHeight: 1.5,
+                }}
+              >
+                Le projet archivera la jouabilité de 50 jeux vidéo québécois selon le
+                protocole établi (voir{" "}
                 <a
                   href="#"
-                  className="text-[--color-primary-blue] underline hover:text-[--color-primary-blue-90]"
+                  className="underline"
+                  style={{ color: "#02cfd8" }}
                 >
                   Publications et ressources
                 </a>
@@ -67,7 +116,8 @@ export function Welcome() {
                 archiver et des fiches préliminaires peuvent être consultées{" "}
                 <a
                   href="#"
-                  className="text-[--color-primary-blue] underline hover:text-[--color-primary-blue-90]"
+                  className="underline"
+                  style={{ color: "#02cfd8" }}
                 >
                   ici
                 </a>
@@ -81,28 +131,56 @@ export function Welcome() {
         )}
 
         {activeTab === 2 && (
-          <div className="prose max-w-none">
+          <div
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "15px",
+              color: "#4f4f4f",
+              lineHeight: 1.5,
+            }}
+          >
             <h2>Publications et ressources</h2>
             <p>lien vers WordPress.</p>
           </div>
         )}
 
         {activeTab === 3 && (
-          <div className="prose max-w-none">
+          <div
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "15px",
+              color: "#4f4f4f",
+              lineHeight: 1.5,
+            }}
+          >
             <h2>Revue de presse</h2>
             <p>lien vers WordPress.</p>
           </div>
         )}
 
         {activeTab === 4 && (
-          <div className="prose max-w-none">
+          <div
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "15px",
+              color: "#4f4f4f",
+              lineHeight: 1.5,
+            }}
+          >
             <h2>Carte vidéoludiQC</h2>
             <p>lien vers WordPress.</p>
           </div>
         )}
 
         {activeTab === 5 && (
-          <div className="prose max-w-none">
+          <div
+            style={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: "15px",
+              color: "#4f4f4f",
+              lineHeight: 1.5,
+            }}
+          >
             <h2>Pour participer</h2>
             <p>lien vers WordPress.</p>
           </div>

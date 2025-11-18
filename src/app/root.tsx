@@ -12,6 +12,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { NavSection } from "~/components/NavSection";
 
+
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {

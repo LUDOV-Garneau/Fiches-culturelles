@@ -3,7 +3,9 @@
 /* === Thème global (v4) === */
 @theme {
   --color-primary-blue: #02dade;
-  --color-primary-gray: #e6e6e6;
+
+  /* === FOND GLOBAL DU SITE (NOUVEAU GRIS) === */
+  --color-primary-gray: #D0D0D0;
 
   --color-primary-blue-90: color-mix(
     in oklab,
@@ -24,13 +26,10 @@
 /* base */
 html,
 body {
-  @apply bg-primary-gray /*dark:bg-gray-950*/ font-sans;
-  /*@media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }*/
+  @apply bg-primary-gray font-sans;
 }
 
-/* pour un boutton si on a besoin plustard */
+/* pour un bouton si on a besoin plus tard */
 .btn-primary {
   @apply text-white inline-flex items-center justify-center p-2 w-15 h-8;
   @apply text-[0.7rem];
@@ -92,6 +91,7 @@ body {
   justify-content: left;
   white-space: nowrap;
 }
+
 .text {
   color: #333333;
   font-size: 1.875rem;
