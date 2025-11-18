@@ -32,12 +32,12 @@ export function Welcome() {
       <section>
         <div className="mx-auto max-w-6xl px-4 py-10">
 
-          {/* TITRE IDENTIQUE AU SITE LUDOV */}
+         
           <h2
             style={{
               fontFamily: '"Roboto", sans-serif',
-              fontSize: "30px",       // EXACT LUDOV
-              fontWeight: 300,        // ROBOTO LIGHT
+              fontSize: "30px",       
+              fontWeight: 300,       
               color: "#5e5e5eff",
               lineHeight: 1.3,
               marginBottom: "20px",
@@ -62,7 +62,6 @@ export function Welcome() {
         </div>
       </section>
 
-      {/* SECTION CONTENU DES TABS */}
       <section className="mx-auto max-w-6xl px-4 py-10">
         {activeTab === 0 && (
           <div
@@ -80,7 +79,7 @@ export function Welcome() {
         {activeTab === 1 && (
           <div className="space-y-12">
 
-            {/* TITRE + DESCRIPTION EXACTEMENT STYLE LUDOV */}
+           
             <header className="space-y-2">
               <h2
                 style={{
