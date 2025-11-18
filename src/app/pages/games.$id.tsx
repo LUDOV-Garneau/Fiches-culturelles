@@ -25,7 +25,7 @@ export default function GameDetail() {
 
     async function fetchJeu() {
       try {
-        const resp = await fetch(`http://72.11.148.122/api/jeux/${id}`);
+        const resp = await fetch(`http://localhost:3000/jeux/${id}`);
         const data = await resp.json();
         if (data.success && data.data) setJeu(data.data);
         else setError("Jeu introuvable.");
@@ -71,13 +71,10 @@ export default function GameDetail() {
               Fiche de jeu
             </p>
             <h1 className="text-4xl md:text-5xl font-black leading-tight mt-2">
-              {jeu.titreComplet?.principal ?? "Jeu sans titre"}
+              {jeu.titreComplet?.sousTitre
+                ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                : jeu.titreComplet?.principal}
             </h1>
-
-            {jeu.titreComplet?.sousTitre && (
-              <p className="mt-1 text-white/70 italic">{jeu.titreComplet.sousTitre}</p>
-            )}
-
             {jeu.anneeSortie && (
               <p className="mt-2 text-sm text-white/70">
                 Année de sortie : {jeu.anneeSortie}
@@ -114,8 +111,12 @@ export default function GameDetail() {
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-6 py-3">
               <p className="text-lg font-semibold text-white">
-                {jeu.titreComplet?.principal ?? "Jeu sans titre"}
+                {jeu.titreComplet?.sousTitre
+                  ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                  : jeu.titreComplet?.principal}
               </p>
+
+
               <p className="text-sm text-white/70">
                 {jeu.developpeurs?.[0] ?? "Développeur inconnu"}
               </p>
@@ -140,7 +141,7 @@ export default function GameDetail() {
             {/* Bouton PDF */}
             <div className="pt-3 border-t border-gray-100">
               <a
-                href={`http://72.11.148.122/api/jeux/${jeu._id}/pdf`}
+                href={`http://localhost:3000/jeux/${jeu._id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-800 transition"
