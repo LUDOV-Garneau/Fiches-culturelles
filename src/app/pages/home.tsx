@@ -3,6 +3,9 @@ import { CoverflowCarousel } from "../components/CoverflowCaroussel";
 import JeuxGrid from "../components/LstJeux";
 import Tabs from "../components/Tabs";
 
+const LUDOV_DOC_URL =
+  "https://www.ludov.ca/fr/documentation/le-jeu-video-au-quebec/";
+
 export function Welcome() {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [jeux, setJeux] = useState<any[]>([]);
@@ -26,18 +29,28 @@ export function Welcome() {
     chargerJeux();
   }, []);
 
+ 
+  const handleTabChange = (index: number) => {
+   
+    if (index === 1) {
+      setActiveTab(index);
+      return;
+    }
+
+    
+    window.location.href = LUDOV_DOC_URL;
+  };
+
   return (
     <main className="min-h-[70vh]">
       {/* SECTION TITRE PRINCIPAL */}
       <section>
         <div className="mx-auto max-w-6xl px-4 py-10">
-
-         
           <h2
             style={{
               fontFamily: '"Roboto", sans-serif',
-              fontSize: "30px",       
-              fontWeight: 300,       
+              fontSize: "30px",
+              fontWeight: 300,
               color: "#5e5e5eff",
               lineHeight: 1.3,
               marginBottom: "20px",
@@ -57,7 +70,7 @@ export function Welcome() {
               lineHeight: 1.5,
             }}
           >
-            <Tabs active={activeTab} onChange={setActiveTab} />
+            <Tabs active={activeTab} onChange={handleTabChange} />
           </div>
         </div>
       </section>
@@ -78,8 +91,6 @@ export function Welcome() {
 
         {activeTab === 1 && (
           <div className="space-y-12">
-
-           
             <header className="space-y-2">
               <h2
                 style={{
@@ -102,22 +113,14 @@ export function Welcome() {
                   lineHeight: 1.5,
                 }}
               >
-                Le projet archivera la jouabilité de 50 jeux vidéo québécois selon le
-                protocole établi (voir{" "}
-                <a
-                  href="#"
-                  className="underline"
-                  style={{ color: "#02cfd8" }}
-                >
+                Le projet archivera la jouabilité de 50 jeux vidéo québécois
+                selon le protocole établi (voir{" "}
+                <a href="#" className="underline" style={{ color: "#02cfd8" }}>
                   Publications et ressources
                 </a>
                 ). Le travail est en cours — une première sélection de 30 jeux à
                 archiver et des fiches préliminaires peuvent être consultées{" "}
-                <a
-                  href="#"
-                  className="underline"
-                  style={{ color: "#02cfd8" }}
-                >
+                <a href="#" className="underline" style={{ color: "#02cfd8" }}>
                   ici
                 </a>
                 .

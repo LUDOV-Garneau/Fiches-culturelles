@@ -60,7 +60,7 @@ export default function GameDetail() {
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
-      {/* Bandeau supérieur — BOUTON RETIRÉ */}
+ 
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white shadow-lg">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 py-10">
           <div>
@@ -77,7 +77,6 @@ export default function GameDetail() {
             )}
           </div>
 
-          {/* (Rien ici, le bouton Retour a été supprimé) */}
           <div />
         </div>
       </div>
