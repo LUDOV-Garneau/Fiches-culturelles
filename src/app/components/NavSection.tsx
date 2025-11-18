@@ -1,31 +1,31 @@
 // src/components/NavSection.tsx
 import { Link } from "react-router";
 
-const BAR_HEIGHT = 55;              
-const PRIMARY = "#02cfd8";         
+const BAR_HEIGHT = 55;               // hauteur de la barre
+const PRIMARY = "#02cfd8";           // turquoise un peu plus foncé
 
 export function NavSection() {
   return (
     <header
       className="w-full"
       style={{
-      
-        backgroundColor: "transparent",
+        backgroundColor: "transparent", // même fond que ton site -> pas de bande grise foncée
         fontFamily:
           '"Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         fontSize: "13px",
         fontWeight: 400,
       }}
     >
-  
+      {/* barre alignée à droite comme sur WP */}
       <div
         className="flex items-center justify-end pl-4 pr-16"
         style={{ height: BAR_HEIGHT }}
       >
-        {/* Bloc complet à droite */}
         <div className="flex items-center gap-10">
+
           {/* Icônes Facebook + YouTube */}
           <div className="flex items-center gap-8">
+
             {/* Facebook */}
             <button
               type="button"
@@ -71,11 +71,12 @@ export function NavSection() {
 
           {/* Boutons turquoise */}
           <div className="flex items-center gap-4">
+            
             <Link
               to="/contact"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "8px 20px",
+                padding: "11px 24px",  // padding EXACT de WordPress
                 color: "#333333",
                 lineHeight: 1,
                 textDecoration: "none",
@@ -89,7 +90,7 @@ export function NavSection() {
               to="/english"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "8px 20px",
+                padding: "11px 24px",
                 color: "#333333",
                 lineHeight: 1,
                 textDecoration: "none",
@@ -103,7 +104,7 @@ export function NavSection() {
               to="/admin"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "8px 20px",
+                padding: "11px 24px",
                 color: "#333333",
                 lineHeight: 1,
                 textDecoration: "none",
@@ -117,7 +118,7 @@ export function NavSection() {
               to="/login"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "8px 20px",
+                padding: "11px 24px",
                 color: "#333333",
                 lineHeight: 1,
                 textDecoration: "none",
@@ -126,6 +127,7 @@ export function NavSection() {
             >
               Login
             </Link>
+
           </div>
         </div>
       </div>
