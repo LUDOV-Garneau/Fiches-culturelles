@@ -1,24 +1,45 @@
 // src/components/NavSection.tsx
 import { Link } from "react-router";
 
+const BAR_HEIGHT = 55;              
+const PRIMARY = "#02cfd8";         
+
 export function NavSection() {
   return (
-    <header className="w-full bg-[#e5e5e5]">
-      <div className="mx-auto flex h-[56px] max-w-6xl items-center justify-end px-6">
-        {/* Groupe icônes + boutons, bien collés comme sur WP */}
-        <div className="flex items-center gap-8">
-          {/* Icônes réseaux sociaux */}
-          <div className="flex items-center gap-6">
+    <header
+      className="w-full"
+      style={{
+      
+        backgroundColor: "transparent",
+        fontFamily:
+          '"Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        fontSize: "13px",
+        fontWeight: 400,
+      }}
+    >
+  
+      <div
+        className="flex items-center justify-end pl-4 pr-16"
+        style={{ height: BAR_HEIGHT }}
+      >
+        {/* Bloc complet à droite */}
+        <div className="flex items-center gap-10">
+          {/* Icônes Facebook + YouTube */}
+          <div className="flex items-center gap-8">
             {/* Facebook */}
             <button
               type="button"
-              className="flex h-8 w-8 items-center justify-center"
-              style={{ backgroundColor: "#02dcde" }}
+              className="flex items-center justify-center"
+              style={{
+                width: 34,
+                height: 34,
+                backgroundColor: PRIMARY,
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="15"
-                height="15"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="#ffffff"
               >
@@ -29,13 +50,17 @@ export function NavSection() {
             {/* YouTube */}
             <button
               type="button"
-              className="flex h-8 w-8 items-center justify-center"
-              style={{ backgroundColor: "#02dcde" }}
+              className="flex items-center justify-center"
+              style={{
+                width: 34,
+                height: 34,
+                backgroundColor: PRIMARY,
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="17"
-                height="17"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="#ffffff"
               >
@@ -44,36 +69,60 @@ export function NavSection() {
             </button>
           </div>
 
-          {/* Boutons turquoise (Contact / English / Admin / Login) */}
-          <div className="flex items-center gap-3 text-[13px]">
+          {/* Boutons turquoise */}
+          <div className="flex items-center gap-4">
             <Link
               to="/contact"
-              className="px-4 py-1 leading-none text-[#333]"
-              style={{ backgroundColor: "#02dcde" }}
+              style={{
+                backgroundColor: PRIMARY,
+                padding: "8px 20px",
+                color: "#333333",
+                lineHeight: 1,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
             >
               Contact
             </Link>
 
             <Link
               to="/english"
-              className="px-4 py-1 leading-none text-[#333]"
-              style={{ backgroundColor: "#02dcde" }}
+              style={{
+                backgroundColor: PRIMARY,
+                padding: "8px 20px",
+                color: "#333333",
+                lineHeight: 1,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
             >
               English
             </Link>
 
             <Link
               to="/admin"
-              className="px-4 py-1 leading-none text-[#333]"
-              style={{ backgroundColor: "#02dcde" }}
+              style={{
+                backgroundColor: PRIMARY,
+                padding: "8px 20px",
+                color: "#333333",
+                lineHeight: 1,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
             >
               Admin
             </Link>
 
             <Link
               to="/login"
-              className="px-4 py-1 leading-none text-[#333]"
-              style={{ backgroundColor: "#02dcde" }}
+              style={{
+                backgroundColor: PRIMARY,
+                padding: "8px 20px",
+                color: "#333333",
+                lineHeight: 1,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
             >
               Login
             </Link>
