@@ -12,7 +12,7 @@ export default function ModifierJeu() {
   useEffect(() => {
     async function chargerJeu() {
       try {
-        const response = await fetch(`http://72.11.148.122/api/jeux/${id}`);
+        const response = await fetch(`http://localhost:3000/jeux/${id}`);
         const data = await response.json();
 
         if (data.success && data.data) {
@@ -34,7 +34,7 @@ export default function ModifierJeu() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
+      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(jeu),
@@ -51,10 +51,9 @@ export default function ModifierJeu() {
       alert("Erreur lors de la mise à jour du jeu.");
     }
   }
-
   async function toggleChoisi(id: string, estChoisiActuel: boolean) {
     try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
+      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +77,6 @@ export default function ModifierJeu() {
       alert("Erreur lors de la mise à jour du jeu.");
     }
   }
-
   if (loading) return <p className="p-4">Chargement du jeu...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
   if (!jeu) return null;
@@ -91,16 +89,32 @@ export default function ModifierJeu() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* --- CHAMPS PRINCIPAUX --- */}
-        <div>
-          <label className="block font-semibold mb-1">Titre</label>
-          <input
-            type="text"
-            value={jeu.titre}
-            onChange={(e) => setJeu({ ...jeu, titre: e.target.value })}
-            className="border p-2 w-full rounded"
-            required
-          />
-        </div>
+       <div>
+  <label className="block font-semibold mb-1">Titre</label>
+  <input
+    type="text"
+    value={
+      jeu.titreComplet?.sousTitre
+        ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+        : jeu.titreComplet?.principal || ""
+    }
+    onChange={(e) => {
+      const texte = e.target.value.trim();
+      const match = texte.match(/^(.*?:)\s*(.*)$/);
+
+      setJeu({
+        ...jeu,
+        titreComplet: {
+          ...jeu.titreComplet,
+          principal: match ? match[1].trim() : texte,
+          sousTitre: match && match[2] ? match[2].trim() : null,
+        },
+      });
+    }}
+    className="border p-2 w-full rounded"
+    required
+  />
+</div>
 
         <div>
           <label className="block font-semibold mb-1">Année de sortie</label>
@@ -247,9 +261,7 @@ export default function ModifierJeu() {
           <div className="space-y-6">
             {/* Crédits */}
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">
-                Crédits
-              </label>
+              <label className="block font-semibold mb-1 text-gray-700">Crédits</label>
               <textarea
                 placeholder="Entrez les crédits..."
                 value={jeu.resume?.notes?.credits || ""}
@@ -297,9 +309,7 @@ export default function ModifierJeu() {
               </label>
               <textarea
                 placeholder="Entrez les étiquettes (séparées par des virgules)..."
-                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(
-                  ", ",
-                )}
+                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(", ")}
                 onChange={(e) =>
                   setJeu({
                     ...jeu,
@@ -332,10 +342,7 @@ export default function ModifierJeu() {
                     ...jeu,
                     resume: {
                       ...jeu.resume,
-                      notes: {
-                        ...jeu.resume?.notes,
-                        liensQuebec: e.target.value,
-                      },
+                      notes: { ...jeu.resume?.notes, liensQuebec: e.target.value },
                     },
                   })
                 }
@@ -345,25 +352,64 @@ export default function ModifierJeu() {
           </div>
         </fieldset>
 
-        {/* --- CARACTÉRISTIQUES --- */}
-        <div>
-          <label className="block font-semibold mb-1">Caractéristiques</label>
-          <input
-            type="text"
-            value={(jeu.caracteristiques || []).join(", ")}
-            onChange={(e) =>
-              setJeu({
-                ...jeu,
-                caracteristiques: e.target.value
-                  .split(",")
-                  .map((v) => v.trim())
-                  .filter(Boolean),
-              })
+       {/* --- GENRES --- */}
+<div>
+  <label className="block font-semibold mb-2 text-gray-800 text-lg">
+    Genres
+  </label>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {(jeu.genres && jeu.genres.length > 0
+      ? jeu.genres
+      : [{ type: "", valeur: "" }]
+    ).map((genre: { type: string; valeur: string }, i: number) => (
+      <div
+        key={i}
+        className="flex flex-col bg-gray-50 border rounded-lg p-3 shadow-sm hover:shadow-md transition"
+      >
+        <input
+          type="text"
+          value={genre.type || ""}
+          onChange={(e) => {
+            const newGenres = [...(jeu.genres || [{ type: "", valeur: "" }])];
+            newGenres[i] = { ...newGenres[i], type: e.target.value };
+
+            if (
+              i === newGenres.length - 1 &&
+              (newGenres[i].type || newGenres[i].valeur)
+            ) {
+              newGenres.push({ type: "", valeur: "" });
             }
-            className="border p-2 w-full rounded"
-            placeholder="Ex: Action, Coopératif, Multijoueur"
-          />
-        </div>
+
+            setJeu({ ...jeu, genres: newGenres });
+          }}
+          className="border p-2 rounded mb-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          placeholder="Type (ex: Basic Genres)"
+        />
+        <input
+          type="text"
+          value={genre.valeur || ""}
+          onChange={(e) => {
+            const newGenres = [...(jeu.genres || [{ type: "", valeur: "" }])];
+            newGenres[i] = { ...newGenres[i], valeur: e.target.value };
+
+            if (
+              i === newGenres.length - 1 &&
+              (newGenres[i].type || newGenres[i].valeur)
+            ) {
+              newGenres.push({ type: "", valeur: "" });
+            }
+
+            setJeu({ ...jeu, genres: newGenres });
+          }}
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          placeholder="Valeur (ex: Adventure)"
+        />
+      </div>
+    ))}
+  </div>
+</div>
+
 
         {/* --- BOUTONS --- */}
         <div className="flex justify-between mt-6">
