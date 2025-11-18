@@ -1,10 +1,9 @@
-import { Link } from "react-router";
-
 import FacebookIcon from "../img/Facebook.png";
 import YouTubeIcon from "../img/youtube.png";
+import { Link } from "react-router";
 
 const BAR_HEIGHT = 55;
-const PRIMARY = "#02cfd8";
+const PRIMARY = "#1ee7ef"; // turquoise plus clair (ajusté)
 
 export function NavSection() {
   return (
@@ -23,80 +22,69 @@ export function NavSection() {
         style={{ height: BAR_HEIGHT }}
       >
         <div className="flex items-center gap-10">
-          <div className="flex items-center gap-8">
 
+          {/* Icônes */}
+          <div className="flex items-center gap-6">
             <a
-              href="https://www.facebook.com/LUDOVUdeM/"
+              href="https://www.facebook.com/LUDOVUdeM"
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                width: 42,
-                height: 42,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 4,
-              }}
             >
               <img
                 src={FacebookIcon}
                 alt="Facebook"
                 style={{
-                  width: "42px",
-                  height: "42px",
+                  width: 32,
+                  height: 32,
                   objectFit: "contain",
                 }}
               />
             </a>
 
             <a
-              href="https://www.youtube.com/channel/UChdKw_7Vr3uKxR271GGBqMw"
+              href="https://www.youtube.com/channel/UC4baVwPqT7E2xI4fxqzj8kg"
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                width: 42,
-                height: 42,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 4,
-              }}
             >
               <img
                 src={YouTubeIcon}
                 alt="YouTube"
                 style={{
-                  width: "42px",
-                  height: "42px",
+                  width: 32,
+                  height: 32,
                   objectFit: "contain",
                 }}
               />
             </a>
           </div>
 
+          {/* Boutons */}
           <div className="flex items-center gap-4">
-            <Link
-              to="/contact"
+
+            <a
+              href="https://www.ludov.ca/fr/contact/"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "11px 24px",
-                color: "#333333",
-                lineHeight: 1,
+                padding: "11px 26px",
+                color: "#333",
                 textDecoration: "none",
+                lineHeight: 1,
                 display: "inline-block",
               }}
             >
               Contact
-            </Link>
+            </a>
 
             <Link
               to="/english"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "11px 24px",
-                color: "#333333",
-                lineHeight: 1,
+                padding: "11px 26px",
+                color: "#333",
                 textDecoration: "none",
+                lineHeight: 1,
                 display: "inline-block",
               }}
             >
@@ -107,10 +95,10 @@ export function NavSection() {
               to="/admin"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "11px 24px",
-                color: "#333333",
-                lineHeight: 1,
+                padding: "11px 26px",
+                color: "#333",
                 textDecoration: "none",
+                lineHeight: 1,
                 display: "inline-block",
               }}
             >
@@ -121,10 +109,10 @@ export function NavSection() {
               to="/login"
               style={{
                 backgroundColor: PRIMARY,
-                padding: "11px 24px",
-                color: "#333333",
-                lineHeight: 1,
+                padding: "11px 26px",
+                color: "#333",
                 textDecoration: "none",
+                lineHeight: 1,
                 display: "inline-block",
               }}
             >
