@@ -28,10 +28,10 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
     return () => clearInterval(id);
   }, [isHovered, len]);
 
-  const CARD_W = 218;
-  const CARD_H = 288;
-  const TRACK_H = 340;
-  const GAP_X = 200;
+  const CARD_W = 300;
+  const CARD_H = 430;
+  const GAP_X = 300;
+  const TRACK_H = 520;
 
   if (len === 0) return null;
   return (
@@ -62,7 +62,11 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                 <Link
                   key={jeu._id}
                   to={`/games/${jeu._id}`}
-                  className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden bg-gray-200"
+                  className="
+    absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md 
+    overflow-hidden bg-gray-200
+    transition-transform duration-700 ease-in-out
+  "
                   style={{
                     width: CARD_W,
                     height: CARD_H,
@@ -112,7 +116,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                           {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                         </p>
                       </div>,
-                      document.body,
+                      document.body
                     )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
@@ -139,9 +143,11 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
               "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
           }}
         >
-          <span className="text-lg leading-none">◀</span>
+          <span className="text-xl leading-none">❮</span>
         </button>
 
+        {/* BULLETS */}
+        
         <div className="flex gap-1">
           {jeuxChoisis.map((_, i) => (
             <span
@@ -163,7 +169,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
               "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
           }}
         >
-          <span className="text-lg leading-none">▶</span>
+<span className="text-xl leading-none">❯</span>
         </button>
       </div>
     </div>

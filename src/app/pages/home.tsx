@@ -90,43 +90,7 @@ export function Welcome() {
         )}
 
         {activeTab === 1 && (
-          <div className="space-y-12">
-            <header className="space-y-2">
-              <h2
-                style={{
-                  fontFamily: '"Roboto", sans-serif',
-                  fontSize: "24px",
-                  fontWeight: 600,
-                  color: "#333333",
-                  lineHeight: 1.3,
-                }}
-              >
-                50 jeux vidéo québécois
-              </h2>
-
-              <p
-                style={{
-                  fontFamily: '"Roboto", sans-serif',
-                  fontSize: "15px",
-                  fontWeight: 400,
-                  color: "#4f4f4f",
-                  lineHeight: 1.5,
-                }}
-              >
-                Le projet archivera la jouabilité de 50 jeux vidéo québécois
-                selon le protocole établi (voir{" "}
-                <a href="#" className="underline" style={{ color: "#02cfd8" }}>
-                  Publications et ressources
-                </a>
-                ). Le travail est en cours — une première sélection de 30 jeux à
-                archiver et des fiches préliminaires peuvent être consultées{" "}
-                <a href="#" className="underline" style={{ color: "#02cfd8" }}>
-                  ici
-                </a>
-                .
-              </p>
-            </header>
-
+          <div>
             <CoverflowCarousel jeux={jeux} />
             <JeuxGrid jeux={jeux} loading={loading} error={error} />
           </div>
