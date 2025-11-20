@@ -155,7 +155,9 @@ export default function Admin() {
 
                         <div className="p-4">
                           <h4 className="font-bold text-lg mb-1">
-                            {jeu.titre}
+                            {jeu.titreComplet?.sousTitre
+                              ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                              : jeu.titreComplet.principal}
                           </h4>
                           <p className="text-sm text-gray-500 mb-3">
                             {jeu.developpeurs?.[0] || "Inconnu"} —{" "}
@@ -212,7 +214,9 @@ export default function Admin() {
 
                         <div className="p-4">
                           <h4 className="font-bold text-lg mb-1">
-                            {jeu.titre}
+                            {jeu.titreComplet?.sousTitre
+                              ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                              : jeu.titreComplet.principal}
                           </h4>
                           <p className="text-sm text-gray-500 mb-3">
                             {jeu.developpeurs?.[0] || "Inconnu"} —{" "}
@@ -237,7 +241,14 @@ export default function Admin() {
                             </button>
 
                             <button
-                              onClick={() => supprimerJeu(jeu._id, jeu.titre)}
+                              onClick={() =>
+                                supprimerJeu(
+                                  jeu._id,
+                                  jeu.titreComplet?.sousTitre
+                                    ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                                    : jeu.titreComplet.principal
+                                )
+                              }
                               className="flex-1 bg-red-600 text-white text-sm rounded-lg py-2 hover:bg-red-700"
                             >
                               Supprimer

@@ -29,13 +29,26 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
 
     if (searchTerm.trim()) {
       const lower = searchTerm.toLowerCase();
-      filtered = filtered.filter((jeu) =>
-        [jeu.titre, jeu.resume?.brut, ...(jeu.developpeurs || [])]
+
+      filtered = filtered.filter((jeu) => {
+        const titrePrincipal = jeu.titreComplet?.principal ?? "";
+        const sousTitre = jeu.titreComplet?.sousTitre ?? "";
+        const alternatifs = jeu.titreComplet?.alternatifs ?? [];
+
+        const texteRecherche = [
+          titrePrincipal,
+          sousTitre,
+          ...alternatifs,
+          jeu.resume?.brut ?? "",
+          ...(jeu.developpeurs || [])
+        ]
           .join(" ")
-          .toLowerCase()
-          .includes(lower),
-      );
+          .toLowerCase();
+
+        return texteRecherche.includes(lower);
+      });
     }
+
 
     if (decennieFiltre !== "toutes") {
       const dec = parseInt(decennieFiltre);
@@ -128,10 +141,19 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
             >
               <img
                 src={jeu.imageUrl || "https://placehold.co/600x400"}
-                alt={jeu.titre}
+                alt={
+                  jeu.titreComplet?.sousTitre
+                    ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                    : jeu.titreComplet?.principal
+                }
                 className="mb-2 h-40 w-full rounded object-cover"
               />
-              <h3 className="text-lg font-bold">{jeu.titre}</h3>
+              <h3 className="text-lg font-bold">
+                {jeu.titreComplet?.sousTitre
+                  ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                  : jeu.titreComplet?.principal}
+              </h3>
+
               <p className="mb-1 text-gray-500">
                 Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
               </p>
@@ -151,7 +173,12 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                       maxWidth: "400px",
                     }}
                   >
-                    <p className="font-semibold">{jeu.titre}</p>
+                    <p className="font-semibold">
+                      {jeu.titreComplet?.sousTitre
+                        ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                        : jeu.titreComplet?.principal}
+                    </p>
+
                     <p className="text-sm text-gray-200 mt-1">
                       {jeu.resume?.brut
                         ? jeu.resume.brut.slice(0, 200) + "..."

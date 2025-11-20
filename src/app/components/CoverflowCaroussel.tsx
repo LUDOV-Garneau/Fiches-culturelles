@@ -78,7 +78,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                     src={
                       jeu.imageUrl || "https://placehold.co/600x400?text=Jeu"
                     }
-                    alt={jeu.titre}
+                    alt={jeu.titreComplet?.principal}
                     className="h-full w-full object-cover"
                   />
 
@@ -94,7 +94,12 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                           maxWidth: "400px",
                         }}
                       >
-                        <p className="font-semibold">{jeu.titre}</p>
+                        <p className="font-semibold">
+                          {jeu.titreComplet?.sousTitre
+                            ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                            : jeu.titreComplet?.principal}
+                        </p>
+
                         <p className="text-sm opacity-80">
                           Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
                         </p>
@@ -106,7 +111,9 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                     )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
-                    {jeu.titre}
+                    {jeu.titreComplet?.sousTitre
+                      ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                      : jeu.titreComplet?.principal}
                     {jeu.anneeSortie ? ` • ${jeu.anneeSortie}` : ""}
                   </div>
                 </Link>

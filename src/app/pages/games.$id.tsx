@@ -71,13 +71,10 @@ export default function GameDetail() {
               Fiche de jeu
             </p>
             <h1 className="text-4xl md:text-5xl font-black leading-tight mt-2">
-              {jeu.titreComplet?.principal ?? "Jeu sans titre"}
+              {jeu.titreComplet?.sousTitre
+                ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                : jeu.titreComplet?.principal}
             </h1>
-
-            {jeu.titreComplet?.sousTitre && (
-              <p className="mt-1 text-white/70 italic">{jeu.titreComplet.sousTitre}</p>
-            )}
-
             {jeu.anneeSortie && (
               <p className="mt-2 text-sm text-white/70">
                 Année de sortie : {jeu.anneeSortie}
@@ -108,8 +105,12 @@ export default function GameDetail() {
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-6 py-3">
               <p className="text-lg font-semibold text-white">
-                {jeu.titreComplet?.principal ?? "Jeu sans titre"}
+                {jeu.titreComplet?.sousTitre
+                  ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                  : jeu.titreComplet?.principal}
               </p>
+
+
               <p className="text-sm text-white/70">
                 {jeu.developpeurs?.[0] ?? "Développeur inconnu"}
               </p>
