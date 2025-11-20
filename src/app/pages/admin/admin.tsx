@@ -92,9 +92,9 @@ export default function Admin() {
       <div className="p-3 bg-gray-800 text-white flex justify-between items-center">
         <h1 className="text-2xl font-bold">Page Admin</h1>
         <div className="space-x-3">
-          <button onClick={toggleAffichage} className="btn-primary">
+          {/* <button onClick={toggleAffichage} className="btn-primary">
             {modeAffichage === "card" ? "Mode détaillé" : "Mode carte"}
-          </button>
+          </button> */}
           <button onClick={() => navigate("/")} className="btn-primary">
             Retour
           </button>
@@ -102,19 +102,7 @@ export default function Admin() {
       </div>
 
       <div className="flex flex-1">
-        <aside className="w-1/4 bg-white border-r border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-4">Menu</h2>
-          <ul className="space-y-3">
-            <li>
-              <button
-                onClick={() => navigate("/admin/jeux/ajouter")}
-                className="w-full text-left px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded"
-              >
-                Ajouter un jeu
-              </button>
-            </li>
-          </ul>
-        </aside>
+       
 
         <main className="flex-1 p-6">
           {loading && <p>Chargement des jeux...</p>}
@@ -146,7 +134,7 @@ export default function Admin() {
                           <img
                             src={jeu.imageUrl || "https://placehold.co/600x400"}
                             alt={jeu.titre}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-70 object-cover"
                           />
                           <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">
                             Sélectionné
@@ -208,7 +196,7 @@ export default function Admin() {
                           <img
                             src={jeu.imageUrl || "https://placehold.co/600x400"}
                             alt={jeu.titre}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-70 object-cover"
                           />
                         </div>
 

@@ -4,12 +4,13 @@ import { Link } from "react-router";
 
 export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
-    const jeuxChoisis = useMemo(
-      () => jeux.filter((j: any) => j.estChoisi === true),
-      [jeux],
-    );
-  const display = jeuxChoisis.slice(0, jeuxChoisis.length);
-  const len = display.length;
+
+  const jeuxChoisis = useMemo(
+    () => jeux.filter((j: any) => j.estChoisi === true),
+    [jeux],
+  );
+
+  const len = jeuxChoisis.length;
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
@@ -22,16 +23,17 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   });
 
   useEffect(() => {
-    if (isHovered) return; // pause le carrousel quand la souris est dessus
+    if (isHovered || len === 0) return;
     const id = setInterval(next, 3500);
     return () => clearInterval(id);
   }, [isHovered, len]);
 
-  const CARD_W = 218;
-  const CARD_H = 288;
-  const TRACK_H = 340;
-  const GAP_X = 200;
+  const CARD_W = 300;
+  const CARD_H = 430;
+  const GAP_X = 300;
+  const TRACK_H = 520;
 
+  if (len === 0) return null;
   return (
     <div className="relative py-8">
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
@@ -42,7 +44,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
           onMouseLeave={() => setIsHovered(false)}
         >
           <div className="absolute inset-0 flex items-center justify-center">
-            {jeux.slice(0, len).map((jeu, i) => {
+            {jeuxChoisis.map((jeu, i) => {
               const offset = i - active;
               const wrapped =
                 Math.abs(offset) > len / 2
@@ -60,7 +62,11 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                 <Link
                   key={jeu._id}
                   to={`/games/${jeu._id}`}
-                  className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden bg-gray-200"
+                  className="
+    absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md 
+    overflow-hidden bg-gray-200
+    transition-transform duration-700 ease-in-out
+  "
                   style={{
                     width: CARD_W,
                     height: CARD_H,
@@ -103,7 +109,6 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                             ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
                             : jeu.titreComplet?.principal}
                         </p>
-
                         <p className="text-sm opacity-80">
                           Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
                         </p>
@@ -111,7 +116,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
                           {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                         </p>
                       </div>,
-                      document.body,
+                      document.body
                     )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
@@ -129,25 +134,22 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
       {/* --- Contrôles + bullets --- */}
       <div className="mt-6 flex items-center justify-center gap-4">
-        {/* BOUTON PREV */}
         <button
           onClick={prev}
           aria-label="Jeu précédent"
-          className="flex h-9 w-9 items-center justify-center rounded-md border border-[--color-primary-blue] text-white shadow-sm transition
-                     bg-[--color-primary-blue]
-                     hover:bg-[--color-primary-blue-90] hover:border-[--color-primary-blue-90]
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-primary-blue] focus-visible:ring-offset-2"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-[--color-primary-blue] text-white shadow-sm transition bg-[--color-primary-blue] hover:bg-[--color-primary-blue-90] focus-visible:outline-none focus-visible:ring-2"
           style={{
             background:
               "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
           }}
         >
-          <span className="text-lg leading-none">◀</span>
+          <span className="text-xl leading-none">❮</span>
         </button>
 
         {/* BULLETS */}
+        
         <div className="flex gap-1">
-          {jeux.slice(0, len).map((_, i) => (
+          {jeuxChoisis.map((_, i) => (
             <span
               key={i}
               className={[
@@ -158,20 +160,16 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
           ))}
         </div>
 
-        {/* BOUTON NEXT */}
         <button
           onClick={next}
           aria-label="Jeu suivant"
-          className="flex h-9 w-9 items-center justify-center rounded-md border border-[--color-primary-blue] text-white shadow-sm transition
-                     bg-[--color-primary-blue]
-                     hover:bg-[--color-primary-blue-90] hover:border-[--color-primary-blue-90]
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-primary-blue] focus-visible:ring-offset-2"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-[--color-primary-blue] text-white shadow-sm transition bg-[--color-primary-blue] hover:bg-[--color-primary-blue-90] focus-visible:outline-none focus-visible:ring-2"
           style={{
             background:
               "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
           }}
         >
-          <span className="text-lg leading-none">▶</span>
+<span className="text-xl leading-none">❯</span>
         </button>
       </div>
     </div>

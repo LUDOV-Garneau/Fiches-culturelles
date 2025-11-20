@@ -8,24 +8,20 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
   const [decennieFiltre, setDecennieFiltre] = useState("toutes");
   const JEUX_PAR_PAGE = 9;
 
-  const jeuxChoisis = useMemo(
-    () => jeux.filter((j: any) => j.estChoisi === true),
-    [jeux],
-  );
-
   const decenniesDisponibles = useMemo(() => {
     const set = new Set<number>();
-    jeuxChoisis.forEach((j: any) => {
+
+    jeux.forEach((j: any) => {
       if (j.anneeSortie) {
         const dec = Math.floor(j.anneeSortie / 10) * 10;
         set.add(dec);
       }
     });
     return Array.from(set).sort((a, b) => a - b);
-  }, [jeuxChoisis]);
+  }, [jeux]);
 
   const jeuxFiltres = useMemo(() => {
-    let filtered = [...jeuxChoisis];
+    let filtered = [...jeux];
 
     if (searchTerm.trim()) {
       const lower = searchTerm.toLowerCase();
@@ -40,7 +36,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
           sousTitre,
           ...alternatifs,
           jeu.resume?.brut ?? "",
-          ...(jeu.developpeurs || [])
+          ...(jeu.developpeurs || []),
         ]
           .join(" ")
           .toLowerCase();
@@ -48,7 +44,6 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
         return texteRecherche.includes(lower);
       });
     }
-
 
     if (decennieFiltre !== "toutes") {
       const dec = parseInt(decennieFiltre);
@@ -59,7 +54,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     }
 
     return filtered;
-  }, [jeuxChoisis, searchTerm, decennieFiltre]);
+  }, [jeux, searchTerm, decennieFiltre]);
 
   const totalPages = Math.max(1, Math.ceil(jeuxFiltres.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
@@ -72,7 +67,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     left: 0,
   });
 
-  if (page > totalPages) setPage(totalPages);
+  if (page > totalPages && totalPages > 0) setPage(totalPages);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -146,7 +141,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                     ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
                     : jeu.titreComplet?.principal
                 }
-                className="mb-2 h-40 w-full rounded object-cover"
+                className="mb-2 h-100 w-full rounded object-cover"
               />
               <h3 className="text-lg font-bold">
                 {jeu.titreComplet?.sousTitre
