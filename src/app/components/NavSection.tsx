@@ -42,7 +42,7 @@ export function NavSection() {
             </a>
 
             <a
-              href="https://www.youtube.com/channel/UC4baVwPqT7E2xI4fxqzj8kg"
+              href="https://www.youtube.com/@LUDOVUdeM"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -89,20 +89,6 @@ export function NavSection() {
               }}
             >
               English
-            </Link>
-
-            <Link
-              to="/admin"
-              style={{
-                backgroundColor: PRIMARY,
-                padding: "11px 26px",
-                color: "#333",
-                textDecoration: "none",
-                lineHeight: 1,
-                display: "inline-block",
-              }}
-            >
-              Admin
             </Link>
 
             <Link
