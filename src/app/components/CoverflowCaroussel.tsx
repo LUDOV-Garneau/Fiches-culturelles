@@ -25,14 +25,14 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
   const CARD_W = 218;
   const CARD_H = 288;
-  const TRACK_H = 320;
+  const TRACK_H = 340;
   const GAP_X = 200;
 
   return (
     <div className="relative py-8">
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
         <div
-          className="relative mx-auto max-w-4xl"
+          className="relative mx-auto max-w-7xl overflow-hidden"
           style={{ perspective: "1200px", height: TRACK_H }}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
