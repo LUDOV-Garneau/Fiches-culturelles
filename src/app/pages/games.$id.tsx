@@ -11,8 +11,19 @@ type ApiJeu = {
   imageUrl?: string;
   developpeurs?: string[];
   anneeSortie?: number;
-  resume?: { brut?: string };
+
+  resume: {
+    brut?: string;
+    fr?: string | null;
+    notes?: {
+      credits?: string | null;
+      autresEditions?: string | null;
+      etiquettesGeneriques?: string[];
+      liensQuebec?: string | null;
+    };
+  };
 };
+
 
 export default function GameDetail() {
   const { id } = useParams();
@@ -63,7 +74,7 @@ export default function GameDetail() {
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
- 
+
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white shadow-lg">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 py-10">
           <div>
@@ -123,10 +134,46 @@ export default function GameDetail() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                 Description
               </h2>
+
               <p className="text-gray-700 leading-relaxed">
-                {jeu.resume?.brut ||
+                {jeu.resume?.fr ||
+                  jeu.resume?.brut ||
                   "Aucune description fournie pour ce jeu pour le moment."}
               </p>
+              {jeu.resume?.notes && (
+                <div className="mt-8 space-y-3">
+                  {jeu.resume.notes.credits && (
+                    <div>
+                      <span className="font-semibold text-gray-900">Crédits :</span>{" "}
+                      <span className="text-gray-700">{jeu.resume.notes.credits}</span>
+                    </div>
+                  )}
+
+                  {jeu.resume.notes.autresEditions && (
+                    <div>
+                      <span className="font-semibold text-gray-900">Autres éditions :</span>{" "}
+                      <span className="text-gray-700">{jeu.resume.notes.autresEditions}</span>
+                    </div>
+                  )}
+
+                  {(jeu.resume.notes.etiquettesGeneriques?.length ?? 0) > 0 && (
+                    <div>
+                      <span className="font-semibold text-gray-900">Étiquettes génériques :</span>{" "}
+                      <span className="text-gray-700">
+                        {jeu.resume.notes.etiquettesGeneriques?.join(", ")}
+                      </span>
+                    </div>
+                  )}
+
+                  {jeu.resume.notes.liensQuebec && (
+                    <div>
+                      <span className="font-semibold text-gray-900">Liens Québec :</span>{" "}
+                      <span className="text-gray-700">{jeu.resume.notes.liensQuebec}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <p className="mt-5 text-xs text-gray-400">
                 Source : base de données LUDOV
               </p>
