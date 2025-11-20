@@ -33,9 +33,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const TRACK_H = 340;
   const GAP_X = 200;
 
-  // Sécurité si aucun jeu n'est choisi
   if (len === 0) return null;
-
   return (
     <div className="relative py-8">
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">

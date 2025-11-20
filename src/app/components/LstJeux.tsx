@@ -8,10 +8,9 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
   const [decennieFiltre, setDecennieFiltre] = useState("toutes");
   const JEUX_PAR_PAGE = 9;
 
-  // MODIFICATION : On calcule les décennies sur TOUS les jeux, pas juste les choisis
   const decenniesDisponibles = useMemo(() => {
     const set = new Set<number>();
-    // Utilisation de 'jeux' directment
+
     jeux.forEach((j: any) => {
       if (j.anneeSortie) {
         const dec = Math.floor(j.anneeSortie / 10) * 10;
@@ -21,9 +20,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     return Array.from(set).sort((a, b) => a - b);
   }, [jeux]);
 
-  // MODIFICATION : On filtre à partir de TOUS les jeux
   const jeuxFiltres = useMemo(() => {
-    // On commence avec la liste complète 'jeux'
     let filtered = [...jeux];
 
     if (searchTerm.trim()) {
@@ -57,7 +54,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     }
 
     return filtered;
-  }, [jeux, searchTerm, decennieFiltre]); // Dépendance mise à jour : [jeux]
+  }, [jeux, searchTerm, decennieFiltre]);
 
   const totalPages = Math.max(1, Math.ceil(jeuxFiltres.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
