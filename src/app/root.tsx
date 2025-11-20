@@ -24,16 +24,16 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
-   {
+  {
     rel: "icon",
     href: "/LUDOV_web_logo_final.png",
     type: "image/png",
-  }
+  },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -51,17 +51,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <div className="app-layout">
-      <header className=" text-white p-4">
-        <NavSection />
+    <div className="app-layout min-h-screen bg-gray-100">
+      {/* Barre du haut style WordPress */}
+      <NavSection />
+
+      {/* Contenu principal : side nav + pages */}
+      <div className="flex">
         <Sidenav />
-      </header>
 
-      <main className="p-6">
-        <Outlet />
-      </main>
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
 
-      <footer className="bg-white-100 text-center p-4">
+      <footer className="bg-gray-100 text-center">
         <p className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600">
           © Copyright {new Date().getFullYear()} LUDOV (Laboratoire
           universitaire de documentation et d’observation vidéoludiques) – Tous

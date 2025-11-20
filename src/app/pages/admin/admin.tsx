@@ -15,7 +15,7 @@ export default function Admin() {
   useEffect(() => {
     async function chargerJeux() {
       try {
-        const response = await fetch("http://localhost:3000/jeux");
+        const response = await fetch("http://72.11.148.122/api/jeux");
         const data = await response.json();
 
         if (data.success) {
@@ -38,7 +38,7 @@ export default function Admin() {
     if (!window.confirm(`Supprimer "${titre}" ?`)) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
         method: "DELETE",
       });
 
@@ -57,7 +57,7 @@ export default function Admin() {
 
   async function toggleChoisi(id: string, estChoisiActuel: boolean) {
     try {
-      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

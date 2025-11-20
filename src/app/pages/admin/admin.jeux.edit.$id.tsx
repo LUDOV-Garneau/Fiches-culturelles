@@ -12,7 +12,7 @@ export default function ModifierJeu() {
   useEffect(() => {
     async function chargerJeu() {
       try {
-        const response = await fetch(`http://localhost:3000/jeux/${id}`);
+        const response = await fetch(`http://72.11.148.122/api/jeux/${id}`);
         const data = await response.json();
 
         if (data.success && data.data) {
@@ -34,7 +34,7 @@ export default function ModifierJeu() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(jeu),
@@ -53,7 +53,7 @@ export default function ModifierJeu() {
   }
   async function toggleChoisi(id: string, estChoisiActuel: boolean) {
     try {
-      const response = await fetch(`http://localhost:3000/jeux/${id}`, {
+      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

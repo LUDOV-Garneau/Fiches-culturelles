@@ -6,6 +6,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
   const display = jeux.slice(0, 10);
   const len = display.length;
+
   const prev = () => setActive((i) => (i - 1 + len) % len);
   const next = () => setActive((i) => (i + 1) % len);
 
@@ -17,7 +18,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   });
 
   useEffect(() => {
-    if (isHovered) return; // pause the carousel while hovered
+    if (isHovered) return; // pause le carrousel quand la souris est dessus
     const id = setInterval(next, 3500);
     return () => clearInterval(id);
   }, [isHovered, len]);
@@ -122,13 +123,25 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
         </div>
       </div>
 
+      {/* --- Contrôles + bullets --- */}
       <div className="mt-6 flex items-center justify-center gap-4">
+        {/* BOUTON PREV */}
         <button
           onClick={prev}
-          className="rounded border border-gray-300 bg-white px-3 py-2 hover:bg-[--color-primary-blue-10]"
+          aria-label="Jeu précédent"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-[--color-primary-blue] text-white shadow-sm transition
+                     bg-[--color-primary-blue]
+                     hover:bg-[--color-primary-blue-90] hover:border-[--color-primary-blue-90]
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-primary-blue] focus-visible:ring-offset-2"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
+          }}
         >
-          ◀
+          <span className="text-lg leading-none">◀</span>
         </button>
+
+        {/* BULLETS */}
         <div className="flex gap-1">
           {jeux.slice(0, 10).map((_, i) => (
             <span
@@ -140,11 +153,21 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
             />
           ))}
         </div>
+
+        {/* BOUTON NEXT */}
         <button
           onClick={next}
-          className="rounded border border-gray-300 bg-white px-3 py-2 hover:bg-[--color-primary-blue-10]"
+          aria-label="Jeu suivant"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-[--color-primary-blue] text-white shadow-sm transition
+                     bg-[--color-primary-blue]
+                     hover:bg-[--color-primary-blue-90] hover:border-[--color-primary-blue-90]
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-primary-blue] focus-visible:ring-offset-2"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
+          }}
         >
-          ▶
+          <span className="text-lg leading-none">▶</span>
         </button>
       </div>
     </div>

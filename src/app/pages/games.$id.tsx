@@ -25,7 +25,7 @@ export default function GameDetail() {
 
     async function fetchJeu() {
       try {
-        const resp = await fetch(`http://localhost:3000/jeux/${id}`);
+        const resp = await fetch(`http://72.11.148.122/api/jeux/${id}`);
         const data = await resp.json();
         if (data.success && data.data) setJeu(data.data);
         else setError("Jeu introuvable.");
@@ -63,7 +63,7 @@ export default function GameDetail() {
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
-      {/* Bandeau supérieur */}
+ 
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white shadow-lg">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 py-10">
           <div>
@@ -82,12 +82,7 @@ export default function GameDetail() {
             )}
           </div>
 
-          <Link
-            to="/"
-            className="mt-6 md:mt-0 rounded-full bg-white/10 px-5 py-2 text-sm font-medium text-white hover:bg-white/20 transition"
-          >
-            ← Retour
-          </Link>
+          <div />
         </div>
       </div>
 
@@ -95,7 +90,6 @@ export default function GameDetail() {
       <div className="mx-auto max-w-6xl grid md:grid-cols-[1.4fr_0.6fr] gap-10 px-6 py-16">
         {/* Colonne gauche */}
         <div className="space-y-10">
-          {/* Image */}
           <div className="relative overflow-hidden rounded-3xl shadow-md bg-gray-200">
             {jeu.imageUrl ? (
               <img
@@ -141,7 +135,7 @@ export default function GameDetail() {
             {/* Bouton PDF */}
             <div className="pt-3 border-t border-gray-100">
               <a
-                href={`http://localhost:3000/jeux/${jeu._id}/pdf`}
+                href={`http://72.11.148.122/api/jeux/${jeu._id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-800 transition"
@@ -167,7 +161,7 @@ export default function GameDetail() {
 
         </div>
 
-        {/* Colonne droite : développeur seulement */}
+        {/* Colonne droite */}
         <aside className="space-y-6">
           <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-md transition">
             <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide">
@@ -180,7 +174,6 @@ export default function GameDetail() {
               {jeu.anneeSortie ? `Projet ${jeu.anneeSortie}` : "Année inconnue"}
             </p>
 
-            {/* petit séparateur */}
             <div className="mt-5 h-px bg-gray-100" />
 
             <p className="mt-4 text-sm text-gray-500">
@@ -190,7 +183,7 @@ export default function GameDetail() {
         </aside>
       </div>
 
-      {/* Bloc retour (désormais sous le texte) */}
+      {/* Retour en bas */}
       <div className="mx-auto max-w-6xl px-6 pb-16">
         <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-md hover:bg-slate-800 transition flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
