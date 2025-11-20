@@ -4,10 +4,10 @@ import { Link } from "react-router";
 
 export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
-    const jeuxChoisis = useMemo(
-      () => jeux.filter((j: any) => j.estChoisi === true),
-      [jeux],
-    );
+  const jeuxChoisis = useMemo(
+    () => jeux.filter((j: any) => j.estChoisi === true),
+    [jeux]
+  );
   const display = jeuxChoisis.slice(0, jeuxChoisis.length);
   const len = display.length;
 
@@ -28,10 +28,9 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   }, [isHovered, len]);
 
   const CARD_W = 300;
-const CARD_H = 430;
-const GAP_X = 300;
-const TRACK_H = 520;
-
+  const CARD_H = 430;
+  const GAP_X = 300;
+  const TRACK_H = 520;
 
   return (
     <div className="relative py-8">
@@ -58,21 +57,21 @@ const TRACK_H = 520;
               const zIndex = 100 - Math.abs(wrapped);
 
               return (
-             <Link
-  key={jeu._id}
-  to={`/games/${jeu._id}`}
-  className="
+                <Link
+                  key={jeu._id}
+                  to={`/games/${jeu._id}`}
+                  className="
     absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md 
     overflow-hidden bg-gray-200
     transition-transform duration-700 ease-in-out
   "
-  style={{
-    width: CARD_W,
-    height: CARD_H,
-    transform: `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`,
-    transformStyle: "preserve-3d",
-    zIndex,
-  }}
+                  style={{
+                    width: CARD_W,
+                    height: CARD_H,
+                    transform: `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`,
+                    transformStyle: "preserve-3d",
+                    zIndex,
+                  }}
                   onMouseEnter={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     setHovered(jeu._id);
@@ -116,7 +115,7 @@ const TRACK_H = 520;
                           {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
                         </p>
                       </div>,
-                      document.body,
+                      document.body
                     )}
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-center text-xs text-white">
@@ -147,10 +146,11 @@ const TRACK_H = 520;
               "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
           }}
         >
-          <span className="text-lg leading-none">◀</span>
+          <span className="text-xl leading-none">❮</span>
         </button>
 
         {/* BULLETS */}
+        
         <div className="flex gap-1">
           {jeux.slice(0, len).map((_, i) => (
             <span
@@ -176,7 +176,7 @@ const TRACK_H = 520;
               "linear-gradient(to bottom, var(--color-primary-blue-10), var(--color-primary-blue))",
           }}
         >
-          <span className="text-lg leading-none">▶</span>
+<span className="text-xl leading-none">❯</span>
         </button>
       </div>
     </div>
