@@ -27,10 +27,11 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
     return () => clearInterval(id);
   }, [isHovered, len]);
 
-  const CARD_W = 218;
-  const CARD_H = 288;
-  const TRACK_H = 340;
-  const GAP_X = 200;
+  const CARD_W = 300;
+const CARD_H = 430;
+const GAP_X = 300;
+const TRACK_H = 520;
+
 
   return (
     <div className="relative py-8">
@@ -57,17 +58,21 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
               const zIndex = 100 - Math.abs(wrapped);
 
               return (
-                <Link
-                  key={jeu._id}
-                  to={`/games/${jeu._id}`}
-                  className="absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md overflow-hidden bg-gray-200"
-                  style={{
-                    width: CARD_W,
-                    height: CARD_H,
-                    transform: `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`,
-                    transformStyle: "preserve-3d",
-                    zIndex,
-                  }}
+             <Link
+  key={jeu._id}
+  to={`/games/${jeu._id}`}
+  className="
+    absolute top-1/2 -translate-y-1/2 rounded-lg shadow-md 
+    overflow-hidden bg-gray-200
+    transition-transform duration-700 ease-in-out
+  "
+  style={{
+    width: CARD_W,
+    height: CARD_H,
+    transform: `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`,
+    transformStyle: "preserve-3d",
+    zIndex,
+  }}
                   onMouseEnter={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     setHovered(jeu._id);
