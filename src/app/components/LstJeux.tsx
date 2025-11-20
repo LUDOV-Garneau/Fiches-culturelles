@@ -146,7 +146,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                     ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
                     : jeu.titreComplet?.principal
                 }
-                className="mb-2 h-40 w-full rounded object-cover"
+                className="mb-2 h-100 w-full rounded object-cover"
               />
               <h3 className="text-lg font-bold">
                 {jeu.titreComplet?.sousTitre
