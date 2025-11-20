@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router";
 
 export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
   const [active, setActive] = useState(0);
-  const display = jeux.slice(0, 10);
+    const jeuxChoisis = useMemo(
+      () => jeux.filter((j: any) => j.estChoisi === true),
+      [jeux],
+    );
+  const display = jeuxChoisis.slice(0, jeuxChoisis.length);
   const len = display.length;
 
   const prev = () => setActive((i) => (i - 1 + len) % len);
@@ -25,20 +29,20 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
   const CARD_W = 218;
   const CARD_H = 288;
-  const TRACK_H = 320;
+  const TRACK_H = 340;
   const GAP_X = 200;
 
   return (
     <div className="relative py-8">
       <div className="mx-auto max-w-5xl md:max-w-6xl px-4">
         <div
-          className="relative mx-auto max-w-4xl"
+          className="relative mx-auto max-w-7xl overflow-hidden"
           style={{ perspective: "1200px", height: TRACK_H }}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <div className="absolute inset-0 flex items-center justify-center">
-            {jeux.slice(0, 10).map((jeu, i) => {
+            {jeux.slice(0, len).map((jeu, i) => {
               const offset = i - active;
               const wrapped =
                 Math.abs(offset) > len / 2
@@ -143,7 +147,7 @@ export function CoverflowCarousel({ jeux }: { jeux: any[] }) {
 
         {/* BULLETS */}
         <div className="flex gap-1">
-          {jeux.slice(0, 10).map((_, i) => (
+          {jeux.slice(0, len).map((_, i) => (
             <span
               key={i}
               className={[
