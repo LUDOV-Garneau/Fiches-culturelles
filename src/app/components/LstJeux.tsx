@@ -8,24 +8,23 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
   const [decennieFiltre, setDecennieFiltre] = useState("toutes");
   const JEUX_PAR_PAGE = 9;
 
-  const jeuxChoisis = useMemo(
-    () => jeux.filter((j: any) => j.estChoisi === true),
-    [jeux],
-  );
-
+  // MODIFICATION : On calcule les décennies sur TOUS les jeux, pas juste les choisis
   const decenniesDisponibles = useMemo(() => {
     const set = new Set<number>();
-    jeuxChoisis.forEach((j: any) => {
+    // Utilisation de 'jeux' directment
+    jeux.forEach((j: any) => {
       if (j.anneeSortie) {
         const dec = Math.floor(j.anneeSortie / 10) * 10;
         set.add(dec);
       }
     });
     return Array.from(set).sort((a, b) => a - b);
-  }, [jeuxChoisis]);
+  }, [jeux]);
 
+  // MODIFICATION : On filtre à partir de TOUS les jeux
   const jeuxFiltres = useMemo(() => {
-    let filtered = [...jeuxChoisis];
+    // On commence avec la liste complète 'jeux'
+    let filtered = [...jeux];
 
     if (searchTerm.trim()) {
       const lower = searchTerm.toLowerCase();
@@ -40,7 +39,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
           sousTitre,
           ...alternatifs,
           jeu.resume?.brut ?? "",
-          ...(jeu.developpeurs || [])
+          ...(jeu.developpeurs || []),
         ]
           .join(" ")
           .toLowerCase();
@@ -48,7 +47,6 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
         return texteRecherche.includes(lower);
       });
     }
-
 
     if (decennieFiltre !== "toutes") {
       const dec = parseInt(decennieFiltre);
@@ -59,7 +57,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     }
 
     return filtered;
-  }, [jeuxChoisis, searchTerm, decennieFiltre]);
+  }, [jeux, searchTerm, decennieFiltre]); // Dépendance mise à jour : [jeux]
 
   const totalPages = Math.max(1, Math.ceil(jeuxFiltres.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
@@ -72,7 +70,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     left: 0,
   });
 
-  if (page > totalPages) setPage(totalPages);
+  if (page > totalPages && totalPages > 0) setPage(totalPages);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
