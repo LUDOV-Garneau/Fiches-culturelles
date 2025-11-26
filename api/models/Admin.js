@@ -8,6 +8,21 @@ const adminSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
+
+  courriel: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+    validate: {
+      validator: function (v) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: props => `${props.value} n'est pas un courriel valide.`
+    }
+  },
+
   motDePasseHache: {
     type: String,
     required: true
