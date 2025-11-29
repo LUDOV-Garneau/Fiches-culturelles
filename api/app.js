@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import jeuxRoutes from "./routes/jeux.js";
+import authRoutes from "./routes/auth.js";
 import cors from "cors";
 
 const app = express();
@@ -22,6 +23,8 @@ app.get("/", (req, res) => {
 });
 app.use(cors());
 app.use("/jeux", jeuxRoutes);
+
+app.use("/auth", authRoutes);
 
 export default app; 
 // Jest nécessite qu'on sépare app et server pour fonctionner 
