@@ -32,6 +32,7 @@ router.post("/", upload.single("image"), (req, res) => {
 
   const fileUrl = `http://72.11.148.122/uploads/${req.file.filename}`;
 
+  
   return res.json({
     success: true,
     message: "Image téléversée avec succès.",
