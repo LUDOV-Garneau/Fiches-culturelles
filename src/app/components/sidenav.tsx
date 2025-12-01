@@ -75,7 +75,7 @@ export function Sidenav(){
       <ul>
         <li>
           <a 
-            href="https://www.ludov.ca/fr/documentation/" 
+            href="https://www.ludov.ca/fr/documentation/le-jeu-video-au-quebec/" 
            
           >
             Le jeu vidéo au Québec
@@ -84,7 +84,7 @@ export function Sidenav(){
 
         <li>
           <a 
-            href="https://www.ludov.ca/fr/documentation/" 
+            href="https://www.ludov.ca/fr/documentation/evolution-de-la-jouabilite/" 
 
           >
             Visionneuse: jouabilité
@@ -93,7 +93,7 @@ export function Sidenav(){
 
         <li>
           <a 
-            href="https://www.ludov.ca/fr/documentation/" 
+            href="https://www.ludov.ca/fr/documentation/evolution-de-la-publicite/" 
           
           >
             Visionneuse: marketing
@@ -102,7 +102,7 @@ export function Sidenav(){
 
         <li>
           <a 
-            href="https://www.ludov.ca/fr/documentation/" 
+            href="https://web.archive.org/web/20220303001406/https:/ludicine.ca/"  target="_blank"
            
           >
             Ludiciné (archives)
@@ -122,42 +122,42 @@ export function Sidenav(){
   </a>
   <ul>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/approche-ludique-du-cinema/" >
         Approche ludique du cinéma
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/cinema-interactif/" >
         Cinéma interactif
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/">
+      <a href="https://www.ludov.ca/fr/observation/critique-videoludique/">
         Critique vidéoludique
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/jeu-video-dhorreur/" >
         Jeu vidéo d'horreur
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/genres-videoludiques-et-communautes-discursives/" >
         Genres vidéoludiques et communautés discursives
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/technologies-graphiques/" >
         Technologies graphiques
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/histoire-internationale-du-jeu-video-shac/" >
         Histoire internationale du jeu vidéo (SHAC)
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" >
+      <a href="https://www.ludov.ca/fr/observation/autres-recherches/" >
         Autres recherches
       </a>
     </li>
@@ -171,9 +171,9 @@ export function Sidenav(){
                   <div className="submenu">
             <a href="https://www.ludov.ca/fr/videoludiques/">Vidéoludique</a>
             <ul>
-              <li><a href="https://www.ludov.ca/fr/videoludiques/" >Nos événements</a></li>
-              <li><a href="https://www.ludov.ca/fr/videoludiques/" >Liens utiles</a></li>
-              <li><a href="https://www.ludov.ca/fr/videoludiques/" >Nos partenaires</a></li>
+              <li><a href="https://www.ludov.ca/fr/videoludiques/evenements/" >Nos événements</a></li>
+              <li><a href="https://www.ludov.ca/fr/videoludiques/liens-utiles/" >Liens utiles</a></li>
+              <li><a href="https://www.ludov.ca/fr/videoludiques/partenariats/" >Nos partenaires</a></li>
             </ul>
           </div>
 
