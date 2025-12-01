@@ -57,19 +57,63 @@ export function Sidenav(){
   )}
 </div>
 
-            <div className="sidediv" onMouseEnter={() => setHovered("D")} onMouseLeave={() => setHovered(null)}>D
-                  {hovered === "D" && (
-                    <div className="submenu">
-                      <a>Documentation</a>
-                      <ul>
-                        <li><a>Le jeu vidéo au Québec</a></li>
-                        <li><a>Visionneuse: jouabilité</a></li>
-                        <li><a>Visionneuse: marketing</a></li>
-                        <li><a>Ludiciné (archives)</a></li>
-                      </ul>
-                    </div>
-                    )}
-            </div>
+            <div className="sidediv" 
+     onMouseEnter={() => setHovered("D")} 
+     onMouseLeave={() => setHovered(null)}
+>
+  D
+  {hovered === "D" && (
+    <div className="submenu">
+
+      <a 
+        href="https://www.ludov.ca/fr/documentation/" 
+        target="_blank"
+      >
+        Documentation
+      </a>
+
+      <ul>
+        <li>
+          <a 
+            href="https://www.ludov.ca/fr/documentation/" 
+            target="_blank"
+          >
+            Le jeu vidéo au Québec
+          </a>
+        </li>
+
+        <li>
+          <a 
+            href="https://www.ludov.ca/fr/documentation/" 
+            target="_blank"
+          >
+            Visionneuse: jouabilité
+          </a>
+        </li>
+
+        <li>
+          <a 
+            href="https://www.ludov.ca/fr/documentation/" 
+            target="_blank"
+          >
+            Visionneuse: marketing
+          </a>
+        </li>
+
+        <li>
+          <a 
+            href="https://www.ludov.ca/fr/documentation/" 
+            target="_blank"
+          >
+            Ludiciné (archives)
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  )}
+</div>
+
             <div className="sidediv" onMouseEnter={() => setHovered("O")} onMouseLeave={() => setHovered(null)}>O
                   {hovered === "O" && (
                     <div className="submenu">
