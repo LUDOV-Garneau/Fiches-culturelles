@@ -208,7 +208,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
               onMouseLeave={() => setHovered(null)}
               className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition flex flex-col h-full"
             >
-              <div className="relative h-48 w-full mb-4">
+              <div className="relative h-full w-full mb-4">
                 <img
                   src={jeu.imageUrl || "https://placehold.co/600x400"}
                   alt={jeu.titreComplet?.principal}
