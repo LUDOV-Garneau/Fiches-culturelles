@@ -117,18 +117,53 @@ export function Sidenav(){
             <div className="sidediv" onMouseEnter={() => setHovered("O")} onMouseLeave={() => setHovered(null)}>O
                   {hovered === "O" && (
                     <div className="submenu">
-                      <a>Observation</a>
-                      <ul>
-                        <li><a>Approche ludique du cinéma</a></li>
-                        <li><a>Cinéma interactif</a></li>
-                        <li><a>Critique vidéoludique</a></li>
-                        <li><a>Jeu vidéo d'horreur</a></li>
-                        <li><a>Genres vidéoludique et communautés discursives</a></li>
-                        <li><a>Technologies graphiques</a></li>
-                        <li><a>Histore internationale du jeu vidéo (SHAC)</a></li>
-                        <li><a>Autre recherches</a></li>
-                      </ul>
-                    </div>
+  <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+    Observation
+  </a>
+  <ul>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Approche ludique du cinéma
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Cinéma interactif
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Critique vidéoludique
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Jeu vidéo d'horreur
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Genres vidéoludiques et communautés discursives
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Technologies graphiques
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Histoire internationale du jeu vidéo (SHAC)
+      </a>
+    </li>
+    <li>
+      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+        Autres recherches
+      </a>
+    </li>
+  </ul>
+</div>
+
                     )}
             </div>
             <div className="sidediv" onMouseEnter={() => setHovered("V")} onMouseLeave={() => setHovered(null)}><p>V</p>  
