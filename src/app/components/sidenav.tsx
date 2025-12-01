@@ -9,12 +9,12 @@ export function Sidenav(){
             <div className="sidediv" onMouseEnter={() => {setHovered("L")}} onMouseLeave={() => setHovered(null)}>L
                   {hovered === "L" && (
              <div className="submenu">
-              <a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Laboratoire</a>
+              <a href="https://www.ludov.ca/fr/laboratoire/" >Laboratoire</a>
               <ul>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Nos installations</a></li>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Nos collections</a></li>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Faire une réservation</a></li>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Faire un don</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Nos installations</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Nos collections</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Faire une réservation</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Faire un don</a></li>
               </ul>
             </div>
 
@@ -28,27 +28,27 @@ export function Sidenav(){
   U
   {hovered === "U" && (
     <div className="submenu">
-      <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+      <a href="https://www.ludov.ca/fr/universitaire/" >
         Universitaire
       </a>
       <ul>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+          <a href="https://www.ludov.ca/fr/universitaire/" >
             Notre équipe
           </a>
         </li>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+          <a href="https://www.ludov.ca/fr/universitaire/" >
             Programmes d'études
           </a>
         </li>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+          <a href="https://www.ludov.ca/fr/universitaire/" >
             Recherches étudiantes
           </a>
         </li>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+          <a href="https://www.ludov.ca/fr/universitaire/" >
             Création étudiantes
           </a>
         </li>
@@ -85,7 +85,7 @@ export function Sidenav(){
         <li>
           <a 
             href="https://www.ludov.ca/fr/documentation/" 
-            target="_blank"
+
           >
             Visionneuse: jouabilité
           </a>
@@ -94,7 +94,7 @@ export function Sidenav(){
         <li>
           <a 
             href="https://www.ludov.ca/fr/documentation/" 
-            target="_blank"
+          
           >
             Visionneuse: marketing
           </a>
@@ -103,7 +103,7 @@ export function Sidenav(){
         <li>
           <a 
             href="https://www.ludov.ca/fr/documentation/" 
-            target="_blank"
+           
           >
             Ludiciné (archives)
           </a>
@@ -117,47 +117,47 @@ export function Sidenav(){
             <div className="sidediv" onMouseEnter={() => setHovered("O")} onMouseLeave={() => setHovered(null)}>O
                   {hovered === "O" && (
                     <div className="submenu">
-  <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+  <a href="https://www.ludov.ca/fr/observation/" >
     Observation
   </a>
   <ul>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Approche ludique du cinéma
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Cinéma interactif
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/">
         Critique vidéoludique
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Jeu vidéo d'horreur
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Genres vidéoludiques et communautés discursives
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Technologies graphiques
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Histoire internationale du jeu vidéo (SHAC)
       </a>
     </li>
     <li>
-      <a href="https://www.ludov.ca/fr/observation/" target="_blank">
+      <a href="https://www.ludov.ca/fr/observation/" >
         Autres recherches
       </a>
     </li>
@@ -169,7 +169,7 @@ export function Sidenav(){
             <div className="sidediv" onMouseEnter={() => setHovered("V")} onMouseLeave={() => setHovered(null)}><p>V</p>  
                   {hovered === "V" && (
                   <div className="submenu">
-            <a href="https://www.ludov.ca/fr/videoludiques/" target="_blank">Vidéoludique</a>
+            <a href="https://www.ludov.ca/fr/videoludiques/">Vidéoludique</a>
             <ul>
               <li><a href="https://www.ludov.ca/fr/videoludiques/" >Nos événements</a></li>
               <li><a href="https://www.ludov.ca/fr/videoludiques/" >Liens utiles</a></li>
