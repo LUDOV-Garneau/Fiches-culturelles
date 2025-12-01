@@ -1,6 +1,53 @@
-// src/app/pages/games.$id.tsx
 import * as React from "react";
 import { useParams, Link } from "react-router";
+import { FaSteam, FaXbox, FaPlaystation, FaItchIo } from "react-icons/fa";
+import { SiEpicgames, SiGogdotcom, SiNintendoswitch } from "react-icons/si";
+
+const PlatformIcon = ({ platformName }: { platformName: any }) => {
+  const nameStr = String(platformName || "");
+  const lower = nameStr.toLowerCase();
+
+  let icon = null;
+  let color = "text-gray-500";
+
+  if (lower.includes("steam")) {
+    icon = <FaSteam />;
+    color = "text-blue-900";
+  } else if (lower.includes("epic")) {
+    icon = <SiEpicgames />;
+    color = "text-gray-900";
+  } else if (lower.includes("gog")) {
+    icon = <SiGogdotcom />;
+    color = "text-purple-700";
+  } else if (lower.includes("switch") || lower.includes("nintendo")) {
+    icon = <SiNintendoswitch />;
+    color = "text-red-600";
+  } else if (lower.includes("xbox")) {
+    icon = <FaXbox />;
+    color = "text-green-600";
+  } else if (
+    lower.includes("playstation") ||
+    lower.includes("ps4") ||
+    lower.includes("ps5")
+  ) {
+    icon = <FaPlaystation />;
+    color = "text-blue-700";
+  } else if (lower.includes("itch")) {
+    icon = <FaItchIo />;
+    color = "text-red-500";
+  } else {
+    if (lower.includes("[object")) return null;
+    return (
+      <span className="text-xs bg-gray-200 px-2 py-1 rounded">{nameStr}</span>
+    );
+  }
+
+  return (
+    <span className={`text-2xl ${color}`} title={nameStr}>
+      {icon}
+    </span>
+  );
+};
 
 type ApiJeu = {
   _id: string;
@@ -11,6 +58,7 @@ type ApiJeu = {
   imageUrl?: string;
   developpeurs?: string[];
   anneeSortie?: number;
+  plateformes?: string | string[];
 
   resume: {
     brut?: string;
@@ -24,7 +72,6 @@ type ApiJeu = {
   };
 };
 
-
 export default function GameDetail() {
   const { id } = useParams();
   const [jeu, setJeu] = React.useState<ApiJeu | null>(null);
@@ -34,20 +81,60 @@ export default function GameDetail() {
   React.useEffect(() => {
     if (!id) return;
 
-    async function fetchJeu() {
+    async function fetchJeuAndSiblings() {
       try {
-        const resp = await fetch(`http://72.11.148.122/api/jeux/${id}`);
-        const data = await resp.json();
-        if (data.success && data.data) setJeu(data.data);
-        else setError("Jeu introuvable.");
-      } catch {
+        const respOne = await fetch(`http://72.11.148.122/api/jeux/${id}`);
+        const dataOne = await respOne.json();
+
+        if (!dataOne.success || !dataOne.data) {
+          setError("Jeu introuvable.");
+          setLoading(false);
+          return;
+        }
+
+        const currentGame = dataOne.data;
+
+        const respAll = await fetch(`http://72.11.148.122/api/jeux`);
+        const dataAll = await respAll.json();
+
+        let mergedPlatforms: string[] = [];
+
+        if (dataAll.success && Array.isArray(dataAll.data)) {
+          const siblings = dataAll.data.filter(
+            (g: ApiJeu) =>
+              g.titreComplet.principal === currentGame.titreComplet.principal &&
+              g.anneeSortie === currentGame.anneeSortie,
+          );
+
+          const setPlats = new Set<string>();
+          siblings.forEach((s: any) => {
+            const p = s.plateformes;
+            if (Array.isArray(p)) p.forEach((item) => setPlats.add(item));
+            else if (p) setPlats.add(p);
+          });
+
+          mergedPlatforms = Array.from(setPlats);
+        } else {
+          const p = currentGame.plateformes;
+          mergedPlatforms = Array.isArray(p) ? p : p ? [p] : [];
+        }
+
+        setJeu({ ...currentGame, plateformes: mergedPlatforms });
+      } catch (err) {
+        console.error(err);
         setError("Erreur de connexion au serveur.");
       } finally {
         setLoading(false);
       }
     }
-    fetchJeu();
+
+    fetchJeuAndSiblings();
   }, [id]);
+
+  const plateformesSafe = React.useMemo(() => {
+    if (!jeu?.plateformes) return [];
+    return Array.isArray(jeu.plateformes) ? jeu.plateformes : [jeu.plateformes];
+  }, [jeu]);
 
   if (loading)
     return (
@@ -74,7 +161,6 @@ export default function GameDetail() {
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
-
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white shadow-lg">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 py-10">
           <div>
@@ -97,9 +183,7 @@ export default function GameDetail() {
         </div>
       </div>
 
-      {/* Contenu principal */}
       <div className="mx-auto max-w-6xl grid md:grid-cols-[1.4fr_0.6fr] gap-10 px-6 py-16">
-        {/* Colonne gauche */}
         <div className="space-y-10">
           <div className="relative overflow-hidden rounded-3xl shadow-md bg-gray-200">
             {jeu.imageUrl ? (
@@ -121,14 +205,12 @@ export default function GameDetail() {
                   : jeu.titreComplet?.principal}
               </p>
 
-
               <p className="text-sm text-white/70">
                 {jeu.developpeurs?.[0] ?? "Développeur inconnu"}
               </p>
             </div>
           </div>
 
-          {/* Description */}
           <div className="rounded-3xl bg-white p-8 shadow-sm hover:shadow-md transition space-y-6">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
@@ -144,21 +226,31 @@ export default function GameDetail() {
                 <div className="mt-8 space-y-3">
                   {jeu.resume.notes.credits && (
                     <div>
-                      <span className="font-semibold text-gray-900">Crédits :</span>{" "}
-                      <span className="text-gray-700">{jeu.resume.notes.credits}</span>
+                      <span className="font-semibold text-gray-900">
+                        Crédits :
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {jeu.resume.notes.credits}
+                      </span>
                     </div>
                   )}
 
                   {jeu.resume.notes.autresEditions && (
                     <div>
-                      <span className="font-semibold text-gray-900">Autres éditions :</span>{" "}
-                      <span className="text-gray-700">{jeu.resume.notes.autresEditions}</span>
+                      <span className="font-semibold text-gray-900">
+                        Autres éditions :
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {jeu.resume.notes.autresEditions}
+                      </span>
                     </div>
                   )}
 
                   {(jeu.resume.notes.etiquettesGeneriques?.length ?? 0) > 0 && (
                     <div>
-                      <span className="font-semibold text-gray-900">Étiquettes génériques :</span>{" "}
+                      <span className="font-semibold text-gray-900">
+                        Étiquettes génériques :
+                      </span>{" "}
                       <span className="text-gray-700">
                         {jeu.resume.notes.etiquettesGeneriques?.join(", ")}
                       </span>
@@ -167,8 +259,12 @@ export default function GameDetail() {
 
                   {jeu.resume.notes.liensQuebec && (
                     <div>
-                      <span className="font-semibold text-gray-900">Liens Québec :</span>{" "}
-                      <span className="text-gray-700">{jeu.resume.notes.liensQuebec}</span>
+                      <span className="font-semibold text-gray-900">
+                        Liens Québec :
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {jeu.resume.notes.liensQuebec}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -179,7 +275,6 @@ export default function GameDetail() {
               </p>
             </div>
 
-            {/* Bouton PDF */}
             <div className="pt-3 border-t border-gray-100">
               <a
                 href={`http://72.11.148.122/api/jeux/${jeu._id}/pdf`}
@@ -205,10 +300,8 @@ export default function GameDetail() {
               </a>
             </div>
           </div>
-
         </div>
 
-        {/* Colonne droite */}
         <aside className="space-y-6">
           <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-md transition">
             <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide">
@@ -223,6 +316,20 @@ export default function GameDetail() {
 
             <div className="mt-5 h-px bg-gray-100" />
 
+            {plateformesSafe.length > 0 && (
+              <>
+                <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide mt-5 mb-3">
+                  Plateformes
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {plateformesSafe.map((p, idx) => (
+                    <PlatformIcon key={idx} platformName={p} />
+                  ))}
+                </div>
+                <div className="mt-5 h-px bg-gray-100" />
+              </>
+            )}
+
             <p className="mt-4 text-sm text-gray-500">
               Cette fiche présente un jeu québécois archivé dans LUDOV.
             </p>
@@ -230,7 +337,6 @@ export default function GameDetail() {
         </aside>
       </div>
 
-      {/* Retour en bas */}
       <div className="mx-auto max-w-6xl px-6 pb-16">
         <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-md hover:bg-slate-800 transition flex flex-col md:flex-row items-center justify-between gap-4">
           <div>

@@ -1,4 +1,3 @@
-// src/app/pages/InfoJeu.tsx
 import * as React from "react";
 import { useParams, Link } from "react-router";
 
