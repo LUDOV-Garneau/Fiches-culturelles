@@ -11,10 +11,10 @@ export function Sidenav(){
              <div className="submenu">
               <a href="https://www.ludov.ca/fr/laboratoire/" >Laboratoire</a>
               <ul>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Nos installations</a></li>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Nos collections</a></li>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Faire une réservation</a></li>
-                <li><a href="https://www.ludov.ca/fr/laboratoire/" >Faire un don</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/installations/" >Nos installations</a></li>
+                <li><a href="hhttps://www.ludov.ca/fr/laboratoire/collections/" >Nos collections</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/reservations/" >Faire une réservation</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/dons/" >Faire un don</a></li>
               </ul>
             </div>
 
@@ -67,7 +67,7 @@ export function Sidenav(){
 
       <a 
         href="https://www.ludov.ca/fr/documentation/" 
-        target="_blank"
+    
       >
         Documentation
       </a>
@@ -76,7 +76,7 @@ export function Sidenav(){
         <li>
           <a 
             href="https://www.ludov.ca/fr/documentation/" 
-            target="_blank"
+           
           >
             Le jeu vidéo au Québec
           </a>
