@@ -66,8 +66,8 @@ export default function ModifierJeu() {
       if (data.success) {
         setJeu((prev: any) =>
           prev.map((j: any) =>
-            j._id === id ? { ...j, estChoisi: !estChoisiActuel } : j,
-          ),
+            j._id === id ? { ...j, estChoisi: !estChoisiActuel } : j
+          )
         );
       } else {
         alert("Erreur : " + data.message);
@@ -81,6 +81,32 @@ export default function ModifierJeu() {
   if (error) return <p className="p-4 text-red-500">{error}</p>;
   if (!jeu) return null;
 
+  async function handleImageUpload(file: File) {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const resp = await fetch("http://72.11.148.122/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await resp.json();
+
+      if (data.success) {
+        setJeu((prev: any) => ({
+          ...prev,
+          imageUrl: data.imageUrl,
+        }));
+      } else {
+        alert("Erreur upload image : " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Impossible d’envoi vers le serveur.");
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
@@ -89,32 +115,32 @@ export default function ModifierJeu() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* --- CHAMPS PRINCIPAUX --- */}
-       <div>
-  <label className="block font-semibold mb-1">Titre</label>
-  <input
-    type="text"
-    value={
-      jeu.titreComplet?.sousTitre
-        ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
-        : jeu.titreComplet?.principal || ""
-    }
-    onChange={(e) => {
-      const texte = e.target.value.trim();
-      const match = texte.match(/^(.*?:)\s*(.*)$/);
+        <div>
+          <label className="block font-semibold mb-1">Titre</label>
+          <input
+            type="text"
+            value={
+              jeu.titreComplet?.sousTitre
+                ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
+                : jeu.titreComplet?.principal || ""
+            }
+            onChange={(e) => {
+              const texte = e.target.value.trim();
+              const match = texte.match(/^(.*?:)\s*(.*)$/);
 
-      setJeu({
-        ...jeu,
-        titreComplet: {
-          ...jeu.titreComplet,
-          principal: match ? match[1].trim() : texte,
-          sousTitre: match && match[2] ? match[2].trim() : null,
-        },
-      });
-    }}
-    className="border p-2 w-full rounded"
-    required
-  />
-</div>
+              setJeu({
+                ...jeu,
+                titreComplet: {
+                  ...jeu.titreComplet,
+                  principal: match ? match[1].trim() : texte,
+                  sousTitre: match && match[2] ? match[2].trim() : null,
+                },
+              });
+            }}
+            className="border p-2 w-full rounded"
+            required
+          />
+        </div>
 
         <div>
           <label className="block font-semibold mb-1">Année de sortie</label>
@@ -208,22 +234,41 @@ export default function ModifierJeu() {
         </div>
 
         {/* --- IMAGE --- */}
+
         <div>
-          <label className="block font-semibold mb-1">Image (URL)</label>
-          <input
-            type="text"
-            value={jeu.imageUrl || ""}
-            onChange={(e) => setJeu({ ...jeu, imageUrl: e.target.value })}
-            className="border p-2 w-full rounded"
-            placeholder="https://exemple.com/jeu.jpg"
-          />
+          <label className="block font-semibold mb-1">Image actuelle</label>
+
           {jeu.imageUrl && (
             <img
               src={jeu.imageUrl}
               alt={jeu.titre}
-              className="mt-4 w-64 rounded shadow border"
+              className="mt-2 w-full rounded shadow border"
             />
           )}
+
+          <label className="block font-semibold mt-4 mb-1">
+            Changer l’image :
+          </label>
+          <input
+            type="text"
+            value={jeu.imageUrl || ""}
+            onChange={(e) => setJeu({ ...jeu, imageUrl: e.target.value })}
+            className="border p-2 w-full rounded mt-4"
+            placeholder="https://exemple.com/jeu.jpg"
+          />
+          <div className="m-1">
+            <strong>Ou</strong>
+          </div>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImageUpload(file);
+            }}
+            className="border p-1 w-34 rounded"
+          />
         </div>
 
         {/* --- RÉSUMÉ --- */}
@@ -261,7 +306,9 @@ export default function ModifierJeu() {
           <div className="space-y-6">
             {/* Crédits */}
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Crédits</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Crédits
+              </label>
               <textarea
                 placeholder="Entrez les crédits..."
                 value={jeu.resume?.notes?.credits || ""}
@@ -309,7 +356,9 @@ export default function ModifierJeu() {
               </label>
               <textarea
                 placeholder="Entrez les étiquettes (séparées par des virgules)..."
-                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(", ")}
+                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(
+                  ", "
+                )}
                 onChange={(e) =>
                   setJeu({
                     ...jeu,
@@ -342,7 +391,10 @@ export default function ModifierJeu() {
                     ...jeu,
                     resume: {
                       ...jeu.resume,
-                      notes: { ...jeu.resume?.notes, liensQuebec: e.target.value },
+                      notes: {
+                        ...jeu.resume?.notes,
+                        liensQuebec: e.target.value,
+                      },
                     },
                   })
                 }
@@ -352,64 +404,67 @@ export default function ModifierJeu() {
           </div>
         </fieldset>
 
-       {/* --- GENRES --- */}
-<div>
-  <label className="block font-semibold mb-2 text-gray-800 text-lg">
-    Genres
-  </label>
+        {/* --- GENRES --- */}
+        <div>
+          <label className="block font-semibold mb-2 text-gray-800 text-lg">
+            Genres
+          </label>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-    {(jeu.genres && jeu.genres.length > 0
-      ? jeu.genres
-      : [{ type: "", valeur: "" }]
-    ).map((genre: { type: string; valeur: string }, i: number) => (
-      <div
-        key={i}
-        className="flex flex-col bg-gray-50 border rounded-lg p-3 shadow-sm hover:shadow-md transition"
-      >
-        <input
-          type="text"
-          value={genre.type || ""}
-          onChange={(e) => {
-            const newGenres = [...(jeu.genres || [{ type: "", valeur: "" }])];
-            newGenres[i] = { ...newGenres[i], type: e.target.value };
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {(jeu.genres && jeu.genres.length > 0
+              ? jeu.genres
+              : [{ type: "", valeur: "" }]
+            ).map((genre: { type: string; valeur: string }, i: number) => (
+              <div
+                key={i}
+                className="flex flex-col bg-gray-50 border rounded-lg p-3 shadow-sm hover:shadow-md transition"
+              >
+                <input
+                  type="text"
+                  value={genre.type || ""}
+                  onChange={(e) => {
+                    const newGenres = [
+                      ...(jeu.genres || [{ type: "", valeur: "" }]),
+                    ];
+                    newGenres[i] = { ...newGenres[i], type: e.target.value };
 
-            if (
-              i === newGenres.length - 1 &&
-              (newGenres[i].type || newGenres[i].valeur)
-            ) {
-              newGenres.push({ type: "", valeur: "" });
-            }
+                    if (
+                      i === newGenres.length - 1 &&
+                      (newGenres[i].type || newGenres[i].valeur)
+                    ) {
+                      newGenres.push({ type: "", valeur: "" });
+                    }
 
-            setJeu({ ...jeu, genres: newGenres });
-          }}
-          className="border p-2 rounded mb-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="Type (ex: Basic Genres)"
-        />
-        <input
-          type="text"
-          value={genre.valeur || ""}
-          onChange={(e) => {
-            const newGenres = [...(jeu.genres || [{ type: "", valeur: "" }])];
-            newGenres[i] = { ...newGenres[i], valeur: e.target.value };
+                    setJeu({ ...jeu, genres: newGenres });
+                  }}
+                  className="border p-2 rounded mb-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="Type (ex: Basic Genres)"
+                />
+                <input
+                  type="text"
+                  value={genre.valeur || ""}
+                  onChange={(e) => {
+                    const newGenres = [
+                      ...(jeu.genres || [{ type: "", valeur: "" }]),
+                    ];
+                    newGenres[i] = { ...newGenres[i], valeur: e.target.value };
 
-            if (
-              i === newGenres.length - 1 &&
-              (newGenres[i].type || newGenres[i].valeur)
-            ) {
-              newGenres.push({ type: "", valeur: "" });
-            }
+                    if (
+                      i === newGenres.length - 1 &&
+                      (newGenres[i].type || newGenres[i].valeur)
+                    ) {
+                      newGenres.push({ type: "", valeur: "" });
+                    }
 
-            setJeu({ ...jeu, genres: newGenres });
-          }}
-          className="border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="Valeur (ex: Adventure)"
-        />
-      </div>
-    ))}
-  </div>
-</div>
-
+                    setJeu({ ...jeu, genres: newGenres });
+                  }}
+                  className="border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="Valeur (ex: Adventure)"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* --- BOUTONS --- */}
         <div className="flex justify-between mt-6">

@@ -3,10 +3,13 @@ import express from "express";
 import mongoose from "mongoose";
 import jeuxRoutes from "./routes/jeux.js";
 import cors from "cors";
+import uploadRoutes from "./routes/upload.js";
+
 
 const app = express();
 
 app.use(cors());
+app.use("/upload", uploadRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -20,8 +23,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Backend en ligne (route /api) - test déploiement !");
 });
-app.use(cors());
 app.use("/jeux", jeuxRoutes);
+app.use("/uploads", express.static("uploads"));
 
 export default app; 
 // Jest nécessite qu'on sépare app et server pour fonctionner 
