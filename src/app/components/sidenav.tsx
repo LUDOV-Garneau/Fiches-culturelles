@@ -20,19 +20,43 @@ export function Sidenav(){
 
                     )}
             </div>
-            <div className="sidediv" onMouseEnter={() => setHovered("U")} onMouseLeave={() => setHovered(null)}>U
-                  {hovered === "U" && (
-                    <div className="submenu">
-                      <a>Universitaire</a>
-                      <ul>
-                        <li><a>Notre équipe</a></li>
-                        <li><a>Programmes d'études</a></li>
-                        <li><a>Recherches étudiantes</a></li>
-                        <li><a>Création étudiantes</a></li>
-                      </ul>
-                    </div>
-                    )}
-            </div>
+<div
+  className="sidediv"
+  onMouseEnter={() => setHovered("U")}
+  onMouseLeave={() => setHovered(null)}
+>
+  U
+  {hovered === "U" && (
+    <div className="submenu">
+      <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+        Universitaire
+      </a>
+      <ul>
+        <li>
+          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+            Notre équipe
+          </a>
+        </li>
+        <li>
+          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+            Programmes d'études
+          </a>
+        </li>
+        <li>
+          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+            Recherches étudiantes
+          </a>
+        </li>
+        <li>
+          <a href="https://www.ludov.ca/fr/universitaire/" target="_blank">
+            Création étudiantes
+          </a>
+        </li>
+      </ul>
+    </div>
+  )}
+</div>
+
             <div className="sidediv" onMouseEnter={() => setHovered("D")} onMouseLeave={() => setHovered(null)}>D
                   {hovered === "D" && (
                     <div className="submenu">
