@@ -8,15 +8,16 @@ export function Sidenav(){
             <img className="img_logo" src="/LUDOV_web_logo_final.png"></img>
             <div className="sidediv" onMouseEnter={() => {setHovered("L")}} onMouseLeave={() => setHovered(null)}>L
                   {hovered === "L" && (
-                    <div className="submenu">
-                      <a>Laboratoire</a>
-                      <ul>
-                        <li><a>Nos instalations</a></li>
-                        <li><a>Nos collections</a></li>
-                        <li><a>Faire une réservation</a></li>
-                        <li><a>Faire un don</a></li>
-                      </ul>
-                    </div>
+             <div className="submenu">
+              <a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Laboratoire</a>
+              <ul>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Nos installations</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Nos collections</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Faire une réservation</a></li>
+                <li><a href="https://www.ludov.ca/fr/laboratoire/" target="_blank">Faire un don</a></li>
+              </ul>
+            </div>
+
                     )}
             </div>
             <div className="sidediv" onMouseEnter={() => setHovered("U")} onMouseLeave={() => setHovered(null)}>U
