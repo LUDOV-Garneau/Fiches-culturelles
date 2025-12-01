@@ -33,22 +33,22 @@ export function Sidenav(){
       </a>
       <ul>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" >
+          <a href="https://www.ludov.ca/fr/universitaire/chercheurs/" >
             Notre équipe
           </a>
         </li>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" >
+          <a href="https://www.ludov.ca/fr/universitaire/programme-detude/" >
             Programmes d'études
           </a>
         </li>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" >
+          <a href="https://www.ludov.ca/fr/universitaire/ligues-mineures/" >
             Recherches étudiantes
           </a>
         </li>
         <li>
-          <a href="https://www.ludov.ca/fr/universitaire/" >
+          <a href="https://www.ludov.ca/fr/universitaire/creations-ludoviques/" >
             Création étudiantes
           </a>
         </li>
