@@ -171,9 +171,9 @@ export function Sidenav(){
                   <div className="submenu">
             <a href="https://www.ludov.ca/fr/videoludiques/" target="_blank">Vidéoludique</a>
             <ul>
-              <li><a href="https://www.ludov.ca/fr/videoludiques/" target="_blank">Nos événements</a></li>
-              <li><a href="https://www.ludov.ca/fr/videoludiques/" target="_blank">Liens utiles</a></li>
-              <li><a href="https://www.ludov.ca/fr/videoludiques/" target="_blank">Nos partenaires</a></li>
+              <li><a href="https://www.ludov.ca/fr/videoludiques/" >Nos événements</a></li>
+              <li><a href="https://www.ludov.ca/fr/videoludiques/" >Liens utiles</a></li>
+              <li><a href="https://www.ludov.ca/fr/videoludiques/" >Nos partenaires</a></li>
             </ul>
           </div>
 
