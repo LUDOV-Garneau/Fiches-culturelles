@@ -11,6 +11,7 @@
     "he": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
+    "multer": "^2.0.2",
     "pdfkit": "^0.17.2"
   },
   "devDependencies": {

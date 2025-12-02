@@ -1,6 +1,55 @@
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router";
+import { FaSteam, FaXbox, FaPlaystation, FaItchIo } from "react-icons/fa";
+import { SiEpicgames, SiGogdotcom, SiNintendoswitch } from "react-icons/si";
+
+const PlatformIcon = ({ platformName }: { platformName: string }) => {
+  const nameStr = String(platformName || "");
+  const lower = nameStr.toLowerCase();
+
+  let icon = null;
+  let color = "text-gray-500";
+
+  if (lower.includes("steam")) {
+    icon = <FaSteam />;
+    color = "text-blue-900";
+  } else if (lower.includes("epic")) {
+    icon = <SiEpicgames />;
+    color = "text-gray-900";
+  } else if (lower.includes("gog")) {
+    icon = <SiGogdotcom />;
+    color = "text-purple-700";
+  } else if (lower.includes("switch") || lower.includes("nintendo")) {
+    icon = <SiNintendoswitch />;
+    color = "text-red-600";
+  } else if (lower.includes("xbox")) {
+    icon = <FaXbox />;
+    color = "text-green-600";
+  } else if (
+    lower.includes("playstation") ||
+    lower.includes("ps4") ||
+    lower.includes("ps5")
+  ) {
+    icon = <FaPlaystation />;
+    color = "text-blue-700";
+  } else if (lower.includes("itch")) {
+    icon = <FaItchIo />;
+    color = "text-red-500";
+  } else {
+    return (
+      <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+        {platformName}
+      </span>
+    );
+  }
+
+  return (
+    <span className={`text-xl ${color}`} title={platformName}>
+      {icon}
+    </span>
+  );
+};
 
 export default function JeuxGrid({ jeux, loading, error }: any) {
   const [page, setPage] = useState(1);
@@ -8,28 +57,52 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
   const [decennieFiltre, setDecennieFiltre] = useState("toutes");
   const JEUX_PAR_PAGE = 9;
 
+  const jeuxUniques = useMemo(() => {
+    if (!jeux) return [];
+
+    const map = new Map();
+
+    jeux.forEach((jeu: any) => {
+      const key = `${jeu.titreComplet?.principal}-${jeu.anneeSortie}`;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          ...jeu,
+          toutesPlateformes: [jeu.plateformes],
+        });
+      } else {
+        const existing = map.get(key);
+        if (!existing.toutesPlateformes.includes(jeu.plateformes)) {
+          existing.toutesPlateformes.push(jeu.plateformes);
+        }
+      }
+    });
+
+    return Array.from(map.values());
+  }, [jeux]);
+
   const decenniesDisponibles = useMemo(() => {
     const set = new Set<number>();
-
-    jeux.forEach((j: any) => {
+    jeuxUniques.forEach((j: any) => {
       if (j.anneeSortie) {
         const dec = Math.floor(j.anneeSortie / 10) * 10;
         set.add(dec);
       }
     });
     return Array.from(set).sort((a, b) => a - b);
-  }, [jeux]);
+  }, [jeuxUniques]);
 
   const jeuxFiltres = useMemo(() => {
-    let filtered = [...jeux];
+    let filtered = [...jeuxUniques];
 
     if (searchTerm.trim()) {
       const lower = searchTerm.toLowerCase();
-
       filtered = filtered.filter((jeu) => {
         const titrePrincipal = jeu.titreComplet?.principal ?? "";
         const sousTitre = jeu.titreComplet?.sousTitre ?? "";
         const alternatifs = jeu.titreComplet?.alternatifs ?? [];
+
+        const plateformesStr = jeu.toutesPlateformes.join(" ");
 
         const texteRecherche = [
           titrePrincipal,
@@ -37,6 +110,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
           ...alternatifs,
           jeu.resume?.brut ?? "",
           ...(jeu.developpeurs || []),
+          plateformesStr,
         ]
           .join(" ")
           .toLowerCase();
@@ -54,7 +128,7 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
     }
 
     return filtered;
-  }, [jeux, searchTerm, decennieFiltre]);
+  }, [jeuxUniques, searchTerm, decennieFiltre]);
 
   const totalPages = Math.max(1, Math.ceil(jeuxFiltres.length / JEUX_PAR_PAGE));
   const indexOfLast = page * JEUX_PAR_PAGE;
@@ -132,29 +206,36 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                 });
               }}
               onMouseLeave={() => setHovered(null)}
-              className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+              className="border border-gray-300 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition flex flex-col h-full"
             >
-              <img
-                src={jeu.imageUrl || "https://placehold.co/600x400"}
-                alt={
-                  jeu.titreComplet?.sousTitre
-                    ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
-                    : jeu.titreComplet?.principal
-                }
-                className="mb-2 h-100 w-full rounded object-cover"
-              />
+              <div className="relative h-full w-full mb-4">
+                <img
+                  src={jeu.imageUrl || "https://placehold.co/600x400"}
+                  alt={jeu.titreComplet?.principal}
+                  className="w-full h-full object-cover rounded"
+                />
+              </div>
+
               <h3 className="text-lg font-bold">
                 {jeu.titreComplet?.sousTitre
                   ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
                   : jeu.titreComplet?.principal}
               </h3>
 
-              <p className="mb-1 text-gray-500">
-                Auteur : {jeu.developpeurs?.[0] || "Inconnu"}
+              <p className="mb-1 text-gray-500 text-sm">
+                {jeu.developpeurs?.[0] || "Inconnu"}
               </p>
-              <p className="text-sm text-gray-400">
-                {jeu.anneeSortie ? `Année : ${jeu.anneeSortie}` : ""}
-              </p>
+
+              <div className="flex justify-between items-end mt-auto pt-4">
+                <p className="text-sm text-gray-400">{jeu.anneeSortie || ""}</p>
+
+                <div className="flex gap-2">
+                  {jeu.toutesPlateformes &&
+                    jeu.toutesPlateformes.map((p: string, idx: number) => (
+                      <PlatformIcon key={idx} platformName={p} />
+                    ))}
+                </div>
+              </div>
 
               {hovered === jeu._id &&
                 createPortal(
@@ -168,17 +249,21 @@ export default function JeuxGrid({ jeux, loading, error }: any) {
                       maxWidth: "400px",
                     }}
                   >
-                    <p className="font-semibold">
-                      {jeu.titreComplet?.sousTitre
-                        ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
-                        : jeu.titreComplet?.principal}
+                    <p className="font-semibold mb-2">
+                      {jeu.titreComplet?.principal}
                     </p>
-
-                    <p className="text-sm text-gray-200 mt-1">
+                    <p className="text-sm text-gray-200">
                       {jeu.resume?.brut
                         ? jeu.resume.brut.slice(0, 200) + "..."
                         : ""}
                     </p>
+                    <div className="flex gap-2 mt-2 pt-2 border-t border-gray-700">
+                      {jeu.toutesPlateformes.map((p: string, i: number) => (
+                        <span key={i} className="text-xs text-gray-400">
+                          {p}
+                        </span>
+                      ))}
+                    </div>
                   </div>,
                   document.body,
                 )}
