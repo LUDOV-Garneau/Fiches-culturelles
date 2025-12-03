@@ -29,14 +29,14 @@ async function importerJeuxQuebec(req, res) {
 
         if (!data) continue;
 
-        // xtraction depuis Koha JSON
+        // extraction depuis Koha JSON
         const mapped = mapperKohaVersJeu(data);
         if (!mapped.estLieAuQuebec) continue;
 
-        //Lecture MARC 
+        // Lecture MARC
         const marc = await extraireDepuisMarc(id);
         if (marc) {
-          // Titre 
+          // Titre
           if (marc.titreComplet) mapped.titreComplet = marc.titreComplet;
 
           // Informations contextuelles
@@ -50,34 +50,50 @@ async function importerJeuxQuebec(req, res) {
           mapped.contenuPhysique = marc.contenuPhysique?.length ? marc.contenuPhysique : [];
           mapped.genres = marc.genres?.length ? marc.genres : [];
           mapped.recompenses = marc.recompenses?.length ? marc.recompenses : [];
+
+          // Sources (588 )
           mapped.sources = marc.sources?.length ? marc.sources : [];
 
-          // Fusion des notes MARC dans le résumé Koha 
+          // Ajout des  sections sources -------------
+          mapped.critiques = marc.critiques?.length ? marc.critiques : [];
+          mapped.paratextes = marc.paratextes?.length ? marc.paratextes : [];
+          mapped.autresSources = marc.autresSources?.length ? marc.autresSources : [];
+          mapped.ressourcesLudov = marc.ressourcesLudov?.length ? marc.ressourcesLudov : [];
+          mapped.documentsReference = marc.documentsReference?.length ? marc.documentsReference : [];
+
+          // autres remarques
+          if (marc.autresRemarques)
+            mapped.autresRemarques = marc.autresRemarques;
+
+          // Fusion des notes MARC dans le résumé Koha
           if (marc.resume?.notes) {
             const notesMarc = marc.resume.notes;
             if (!mapped.resume.notes) mapped.resume.notes = {};
 
             mapped.resume.notes = {
               credits: notesMarc.credits || mapped.resume.notes.credits || null,
-              autresEditions: notesMarc.autresEditions || mapped.resume.notes.autresEditions || null,
-              etiquettesGeneriques: notesMarc.etiquettesGeneriques?.length
-                ? notesMarc.etiquettesGeneriques
-                : mapped.resume.notes.etiquettesGeneriques || [],
-              liensQuebec: notesMarc.liensQuebec || mapped.resume.notes.liensQuebec || null,
+              autresEditions:
+                notesMarc.autresEditions || mapped.resume.notes.autresEditions || null,
+              etiquettesGeneriques:
+                notesMarc.etiquettesGeneriques?.length
+                  ? notesMarc.etiquettesGeneriques
+                  : mapped.resume.notes.etiquettesGeneriques || [],
+              liensQuebec:
+                notesMarc.liensQuebec || mapped.resume.notes.liensQuebec || null,
             };
 
             // Si le MARC signale un lien Québec, on le conserve
             if (notesMarc.liensQuebec) mapped.estLieAuQuebec = true;
           }
 
-          //Fusion des URLs (Koha + MARC)
+          // Fusion des URLs (Koha + MARC)
           if (marc.urls?.length) {
             const toutes = new Set([...(mapped.urls || []), ...marc.urls]);
             mapped.urls = Array.from(toutes);
           }
         }
 
-        //Image IGDB
+        // Image IGDB
         const titreImage = mapped.titreComplet?.principal || mapped.titre;
         mapped.imageUrl = await obtenirImage(titreImage);
 
@@ -131,6 +147,7 @@ async function importerJeuxQuebec(req, res) {
     });
   }
 }
+
 
 /**
  * Lister les jeux québécois déjà stockés en MongoDB
