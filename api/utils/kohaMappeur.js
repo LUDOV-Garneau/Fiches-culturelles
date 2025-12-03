@@ -239,13 +239,11 @@ async function extraireDepuisMarc(id) {
     const champs = marc.record.datafield;
     const get = (tag) => champs.filter((c) => c["@_tag"] === tag);
     const toArray = (sf) => (Array.isArray(sf) ? sf : sf ? [sf] : []);
+
     const decode = (txt) => {
       try {
         if (!txt) return null;
-        if (typeof txt === "object") {
-          if (txt["#text"]) txt = txt["#text"];
-          else return null;
-        }
+        if (typeof txt === "object" && txt["#text"]) txt = txt["#text"];
         if (Array.isArray(txt)) txt = txt[0];
         return he.decode(String(txt).trim());
       } catch {
@@ -253,47 +251,50 @@ async function extraireDepuisMarc(id) {
       }
     };
 
-    /*Titre, sous-titre, variantes */
+    // TITRE 
     const champ245 = get("245")[0];
     const titrePrincipal = champ245
-      ? decode(toArray(champ245.subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      ? decode(toArray(champ245.subfield).find(sf => sf["@_code"] === "a")?.["#text"])
       : null;
+
     const sousTitre = champ245
-      ? decode(toArray(champ245.subfield).find((sf) => sf["@_code"] === "b")?.["#text"])
+      ? decode(toArray(champ245.subfield).find(sf => sf["@_code"] === "b")?.["#text"])
       : null;
 
-    const titresAlternatifs = get("246").map((c) =>
-      decode(toArray(c.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]),
-    ).filter(Boolean);
+    const titresAlternatifs = get("246")
+      .map(c => decode(toArray(c.subfield).find(sf => sf["@_code"] === "a")?.["#text"]))
+      .filter(Boolean);
 
-    /*Développeur / Éditeur */
+    // DEV / ÉDITEUR / LIEU
     const developpeur = get("100")[0]
-      ? decode(toArray(get("100")[0].subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      ? decode(toArray(get("100")[0].subfield).find(sf => sf["@_code"] === "a")?.["#text"])
       : null;
 
     const editeurPrincipal = get("264")[0]
-      ? decode(toArray(get("264")[0].subfield).find((sf) => sf["@_code"] === "b")?.["#text"])
+      ? decode(toArray(get("264")[0].subfield).find(sf => sf["@_code"] === "b")?.["#text"])
       : null;
 
     const lieuPublication = get("264")[0]
-      ? decode(toArray(get("264")[0].subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      ? decode(toArray(get("264")[0].subfield).find(sf => sf["@_code"] === "a")?.["#text"])
       : null;
 
     const annee = get("264")[0]
-      ? decode(toArray(get("264")[0].subfield).find((sf) => sf["@_code"] === "c")?.["#text"])
+      ? decode(toArray(get("264")[0].subfield).find(sf => sf["@_code"] === "c")?.["#text"])
       : null;
 
     const plateforme = get("250")[0]
-      ? decode(toArray(get("250")[0].subfield).find((sf) => sf["@_code"] === "a")?.["#text"])
+      ? decode(toArray(get("250")[0].subfield).find(sf => sf["@_code"] === "a")?.["#text"])
       : null;
 
+    // URL SIMPLES (856$u)
     const urls = get("856")
-      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "u")?.["#text"]))
+      .map(f => decode(toArray(f.subfield).find(sf => sf["@_code"] === "u")?.["#text"]))
       .filter(Boolean);
 
-     const resumes = get("520");
-    let resumeFR = null,
-      resumeEN = null;
+    // RÉSUMÉS / NOTES / AUTRES REMARQUES (520)
+    const resumes = get("520");
+    let resumeFR = null, resumeEN = null, autresRemarques = null;
+
     const notes = {
       credits: null,
       autresEditions: null,
@@ -302,76 +303,133 @@ async function extraireDepuisMarc(id) {
     };
 
     for (const champ of resumes) {
-      const subs = toArray(champ.subfield);
-      const subA = decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"]);
-      const subB = decode(subs.find((sf) => sf["@_code"] === "b")?.["#text"]);
-      const texte = [subA, subB].filter(Boolean).join(" ").trim();
-      if (!subA) continue;
+      const sub = toArray(champ.subfield);
+      const a = decode(sub.find(sf => sf["@_code"] === "a")?.["#text"]);
+      const b = decode(sub.find(sf => sf["@_code"] === "b")?.["#text"]);
+      const texte = [a, b].filter(Boolean).join(" ").trim();
+      if (!a) continue;
 
-      // résumé FR
-      if (
-        !resumeFR &&
-        /jeu/i.test(subA) &&
-        !/développement|édition|autres|étiquettes|liens|crédits/i.test(subA)
-      ) {
+      const low = a.toLowerCase();
+
+      if (!resumeFR && /infiltrez|jeu|sam fisher|histoire/i.test(a)) {
         resumeFR = texte;
+        continue;
       }
-      // résumé EN
-      else if (
-        !resumeEN &&
-        /game/i.test(subA) &&
-        !/développement|édition|autres|étiquettes|liens|crédits/i.test(subA)
-      ) {
+      if (!resumeEN && /the player|game|echelon/i.test(a)) {
         resumeEN = texte;
+        continue;
       }
-      // notes
-      else if (/cr[eé]dits/i.test(subA))
-        notes.credits = texte.replace(/^cr[eé]dits\s*:\s*/i, "").trim();
-      else if (/autres éditions/i.test(subA))
-        notes.autresEditions = texte.replace(/^autres éditions\s*:\s*/i, "").trim();
-      else if (/autres remarques/i.test(subA))
-        notes.autresRemarques = texte.replace(/^autres remarques\s*:\s*/i, "").trim();
-      else if (/étiquettes|etiquettes/i.test(subA) || /étiquettes|etiquettes/i.test(subB)) {
-        const texteEtiquettes = subA.includes("Étiquettes") ? subB : subA;
-        notes.etiquettesGeneriques = texteEtiquettes
-          ? texteEtiquettes
-            .replace(/^étiquettes génériques\s*:\s*/i, "")
-            .split(/[;,]/)
-            .map((s) => he.decode(s.trim()))
-            .filter(Boolean)
+
+      if (/cr[eé]dits/.test(a)) {
+        notes.credits = b ?? texte.replace(/^cr[eé]dits\s*:\s*/i, "");
+        continue;
+      }
+
+      if (/autres éditions/.test(a)) {
+        notes.autresEditions = b ?? texte.replace(/^autres éditions\s*:\s*/i, "");
+        continue;
+      }
+
+      if (/étiquettes/.test(a)) {
+        notes.etiquettesGeneriques = b
+          ? b.split(/[;,]/).map(s => s.trim())
           : [];
-      } else if (/liens/i.test(subA)) {
-        notes.liensQuebec = texte.trim();
+        continue;
+      }
+
+      if (/liens/.test(a)) {
+        notes.liensQuebec = b ?? texte;
+        continue;
+      }
+
+      if (/autres remarques/.test(a)) {
+        autresRemarques = b ?? texte;
+        continue;
       }
     }
-     const contenusPhysiques = get("300").map((f) => {
-      const subs = toArray(f.subfield);
-      const quantite = Number(decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"])) || 1;
-      const type = decode(subs.find((sf) => sf["@_code"] === "f")?.["#text"]);
-      const materiaux = decode(subs.find((sf) => sf["@_code"] === "b")?.["#text"]);
-      return type ? { quantite, type, materiaux } : null;
-    }).filter(Boolean);
 
+    // CONTENU PHYSIQUE (300)
+    const contenuPhysique = get("300")
+      .map(f => {
+        const sub = toArray(f.subfield);
+        return {
+          quantite: Number(decode(sub.find(sf => sf["@_code"] === "a")?.["#text"])) || 1,
+          type: decode(sub.find(sf => sf["@_code"] === "f")?.["#text"]),
+          materiaux: decode(sub.find(sf => sf["@_code"] === "b")?.["#text"]),
+        };
+      })
+      .filter(x => x.type);
+
+    // RÉCOMPENSES (586)
     const recompenses = get("586")
-      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]))
+      .map(f => decode(toArray(f.subfield).find(sf => sf["@_code"] === "a")?.["#text"]))
       .filter(Boolean);
 
-    const sources = get("588")
-      .map((f) => decode(toArray(f.subfield).find((sf) => sf["@_code"] === "a")?.["#text"]))
-      .filter(Boolean);
-
+    // GENRES (655)
     const genres = get("655")
-      .map((f) => {
-        const subs = toArray(f.subfield);
-        const type = decode(subs.find((sf) => sf["@_code"] === "a")?.["#text"]);
-        const valeur = decode(subs.find((sf) => sf["@_code"] === "v")?.["#text"]);
-        return type && valeur ? { type, valeur } : null;
+      .map(f => {
+        const sub = toArray(f.subfield);
+        return {
+          type: decode(sub.find(sf => sf["@_code"] === "a")?.["#text"]),
+          valeur: decode(sub.find(sf => sf["@_code"] === "v")?.["#text"]),
+        };
+      })
+      .filter(g => g.type && g.valeur);
+
+    // RESSOURCES LUDOV 
+    const ressourcesLudov = get("856")
+      .map(f => {
+        const sub = toArray(f.subfield);
+        const url = decode(sub.find(sf => sf["@_code"] === "u")?.["#text"]);
+        const titre = decode(sub.find(sf => sf["@_code"] === "y")?.["#text"]);
+        return url ? { titre: titre || null, url } : null;
       })
       .filter(Boolean);
 
-    const langue = marc?.record?.controlfield?.find(
-      (c) => c["@_tag"] === "008"
-    )?.["#text"]?.slice(35, 38) || null;
+    // CRITIQUES / PARATEXTES / AUTRES SOURCES / DOCUMENTS RÉFÉRENCE (588)
+    const critiques = [];
+    const paratextes = [];
+    const autresSources = [];
+    const documentsReference = [];
+    const sources588 = [];
+
+    for (const f of get("588")) {
+      const txt = decode(toArray(f.subfield).find(sf => sf["@_code"] === "a")?.["#text"]);
+      if (!txt) continue;
+
+      const low = txt.toLowerCase();
+
+      if (low.startsWith("critiques")) {
+        critiques.push({ titre: txt, url: null });
+        continue;
+      }
+
+      if (low.startsWith("paratextes")) {
+        paratextes.push({ titre: txt, url: null });
+        continue;
+      }
+
+      if (low.startsWith("autres sources pertinentes")) {
+        autresSources.push({ titre: txt, url: null });
+        continue;
+      }
+
+      const urlMatch = txt.match(/https?:\/\/\S+/i);
+      if (urlMatch) {
+        documentsReference.push({
+          titre: txt.replace(urlMatch[0], "").trim(),
+          url: urlMatch[0],
+        });
+        continue;
+      }
+      sources588.push(txt);
+    }
+
+    // LANGUE (008)
+    const langue =
+      marc?.record?.controlfield?.find(c => c["@_tag"] === "008")
+        ?.["#text"]?.slice(35, 38) ?? null;
+
 
     return {
       titreComplet: {
@@ -379,24 +437,35 @@ async function extraireDepuisMarc(id) {
         sousTitre,
         alternatifs: titresAlternatifs,
       },
+
       developpeur,
       editeurPrincipal,
       lieuPublication,
       annee: annee ? Number(annee) : null,
       plateforme,
       langue,
+
       resume: {
         brut: [resumeFR, resumeEN].filter(Boolean).join(" | "),
         fr: resumeFR,
         en: resumeEN,
         notes,
       },
-      contenuPhysique: contenusPhysiques,
+
+      autresRemarques,
+      contenuPhysique,
       recompenses,
-      sources,
       genres,
       urls,
+
+      ressourcesLudov,
+      critiques,
+      paratextes,
+      autresSources,
+      documentsReference,
+      sources: sources588,
     };
+
   } catch (err) {
     console.error(`Erreur MARC ID ${id}:`, err.message);
     return null;
