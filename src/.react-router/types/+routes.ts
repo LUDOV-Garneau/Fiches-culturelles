@@ -29,12 +29,21 @@ type Pages = {
       "id": string;
     };
   };
+  "/docs": {
+    params: {};
+  };
+  "/docs/utilisateur": {
+    params: {};
+  };
+  "/docs/administrateur": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/admin" | "/admin/jeux/edit/:id" | "/games/:id";
+    page: "/" | "/login" | "/admin" | "/admin/jeux/edit/:id" | "/games/:id" | "/docs" | "/docs/utilisateur" | "/docs/administrateur";
   };
   "./pages/home.tsx": {
     id: "pages/home";
@@ -55,5 +64,21 @@ type RouteFiles = {
   "./pages/games.$id.tsx": {
     id: "pages/games.$id";
     page: "/games/:id";
+  };
+  "./docs/layout.tsx": {
+    id: "docs/layout";
+    page: "/docs" | "/docs/utilisateur" | "/docs/administrateur";
+  };
+  "./docs/pages/intro.mdx": {
+    id: "docs/pages/intro";
+    page: "/docs";
+  };
+  "./docs/pages/utilisateur.mdx": {
+    id: "docs/pages/utilisateur";
+    page: "/docs/utilisateur";
+  };
+  "./docs/pages/administrateur.mdx": {
+    id: "docs/pages/administrateur";
+    page: "/docs/administrateur";
   };
 };
