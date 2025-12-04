@@ -327,163 +327,321 @@ async function exporterJeuPdf(req, res) {
     const dossier = "exports";
     if (!fs.existsSync(dossier)) fs.mkdirSync(dossier);
 
-    const nomFichierJeu = jeu.titreComplet.principal
+    const nomFichierJeu = (jeu.titreComplet?.principal || "jeu")
       .replace(/[^a-zA-Z0-9_\- ]/g, "")
       .replace(/\s+/g, "_")
       .substring(0, 80);
-    const nomPdf = `${nomFichierJeu || "jeu"}.pdf`;
+    const nomPdf = `${nomFichierJeu}.pdf`;
     const filePath = path.join(dossier, nomPdf);
+
     const doc = new PDFDocument({ margin: 50 });
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    // === EN-TÊTE BLEU FONCÉ ===
+    //  EN-TÊTE 
     doc.rect(0, 0, doc.page.width, 60).fill("#2C3E50");
-    doc.fillColor("#ECF0F1").fontSize(20).text("Catalogue LUDOV - Jeu Québécois", 50, 20);
+    doc
+      .fillColor("#ECF0F1")
+      .font("Helvetica-Bold")
+      .fontSize(20)
+      .text("Catalogue LUDOV - Jeu québécois", 50, 20);
     doc.moveDown(2);
-    doc.fillColor("black");
+    doc.fillColor("black").font("Helvetica");
 
-    // === TITRE ===
-    doc.fontSize(22).fillColor("#1A5276").text(jeu.titreComplet.principal, { align: "center" });
-    if (jeu.titreComplet.sousTitre) {
-      doc.fontSize(14).fillColor("#34495E").text(jeu.titreComplet.sousTitre, { align: "center" });
+    // TITRE 
+    let principal = (jeu.titreComplet?.principal || "Titre inconnu").trim();
+    let sousTitre = (jeu.titreComplet?.sousTitre || "").trim();
+
+    if (principal.endsWith(":")) {
+      principal = principal.slice(0, -1).trim();
     }
-    doc.moveDown(1.5);
 
-    // === IMAGE (centrée) ===
+    if (sousTitre.startsWith(":")) {
+      sousTitre = sousTitre.slice(1).trim();
+    }
+
+    let titreComplet = principal;
+    if (sousTitre) {
+      titreComplet = `${principal} : ${sousTitre}`;
+    }
+
+    doc
+      .moveDown(0.5)
+      .fontSize(22)
+      .fillColor("#1A5276")
+      .font("Helvetica-Bold")
+      .text(titreComplet, {
+        align: "center",
+        width: 500,
+      });
+
+    doc.moveDown(1.2);
+    doc.fillColor("black").font("Helvetica");
+    // IMAGE
     if (jeu.imageUrl) {
       try {
         const imgPath = path.join(dossier, `${jeu._id}.jpg`);
         const { data } = await axios.get(jeu.imageUrl, { responseType: "arraybuffer" });
         fs.writeFileSync(imgPath, data);
-        doc.image(imgPath, { fit: [200, 200], align: "center" });
+
+        doc.image(imgPath, {
+          fit: [200, 200],
+          align: "center",
+          valign: "center",
+        });
+
         fs.unlinkSync(imgPath);
         doc.moveDown(1);
       } catch {
-        doc.fillColor("#7F8C8D").text("(Image non disponible)", { align: "center" });
+        doc
+          .fontSize(10)
+          .fillColor("#7F8C8D")
+          .text("(Image non disponible)", { align: "center" });
         doc.moveDown(1);
       }
     }
 
-    // === SECTION INFO GÉNÉRALES ===
-    doc.fontSize(16).fillColor("#1A5276").text("Informations générales", { underline: true });
-    doc.moveDown(0.3);
-    doc.fontSize(12).fillColor("black");
+    //  utilitaire  
+    const sectionTitle = (titre) => {
+      doc
+        .moveDown(0.8)
+        .fontSize(16)
+        .fillColor("#1A5276")
+        .font("Helvetica-Bold")
+        .text(titre, { underline: true });
+      doc.moveDown(0.3);
+      doc.fontSize(12).fillColor("black").font("Helvetica");
+    };
+
+    // utilitaire : sous-titre 
+    const subTitle = (titre) => {
+      doc
+        .moveDown(0.4)
+        .fontSize(13)
+        .fillColor("#154360")
+        .font("Helvetica-Bold")
+        .text(titre);
+      doc.moveDown(0.2);
+      doc.fontSize(12).fillColor("black").font("Helvetica");
+    };
+
+    // INFORMATIONS GÉNÉRALES 
+    sectionTitle("Informations générales");
 
     const infos = [
       ["Année de sortie", jeu.anneeSortie],
-      ["Développeurs", jeu.developpeurs.join(", ")],
-      ["Éditeurs", jeu.editeurs.join(", ")],
-      ["Plateformes", jeu.plateformes.join(", ")],
-      ["Langue", jeu.langue],
-      ["Lieu de publication", jeu.lieuPublication],
-      ["Éditeur principal", jeu.editeurPrincipal],
-      ["Format / support", jeu.formatSupport],
+      ["Développeurs", (jeu.developpeurs || []).join(", ") || null],
+      ["Ville de développement", null],
+      ["Éditeurs", (jeu.editeurs || []).join(", ") || null],
+      ["Ville d’édition", jeu.lieuPublication || null],
+      ["Plateforme", (jeu.plateformes || []).join(", ") || null],
+      ["Langues", jeu.langue || null],
+      ["Éditeur principal", jeu.editeurPrincipal || null],
+      ["Format / support", jeu.formatSupport || null],
     ];
 
     infos.forEach(([label, val]) => {
-      if (val) doc.text(`${label} : ${val}`);
+      if (val) {
+        doc.text(`${label} : ${val}`);
+      }
     });
 
     doc.moveDown(1);
 
-    // === RÉSUMÉ ===
+    // RÉSUMÉ 
+
     if (jeu.resume?.fr || jeu.resume?.en) {
-      doc.fontSize(16).fillColor("#1A5276").text("Résumé", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(12).fillColor("black");
-      doc.text(jeu.resume.fr || jeu.resume.en, { align: "justify" });
-      doc.moveDown(1);
+      sectionTitle("Résumé");
+      const clean = (str) =>
+        str
+          ?.replace(/[\r\n]+/g, " ")   
+          .replace(/\s{2,}/g, " ")     
+          .trim()
+        || null;
+
+      const resumeFR = clean(jeu.resume.fr);
+      const resumeEN = clean(jeu.resume.en);
+
+      if (resumeFR) {
+        doc.fontSize(12).text(`${resumeFR}`, {
+          align: "justify",
+          width: 500,
+        });
+        doc.moveDown(0.5);
+      }
+
+      if (resumeEN) {
+        doc.fontSize(12).text(`${resumeEN}`, {
+          align: "justify",
+          width: 500,
+        });
+        doc.moveDown(0.7);
+      }
     }
 
-    // === NOTES ===
-    if (jeu.resume?.notes) {
-      const n = jeu.resume.notes;
-      doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
-      doc.moveDown(0.4);
+    // NOTES 
+    const notes = jeu.resume?.notes;
+    if (notes) {
+      sectionTitle("Notes");
 
-      const maxWidth = 500;
+      // Autres éditions
+      if (notes.autresEditions) {
+        subTitle("Autres éditions");
+        doc.text(notes.autresEditions, {
+          width: 500,
+          align: "justify",
+        });
+      }
 
-      // Fonction utilitaire pour mise en forme
-      const renderNote = (label, text) => {
-        if (!text) return;
-        doc.fontSize(12)
-          .fillColor("#154360")
-          .font("Helvetica-Bold")
-          .text(`${label}`, { continued: true })
-          .fillColor("black")
-          .font("Helvetica")
-          .text(` ${text}`, {
-            width: maxWidth,
-            align: "justify",
-            indent: 15,
-          });
-        doc.moveDown(0.6);
-      };
+      // Étiquettes génériques
+      if (Array.isArray(notes.etiquettesGeneriques) && notes.etiquettesGeneriques.length) {
+        subTitle("Étiquettes génériques");
+        doc.text(notes.etiquettesGeneriques.join(", "), {
+          width: 500,
+          align: "justify",
+        });
+      }
 
-      renderNote("Crédits :", n.credits);
-      renderNote("Autres éditions :", n.autresEditions);
-      if (n.etiquettesGeneriques?.length)
-        renderNote("Étiquettes :", n.etiquettesGeneriques.join(", "));
-      renderNote("Lien Québec :", n.liensQuebec);
+      // Genres / Thèmes (MobyGames)
+      if (jeu.genres?.length) {
+        subTitle("Genres / Thèmes (MobyGames)");
+        jeu.genres.forEach((g) => {
+          const type = g.type || "Genre";
+          const valeur = g.valeur || "";
+          doc.text(`• ${type} : ${valeur}`, { width: 500 });
+        });
+      }
 
-      doc.moveDown(0.5);
+      // Liens avec la culture québécoise
+      if (notes.liensQuebec) {
+        subTitle("Liens avec la culture québécoise");
+        doc.text(notes.liensQuebec, {
+          width: 500,
+          align: "justify",
+        });
+      }
+
+      // Récompenses
+      if (jeu.recompenses?.length) {
+        subTitle("Récompenses");
+        jeu.recompenses.forEach((r) => {
+          doc.text(`• ${r}`, { width: 500 });
+        });
+      }
+
+      // Autres remarques
+      if (jeu.autresRemarques) {
+        subTitle("Autres remarques");
+        doc.text(jeu.autresRemarques, {
+          width: 500,
+          align: "justify",
+        });
+      }
+
+      if (jeu.ressourcesLudov?.length) {
+        subTitle("Ressources LUDOV");
+        jeu.ressourcesLudov.forEach((r) => {
+          if (r.url) {
+            doc.text(`• ${r.url}`, { width: 500 });
+          }
+        });
+      }
     }
 
-    // === GENRES ===
-    if (jeu.genres?.length) {
-      doc.fontSize(16).fillColor("#1A5276").text("Genres / Thèmes", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(12).fillColor("black");
-      jeu.genres.forEach((g) => {
-        doc.text(`• ${g.type} : ${g.valeur}`);
+    const nettoyerTitreBD = (titre) => {
+      if (!titre) return "";
+
+      const prefixes = [
+        "Critiques et/ou couverture médiatique",
+        "Paratextes",
+        "Autres sources pertinentes",
+        "Documents de référence",
+        "Références"
+      ];
+
+      for (const p of prefixes) {
+        if (titre.startsWith(p)) {
+          return titre
+            .slice(p.length)
+            .replace(/^[:\s]*/m, "")
+            .trim();
+        }
+      }
+
+      return titre.trim();
+    };
+
+    const renderList = (elements) => {
+      if (!elements || !elements.length) return;
+      elements.forEach((item) => {
+        const t = nettoyerTitreBD(item.titre);
+        const url = item.url || "";
+        const ligne = url ? `• ${t} ${url}` : `• ${t}`;
+        doc.text(ligne, { width: 500 });
       });
-      doc.moveDown(1);
+    };
+
+    // SOURCES
+    sectionTitle("Sources");
+
+    // Documents de référence
+    if (jeu.documentsReference?.length) {
+      subTitle("Documents de référence");
+      renderList(jeu.documentsReference);
     }
 
-    // === CONTENU PHYSIQUE ===
-    if (jeu.contenuPhysique?.length) {
-      doc.fontSize(16).fillColor("#1A5276").text("Contenu physique", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(12).fillColor("black");
-      jeu.contenuPhysique.forEach((c) => {
-        const quantite = c.quantite || 1;
-        const type = c.type || "Inconnu";
-        const mat = c.materiaux ? ` (${c.materiaux})` : "";
-        doc.text(`• ${quantite} × ${type}${mat}`);
-      });
-      doc.moveDown(1);
+    // Critiques et/ou couverture médiatique
+    if (jeu.critiques?.length) {
+      subTitle("Critiques et/ou couverture médiatique");
+      renderList(jeu.critiques);
     }
 
-    // === RÉCOMPENSES ===
-    if (jeu.recompenses?.length) {
-      doc.fontSize(16).fillColor("#1A5276").text("Récompenses", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(12).fillColor("black");
-      jeu.recompenses.forEach((r) => doc.text(`• ${r}`));
-      doc.moveDown(1);
+    // Paratextes
+    if (jeu.paratextes?.length) {
+      subTitle("Paratextes");
+      renderList(jeu.paratextes);
     }
 
-    // === SOURCES / RÉFÉRENCES ===
-    if (jeu.sources?.length) {
-      doc.fontSize(16).fillColor("#1A5276").text("Sources / Références", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(10).fillColor("#2C3E50");
-      jeu.sources.forEach((s) => doc.text(`• ${s}`, { width: 500 }));
-      doc.moveDown(1);
+    // Autres sources pertinentes
+    if (jeu.autresSources?.length) {
+      subTitle("Autres sources pertinentes");
+      renderList(jeu.autresSources);
     }
 
-    // === PIED DE PAGE ===
+    // CRÉDITS 
+    if (notes?.credits) {
+      sectionTitle("Crédits");
+      doc
+        .fontSize(12)
+        .text(notes.credits, {
+          width: 500,
+          align: "justify",
+        });
+    }
+
+    //PIED DE PAGE 
     doc.moveDown(2);
-    doc.rect(0, doc.page.height - 40, doc.page.width, 40).fill("#2C3E50");
-    doc.fillColor("white").fontSize(10)
-      .text("Catalogue LUDOV - Jeux québécois", 50, doc.page.height - 30, { align: "center" });
+    const footerHeight = 40;
+    const yFooter = doc.page.height - footerHeight;
+
+    doc.rect(0, yFooter, doc.page.width, footerHeight).fill("#2C3E50");
+    doc
+      .fillColor("white")
+      .font("Helvetica")
+      .fontSize(10)
+      .text("Catalogue LUDOV - Jeux québécois", 50, yFooter + 12, {
+        align: "center",
+      });
 
     doc.end();
 
     stream.on("finish", () => {
       res.download(filePath, nomPdf, () => {
-        fs.unlinkSync(filePath);
+        try {
+          fs.unlinkSync(filePath);
+        } catch {
+          // ignore
+        }
       });
     });
   } catch (err) {
@@ -495,5 +653,7 @@ async function exporterJeuPdf(req, res) {
     });
   }
 }
+
+
 
 export { importerJeuxQuebec, getJeux, getJeu, deleteJeu, updateJeu, exporterJeuPdf };
