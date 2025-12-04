@@ -8,7 +8,7 @@ jest.unstable_mockModule("../../models/Admin.js", () => ({
   },
 }));
 
-//  Mock de jsonwebtoken
+// Mock de jsonwebtoken
 jest.unstable_mockModule("jsonwebtoken", () => ({
   __esModule: true,
   default: {
@@ -39,12 +39,13 @@ describe("loginAdmin", () => {
 
   it("retourne un token si connexion réussie", async () => {
     const req = {
-      body: { nomUtilisateur: "adminTest", motDePasse: "secret" },
+      body: { identifiant: "adminTest", motDePasse: "secret" },
     };
 
     const mockAdmin = {
       _id: "123",
       nomUtilisateur: "adminTest",
+      courriel: "admin@mail.com",
       validerMotDePasse: jest.fn().mockResolvedValue(true),
     };
 
@@ -52,19 +53,27 @@ describe("loginAdmin", () => {
 
     await loginAdmin(req, res);
 
-    expect(Admin.findOne).toHaveBeenCalledWith({ nomUtilisateur: "adminTest" });
+    expect(Admin.findOne).toHaveBeenCalledWith(
+      expect.objectContaining({ nomUtilisateur: "adminTest" })
+    );
+
     expect(mockAdmin.validerMotDePasse).toHaveBeenCalledWith("secret");
     expect(jwt.sign).toHaveBeenCalled();
+
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         message: "Connexion réussie",
         token: "fake-jwt-token",
+        admin: {
+          nomUtilisateur: "adminTest",
+          courriel: "admin@mail.com",
+        },
       })
     );
   });
 
   it("retourne 401 si admin inexistant", async () => {
-    const req = { body: { nomUtilisateur: "invalide", motDePasse: "1234" } };
+    const req = { body: { identifiant: "invalide", motDePasse: "1234" } };
     Admin.findOne.mockResolvedValueOnce(null);
 
     await loginAdmin(req, res);
@@ -76,11 +85,12 @@ describe("loginAdmin", () => {
   });
 
   it("retourne 401 si mot de passe invalide", async () => {
-    const req = { body: { nomUtilisateur: "adminTest", motDePasse: "faux" } };
+    const req = { body: { identifiant: "adminTest", motDePasse: "faux" } };
 
     const mockAdmin = {
       validerMotDePasse: jest.fn().mockResolvedValue(false),
     };
+
     Admin.findOne.mockResolvedValueOnce(mockAdmin);
 
     await loginAdmin(req, res);

@@ -6,13 +6,20 @@ import jwt from "jsonwebtoken";
  */
 export async function loginAdmin(req, res) {
   try {
-    const { nomUtilisateur, motDePasse } = req.body;
+    const { identifiant, motDePasse } = req.body;
 
-    if (!nomUtilisateur || !motDePasse) {
+    if (!identifiant || !motDePasse) {
       return res.status(400).json({ message: "Champs requis manquants." });
     }
 
-    const admin = await Admin.findOne({ nomUtilisateur });
+    const estCourriel = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifiant);
+
+    const filtreRecherche = estCourriel
+      ? { courriel: identifiant.toLowerCase() }
+      : { nomUtilisateur: identifiant };
+
+    const admin = await Admin.findOne(filtreRecherche);
+
     if (!admin) {
       return res.status(401).json({ message: "Identifiants invalides." });
     }
@@ -31,7 +38,10 @@ export async function loginAdmin(req, res) {
     res.json({
       message: "Connexion réussie",
       token,
-      admin: admin.nomUtilisateur
+      admin: {
+        nomUtilisateur: admin.nomUtilisateur,
+        courriel: admin.courriel
+      }
     });
   } catch (err) {
     console.error("Erreur login admin:", err);

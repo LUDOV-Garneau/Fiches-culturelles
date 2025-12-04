@@ -131,6 +131,43 @@ const JeuSchema = new mongoose.Schema(
 
     // Données originales 
     original: { type: mongoose.Schema.Types.Mixed, required: true },
+    autresRemarques: { type: String, default: null },
+
+    ressourcesLudov: [
+      {
+        intitule: { type: String, default: null },
+        url: { type: String, default: null },
+      }
+    ],
+
+    documentsReference: [
+      {
+        titre: { type: String, default: null },
+        url: { type: String, default: null },
+      }
+    ],
+
+    critiques: [
+      {
+        titre: { type: String, default: null },
+        url: { type: String, default: null },
+      }
+    ],
+
+    paratextes: [
+      {
+        titre: { type: String, default: null },
+        url: { type: String, default: null },
+      }
+    ],
+
+    autresSources: [
+      {
+        titre: { type: String, default: null },
+        url: { type: String, default: null },
+      }
+    ],
+
 
     estChoisi: {
       type: Boolean,
