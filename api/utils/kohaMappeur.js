@@ -116,9 +116,9 @@ function extraireDepuisAbstract(abstractBrut) {
         const reste = s.replace(/^étiquettes génériques\s*:\s*/i, "").trim();
         notes.etiquettesGeneriques = reste
           ? reste
-              .split(",")
-              .map((x) => x.trim())
-              .filter(Boolean)
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean)
           : null;
       } else if (lower.startsWith("liens avec la culture québécoise")) {
         notes.liensQuebec =
@@ -153,9 +153,9 @@ function extraireDepuisAbstract(abstractBrut) {
       en: en || null,
       notes:
         notes.credits ||
-        notes.autresEditions ||
-        notes.etiquettesGeneriques ||
-        notes.liensQuebec
+          notes.autresEditions ||
+          notes.etiquettesGeneriques ||
+          notes.liensQuebec
           ? notes
           : undefined,
     },
@@ -291,9 +291,10 @@ async function extraireDepuisMarc(id) {
       .map(f => decode(toArray(f.subfield).find(sf => sf["@_code"] === "u")?.["#text"]))
       .filter(Boolean);
 
-    // RÉSUMÉS / NOTES / AUTRES REMARQUES (520)
-    const resumes = get("520");
-    let resumeFR = null, resumeEN = null, autresRemarques = null;
+    // ---- Extraction NOTES (520) ----
+    let resumeFR = null;
+    let resumeEN = null;
+    let autresRemarques = null;
 
     const notes = {
       credits: null,
@@ -302,51 +303,64 @@ async function extraireDepuisMarc(id) {
       liensQuebec: null,
     };
 
-    for (const champ of resumes) {
-      const sub = toArray(champ.subfield);
-      const a = decode(sub.find(sf => sf["@_code"] === "a")?.["#text"]);
-      const b = decode(sub.find(sf => sf["@_code"] === "b")?.["#text"]);
+    for (const champ of get("520")) {
+      const subs = toArray(champ.subfield);
+
+      const a = decode(subs.find(sf => sf["@_code"] === "a")?.["#text"]);
+      const b = decode(subs.find(sf => sf["@_code"] === "b")?.["#text"]);
       const texte = [a, b].filter(Boolean).join(" ").trim();
+
       if (!a) continue;
 
       const low = a.toLowerCase();
 
-      if (!resumeFR && /infiltrez|jeu|sam fisher|histoire/i.test(a)) {
+      // ---- Résumé FR ----
+      if (!resumeFR && champ["@_ind1"] === " ") {
         resumeFR = texte;
         continue;
       }
-      if (!resumeEN && /the player|game|echelon/i.test(a)) {
+
+      // ---- Résumé EN ----
+      if (!resumeEN && champ["@_ind1"] === "8" && /the player|game/i.test(a)) {
         resumeEN = texte;
         continue;
       }
 
-      if (/cr[eé]dits/.test(a)) {
-        notes.credits = b ?? texte.replace(/^cr[eé]dits\s*:\s*/i, "");
+      // ---- Crédits ----
+      if (low.startsWith("crédits")) {
+        notes.credits = b || texte.replace(/^crédits\s*:\s*/i, "").trim();
         continue;
       }
 
-      if (/autres éditions/.test(a)) {
-        notes.autresEditions = b ?? texte.replace(/^autres éditions\s*:\s*/i, "");
+      // ---- Autres éditions ----
+      if (low.startsWith("autres éditions")) {
+        notes.autresEditions = b || texte.replace(/^autres éditions\s*:\s*/i, "").trim();
         continue;
       }
 
-      if (/étiquettes/.test(a)) {
-        notes.etiquettesGeneriques = b
-          ? b.split(/[;,]/).map(s => s.trim())
-          : [];
+      // ---- Étiquettes génériques ----
+      if (low.startsWith("étiquettes génériques")) {
+        const raw = b || texte.replace(/^étiquettes génériques\s*:\s*/i, "");
+        notes.etiquettesGeneriques = raw
+          .split(/;|,/)
+          .map(s => s.trim())
+          .filter(Boolean);
         continue;
       }
 
-      if (/liens/.test(a)) {
-        notes.liensQuebec = b ?? texte;
+      // ---- Liens Québec ----
+      if (low.startsWith("liens avec la culture québécoise")) {
+        notes.liensQuebec = b || texte.replace(/^liens avec.*québécoise\s*:\s*/i, "").trim();
         continue;
       }
 
-      if (/autres remarques/.test(a)) {
-        autresRemarques = b ?? texte;
+      // ---- Autres remarques ----
+      if (low.startsWith("autres remarques")) {
+        autresRemarques = b || texte.replace(/^autres remarques\s*:\s*/i, "").trim();
         continue;
       }
     }
+
 
     // CONTENU PHYSIQUE (300)
     const contenuPhysique = get("300")
@@ -394,36 +408,35 @@ async function extraireDepuisMarc(id) {
     const sources588 = [];
 
     for (const f of get("588")) {
-      const txt = decode(toArray(f.subfield).find(sf => sf["@_code"] === "a")?.["#text"]);
+      let txt = decode(toArray(f.subfield).find(sf => sf["@_code"] === "a")?.["#text"]);
       if (!txt) continue;
 
       const low = txt.toLowerCase();
 
-      if (low.startsWith("critiques")) {
-        critiques.push({ titre: txt, url: null });
-        continue;
-      }
-
-      if (low.startsWith("paratextes")) {
-        paratextes.push({ titre: txt, url: null });
-        continue;
-      }
-
-      if (low.startsWith("autres sources pertinentes")) {
-        autresSources.push({ titre: txt, url: null });
-        continue;
-      }
-
       const urlMatch = txt.match(/https?:\/\/\S+/i);
-      if (urlMatch) {
-        documentsReference.push({
-          titre: txt.replace(urlMatch[0], "").trim(),
-          url: urlMatch[0],
-        });
+      const url = urlMatch ? urlMatch[0] : null;
+      if (url) {
+        txt = txt.replace(url, "").trim();
+      }
+      if (low.startsWith("critiques")) {
+        critiques.push({ titre: txt, url });
+        continue;
+      }
+      if (low.startsWith("paratextes")) {
+        paratextes.push({ titre: txt, url });
+        continue;
+      }
+      if (low.startsWith("autres sources pertinentes")) {
+        autresSources.push({ titre: txt, url });
+        continue;
+      }
+      if (url) {
+        documentsReference.push({ titre: txt, url });
         continue;
       }
       sources588.push(txt);
     }
+
 
     // LANGUE (008)
     const langue =

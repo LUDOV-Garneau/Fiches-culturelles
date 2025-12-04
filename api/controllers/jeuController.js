@@ -1,6 +1,6 @@
 import axios from "axios";
 import Jeu from "../models/Jeu.js";
-import { mapperKohaVersJeu, obtenirImage } from "../utils/kohaMappeur.js";
+import { mapperKohaVersJeu, obtenirImage, extraireDepuisMarc } from "../utils/kohaMappeur.js";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
@@ -47,51 +47,83 @@ async function importerJeuxQuebec(req, res) {
           mapped.plateformes = marc.plateforme ? [marc.plateforme] : mapped.plateformes;
 
           // Champs ++
-          mapped.contenuPhysique = marc.contenuPhysique?.length ? marc.contenuPhysique : [];
-          mapped.genres = marc.genres?.length ? marc.genres : [];
-          mapped.recompenses = marc.recompenses?.length ? marc.recompenses : [];
+          mapped.contenuPhysique = marc.contenuPhysique?.length
+            ? marc.contenuPhysique
+            : mapped.contenuPhysique;
 
-          // Sources (588 )
-          mapped.sources = marc.sources?.length ? marc.sources : [];
+          mapped.genres = marc.genres?.length
+            ? marc.genres
+            : mapped.genres;
 
-          // Ajout des  sections sources -------------
-          mapped.critiques = marc.critiques?.length ? marc.critiques : [];
-          mapped.paratextes = marc.paratextes?.length ? marc.paratextes : [];
-          mapped.autresSources = marc.autresSources?.length ? marc.autresSources : [];
-          mapped.ressourcesLudov = marc.ressourcesLudov?.length ? marc.ressourcesLudov : [];
-          mapped.documentsReference = marc.documentsReference?.length ? marc.documentsReference : [];
+          mapped.recompenses = marc.recompenses?.length
+            ? marc.recompenses
+            : mapped.recompenses;
 
-          // autres remarques
-          if (marc.autresRemarques)
+          // Sections 588 (sources + LUDOV)
+          mapped.sources = marc.sources?.length ? marc.sources : mapped.sources || [];
+
+          mapped.critiques = marc.critiques?.length
+            ? marc.critiques
+            : mapped.critiques || [];
+
+          mapped.paratextes = marc.paratextes?.length
+            ? marc.paratextes
+            : mapped.paratextes || [];
+
+          mapped.autresSources = marc.autresSources?.length
+            ? marc.autresSources
+            : mapped.autresSources || [];
+
+          mapped.ressourcesLudov = marc.ressourcesLudov?.length
+            ? marc.ressourcesLudov
+            : mapped.ressourcesLudov || [];
+
+          mapped.documentsReference = marc.documentsReference?.length
+            ? marc.documentsReference
+            : mapped.documentsReference || [];
+
+          // Autres remarques
+          if (marc.autresRemarques) {
             mapped.autresRemarques = marc.autresRemarques;
+          }
 
-          // Fusion des notes MARC dans le résumé Koha
+          // --- Fusion intelligente des notes ---
           if (marc.resume?.notes) {
             const notesMarc = marc.resume.notes;
-            if (!mapped.resume.notes) mapped.resume.notes = {};
 
-            mapped.resume.notes = {
-              credits: notesMarc.credits || mapped.resume.notes.credits || null,
-              autresEditions:
-                notesMarc.autresEditions || mapped.resume.notes.autresEditions || null,
-              etiquettesGeneriques:
-                notesMarc.etiquettesGeneriques?.length
-                  ? notesMarc.etiquettesGeneriques
-                  : mapped.resume.notes.etiquettesGeneriques || [],
-              liensQuebec:
-                notesMarc.liensQuebec || mapped.resume.notes.liensQuebec || null,
-            };
+            // Création si absent
+            if (!mapped.resume.notes) {
+              mapped.resume.notes = {
+                credits: null,
+                autresEditions: null,
+                etiquettesGeneriques: [],
+                liensQuebec: null,
+              };
+            }
 
-            // Si le MARC signale un lien Québec, on le conserve
-            if (notesMarc.liensQuebec) mapped.estLieAuQuebec = true;
+            // Remplissage sans écraser
+            if (notesMarc.credits)
+              mapped.resume.notes.credits = notesMarc.credits;
+
+            if (notesMarc.autresEditions)
+              mapped.resume.notes.autresEditions = notesMarc.autresEditions;
+
+            if (Array.isArray(notesMarc.etiquettesGeneriques) &&
+              notesMarc.etiquettesGeneriques.length > 0)
+              mapped.resume.notes.etiquettesGeneriques = notesMarc.etiquettesGeneriques;
+
+            if (notesMarc.liensQuebec) {
+              mapped.resume.notes.liensQuebec = notesMarc.liensQuebec;
+              mapped.estLieAuQuebec = true;
+            }
           }
 
-          // Fusion des URLs (Koha + MARC)
+          // Fusion URLs
           if (marc.urls?.length) {
-            const toutes = new Set([...(mapped.urls || []), ...marc.urls]);
-            mapped.urls = Array.from(toutes);
+            mapped.urls = Array.from(new Set([...(mapped.urls || []), ...marc.urls]));
           }
         }
+
 
         // Image IGDB
         const titreImage = mapped.titreComplet?.principal || mapped.titre;
@@ -296,9 +328,9 @@ async function exporterJeuPdf(req, res) {
     if (!fs.existsSync(dossier)) fs.mkdirSync(dossier);
 
     const nomFichierJeu = jeu.titreComplet.principal
-      .replace(/[^a-zA-Z0-9_\- ]/g, "")  
-      .replace(/\s+/g, "_")              
-      .substring(0, 80);                
+      .replace(/[^a-zA-Z0-9_\- ]/g, "")
+      .replace(/\s+/g, "_")
+      .substring(0, 80);
     const nomPdf = `${nomFichierJeu || "jeu"}.pdf`;
     const filePath = path.join(dossier, nomPdf);
     const doc = new PDFDocument({ margin: 50 });
@@ -366,37 +398,37 @@ async function exporterJeuPdf(req, res) {
 
     // === NOTES ===
     if (jeu.resume?.notes) {
-  const n = jeu.resume.notes;
-  doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
-  doc.moveDown(0.4);
+      const n = jeu.resume.notes;
+      doc.fontSize(16).fillColor("#1A5276").text("Notes", { underline: true });
+      doc.moveDown(0.4);
 
-  const maxWidth = 500;
+      const maxWidth = 500;
 
-  // Fonction utilitaire pour mise en forme
-  const renderNote = (label, text) => {
-    if (!text) return;
-    doc.fontSize(12)
-      .fillColor("#154360")
-      .font("Helvetica-Bold")
-      .text(`${label}`, { continued: true })
-      .fillColor("black")
-      .font("Helvetica")
-      .text(` ${text}`, {
-        width: maxWidth,
-        align: "justify",
-        indent: 15,
-      });
-    doc.moveDown(0.6);
-  };
+      // Fonction utilitaire pour mise en forme
+      const renderNote = (label, text) => {
+        if (!text) return;
+        doc.fontSize(12)
+          .fillColor("#154360")
+          .font("Helvetica-Bold")
+          .text(`${label}`, { continued: true })
+          .fillColor("black")
+          .font("Helvetica")
+          .text(` ${text}`, {
+            width: maxWidth,
+            align: "justify",
+            indent: 15,
+          });
+        doc.moveDown(0.6);
+      };
 
-  renderNote("Crédits :", n.credits);
-  renderNote("Autres éditions :", n.autresEditions);
-  if (n.etiquettesGeneriques?.length)
-    renderNote("Étiquettes :", n.etiquettesGeneriques.join(", "));
-  renderNote("Lien Québec :", n.liensQuebec);
+      renderNote("Crédits :", n.credits);
+      renderNote("Autres éditions :", n.autresEditions);
+      if (n.etiquettesGeneriques?.length)
+        renderNote("Étiquettes :", n.etiquettesGeneriques.join(", "));
+      renderNote("Lien Québec :", n.liensQuebec);
 
-  doc.moveDown(0.5);
-}
+      doc.moveDown(0.5);
+    }
 
     // === GENRES ===
     if (jeu.genres?.length) {
