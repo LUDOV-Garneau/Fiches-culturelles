@@ -29,7 +29,7 @@ export default function DocsLayout() {
                 to="/docs/utilisateur"
                 className="text-sm hover:text-blue-600"
               >
-                Lien 1
+                Guide
               </Link>
             </div>
           </div>
