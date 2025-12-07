@@ -1,3 +1,4 @@
+// src/app/pages/games.$id.tsx
 import * as React from "react";
 import { useParams, Link } from "react-router";
 import { FaSteam, FaXbox, FaPlaystation, FaItchIo } from "react-icons/fa";
@@ -161,6 +162,7 @@ export default function GameDetail() {
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Bandeau supérieur */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white shadow-lg">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 py-10">
           <div>
@@ -183,8 +185,11 @@ export default function GameDetail() {
         </div>
       </div>
 
+      {/* Contenu principal */}
       <div className="mx-auto max-w-6xl grid md:grid-cols-[1.4fr_0.6fr] gap-10 px-6 py-16">
+        {/* Colonne gauche */}
         <div className="space-y-10">
+          {/* Image + titre dans le bandeau bas */}
           <div className="relative overflow-hidden rounded-3xl shadow-md bg-gray-200">
             {jeu.imageUrl ? (
               <img
@@ -211,7 +216,9 @@ export default function GameDetail() {
             </div>
           </div>
 
+          {/* Carte description + notes dans le bon ordre */}
           <div className="rounded-3xl bg-white p-8 shadow-sm hover:shadow-md transition space-y-6">
+            {/* Description / Résumé */}
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                 Description
@@ -222,19 +229,11 @@ export default function GameDetail() {
                   jeu.resume?.brut ||
                   "Aucune description fournie pour ce jeu pour le moment."}
               </p>
+
+              {/* Notes : même visuel qu'avant, mais ordre changé */}
               {jeu.resume?.notes && (
                 <div className="mt-8 space-y-3">
-                  {jeu.resume.notes.credits && (
-                    <div>
-                      <span className="font-semibold text-gray-900">
-                        Crédits :
-                      </span>{" "}
-                      <span className="text-gray-700">
-                        {jeu.resume.notes.credits}
-                      </span>
-                    </div>
-                  )}
-
+                  {/* 1. Autres éditions */}
                   {jeu.resume.notes.autresEditions && (
                     <div>
                       <span className="font-semibold text-gray-900">
@@ -246,6 +245,7 @@ export default function GameDetail() {
                     </div>
                   )}
 
+                  {/* 2. Étiquettes génériques */}
                   {(jeu.resume.notes.etiquettesGeneriques?.length ?? 0) > 0 && (
                     <div>
                       <span className="font-semibold text-gray-900">
@@ -257,13 +257,26 @@ export default function GameDetail() {
                     </div>
                   )}
 
+                  {/* 3. Liens avec la culture québécoise */}
                   {jeu.resume.notes.liensQuebec && (
                     <div>
                       <span className="font-semibold text-gray-900">
-                        Liens Québec :
+                        Liens avec la culture québécoise :
                       </span>{" "}
                       <span className="text-gray-700">
                         {jeu.resume.notes.liensQuebec}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* 4. Crédits */}
+                  {jeu.resume.notes.credits && (
+                    <div>
+                      <span className="font-semibold text-gray-900">
+                        Crédits :
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {jeu.resume.notes.credits}
                       </span>
                     </div>
                   )}
@@ -275,6 +288,7 @@ export default function GameDetail() {
               </p>
             </div>
 
+            {/* Lien PDF (inchangé) */}
             <div className="pt-3 border-t border-gray-100">
               <a
                 href={`http://72.11.148.122/api/jeux/${jeu._id}/pdf`}
@@ -302,6 +316,7 @@ export default function GameDetail() {
           </div>
         </div>
 
+        {/* Colonne droite : développeur + plateformes */}
         <aside className="space-y-6">
           <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-md transition">
             <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide">
@@ -337,6 +352,7 @@ export default function GameDetail() {
         </aside>
       </div>
 
+      {/* Bloc retour en bas (inchangé) */}
       <div className="mx-auto max-w-6xl px-6 pb-16">
         <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-md hover:bg-slate-800 transition flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
