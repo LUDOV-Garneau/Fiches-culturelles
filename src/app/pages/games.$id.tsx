@@ -39,9 +39,7 @@ const PlatformIcon = ({ platformName }: { platformName: any }) => {
   } else {
     if (lower.includes("[object")) return null;
     return (
-      <span className="text-xs bg-gray-200 px-2 py-1 rounded">
-        {nameStr}
-      </span>
+      <span className="text-xs bg-gray-200 px-2 py-1 rounded">{nameStr}</span>
     );
   }
 
@@ -169,10 +167,9 @@ export default function GameDetail() {
   const sousTitre = jeu?.titreComplet?.sousTitre?.trim() || "";
   const titreComplet =
     titrePrincipal && sousTitre
-      ? `${titrePrincipal.replace(/:$/, "").trim()} : ${sousTitre.replace(
-          /^:/,
-          ""
-        ).trim()}`
+      ? `${titrePrincipal.replace(/:$/, "").trim()} : ${sousTitre
+          .replace(/^:/, "")
+          .trim()}`
       : titrePrincipal || sousTitre || "";
 
   if (loading)
@@ -216,7 +213,7 @@ export default function GameDetail() {
                       href={it.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 underline break-all"
+                      className="link underline break-all"
                     >
                       {it.url}
                     </a>
@@ -234,9 +231,8 @@ export default function GameDetail() {
     (jeu.genres && jeu.genres.length > 0 ? jeu.genres : []) || [];
 
   const recompensesSafe: string[] =
-    (jeu.recompenses && jeu.recompenses.length > 0
-      ? jeu.recompenses
-      : []) || [];
+    (jeu.recompenses && jeu.recompenses.length > 0 ? jeu.recompenses : []) ||
+    [];
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-b from-gray-50 to-gray-100">
@@ -250,11 +246,6 @@ export default function GameDetail() {
             <h1 className="text-4xl md:text-5xl font-black leading-tight mt-2">
               {titreComplet || titrePrincipal || jeu.titre || "Jeu sans titre"}
             </h1>
-            {jeu.anneeSortie && (
-              <p className="mt-2 text-sm text-white/70">
-                Année de sortie : {jeu.anneeSortie}
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -279,7 +270,10 @@ export default function GameDetail() {
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-6 py-3">
               <p className="text-lg font-semibold text-white">
-                {titreComplet || titrePrincipal || jeu.titre || "Jeu sans titre"}
+                {titreComplet ||
+                  titrePrincipal ||
+                  jeu.titre ||
+                  "Jeu sans titre"}
               </p>
               <p className="text-sm text-white/70">
                 {jeu.developpeurs?.[0] ?? "Développeur inconnu"}
@@ -289,81 +283,6 @@ export default function GameDetail() {
 
           {/* Carte de détails structurée comme le modèle */}
           <div className="rounded-3xl bg-white p-8 shadow-sm hover:shadow-md transition space-y-8">
-          
-            <section>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Titre complet
-              </h2>
-              <p className="text-gray-800">
-                {titreComplet || "—"}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-gray-900 mb-3">
-                Informations générales
-              </h2>
-              <dl className="space-y-1 text-sm text-gray-800">
-                
-                {jeu.developpeurs && jeu.developpeurs.length > 0 && (
-                  <div>
-                    <dt className="font-semibold inline">Développeurs :</dt>{" "}
-                    <dd className="inline">
-                      {jeu.developpeurs.join(", ")}
-                    </dd>
-                  </div>
-                )}
-
-                {jeu.villeDeveloppement && (
-                  <div>
-                    <dt className="font-semibold inline">
-                      Ville de développement :
-                    </dt>{" "}
-                    <dd className="inline">{jeu.villeDeveloppement}</dd>
-                  </div>
-                )}
-
-                {jeu.editeurs && jeu.editeurs.length > 0 && (
-                  <div>
-                    <dt className="font-semibold inline">Éditeurs :</dt>{" "}
-                    <dd className="inline">{jeu.editeurs.join(", ")}</dd>
-                  </div>
-                )}
-
-                {jeu.lieuPublication && (
-                  <div>
-                    <dt className="font-semibold inline">Ville d’édition :</dt>{" "}
-                    <dd className="inline">{jeu.lieuPublication}</dd>
-                  </div>
-                )}
-
-                {plateformesSafe.length > 0 && (
-                  <div>
-                    <dt className="font-semibold inline">Plateforme :</dt>{" "}
-                    <dd className="inline">
-                      {plateformesSafe.join(", ")}
-                    </dd>
-                  </div>
-                )}
-
-                {jeu.langue && (
-                  <div>
-                    <dt className="font-semibold inline">Langues :</dt>{" "}
-                    <dd className="inline">{jeu.langue}</dd>
-                  </div>
-                )}
-
-                {jeu.editeurPrincipal && (
-                  <div>
-                    <dt className="font-semibold inline">
-                      Éditeur principal :
-                    </dt>{" "}
-                    <dd className="inline">{jeu.editeurPrincipal}</dd>
-                  </div>
-                )}
-              </dl>
-            </section>
-
             {/* Résumé */}
             {(jeu.resume?.fr || jeu.resume?.en || jeu.resume?.brut) && (
               <section>
@@ -374,7 +293,7 @@ export default function GameDetail() {
                 {jeu.resume?.fr && (
                   <div className="mb-3">
                     <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                       Description en français 
+                      Description en français
                     </h3>
                     <p className="text-sm text-gray-700 leading-relaxed">
                       {jeu.resume.fr}
@@ -385,7 +304,7 @@ export default function GameDetail() {
                 {jeu.resume?.en && (
                   <div className="mb-3">
                     <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                      Description en anglais 
+                      Description en anglais
                     </h3>
                     <p className="text-sm text-gray-700 leading-relaxed">
                       {jeu.resume.en}
@@ -440,10 +359,7 @@ export default function GameDetail() {
                   <ul className="text-sm text-gray-700 space-y-1">
                     {genresSafe.map((g, idx) => (
                       <li key={idx}>
-                        •{" "}
-                        {g.type
-                          ? `${g.type}${g.valeur ? " : " : ""}`
-                          : ""}
+                        • {g.type ? `${g.type}${g.valeur ? " : " : ""}` : ""}
                         {g.valeur}
                       </li>
                     ))}
@@ -455,7 +371,7 @@ export default function GameDetail() {
               {jeu.resume?.notes?.liensQuebec && (
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                    Liens avec la culture québécoise 
+                    Liens avec la culture québécoise
                   </h3>
                   <p className="text-sm text-gray-700">
                     {jeu.resume.notes.liensQuebec}
@@ -481,19 +397,17 @@ export default function GameDetail() {
               {jeu.autresRemarques && (
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                    Autres remarques 
+                    Autres remarques
                   </h3>
-                  <p className="text-sm text-gray-700">
-                    {jeu.autresRemarques}
-                  </p>
+                  <p className="text-sm text-gray-700">{jeu.autresRemarques}</p>
                 </div>
               )}
 
               {/* Ressources LUDOV */}
               {jeu.ressourcesLudov && jeu.ressourcesLudov.length > 0 && (
-                <div className="mb-4">
+                <div className="mb-4 text-decoration-none">
                   <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                    Ressources LUDOV 
+                    Ressources LUDOV
                   </h3>
                   {renderSourceList(jeu.ressourcesLudov)}
                 </div>
@@ -507,18 +421,19 @@ export default function GameDetail() {
               jeu.autresSources?.length) && (
               <section>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">
-                  Sources 
+                  Sources
                 </h2>
 
                 {/* Documents de référence */}
-                {jeu.documentsReference && jeu.documentsReference.length > 0 && (
-                  <div className="mb-3">
-                    <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                      Documents de référence
-                    </h3>
-                    {renderSourceList(jeu.documentsReference)}
-                  </div>
-                )}
+                {jeu.documentsReference &&
+                  jeu.documentsReference.length > 0 && (
+                    <div className="mb-3">
+                      <h3 className="font-semibold text-gray-800 text-sm mb-1">
+                        Documents de référence
+                      </h3>
+                      {renderSourceList(jeu.documentsReference)}
+                    </div>
+                  )}
 
                 {/* Critiques et/ou couverture médiatique */}
                 {jeu.critiques && jeu.critiques.length > 0 && (
@@ -556,7 +471,7 @@ export default function GameDetail() {
             {jeu.resume?.notes?.credits && (
               <section>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Crédits 
+                  Crédits
                 </h2>
                 <p className="text-sm text-gray-700">
                   {jeu.resume.notes.credits}
@@ -595,39 +510,99 @@ export default function GameDetail() {
         {/* Colonne droite : développeur + plateformes */}
         <aside className="space-y-6">
           <div className="rounded-3xl bg-white p-7 shadow-sm hover:shadow-md transition">
-            <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide">
-              Développeur
-            </p>
-            <h3 className="text-2xl font-bold text-gray-900 mt-3">
-              {jeu.developpeurs?.[0] ?? "Inconnu"}
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              {jeu.anneeSortie ? `Projet ${jeu.anneeSortie}` : "Année inconnue"}
-            </p>
+            {/* Titre de section */}
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              Informations générales
+            </h2>
 
+            {/* Bloc infos type notice bibliographique */}
+            <dl className="space-y-1 text-sm text-gray-800">
+              {jeu.anneeSortie && (
+                <div>
+                  <dt className="font-semibold inline">Année de sortie :</dt>{" "}
+                  <dd className="inline">{jeu.anneeSortie}</dd>
+                </div>
+              )}
+
+              {jeu.villeDeveloppement && (
+                <div>
+                  <dt className="font-semibold inline">
+                    Ville de développement :
+                  </dt>{" "}
+                  <dd className="inline">{jeu.villeDeveloppement}</dd>
+                </div>
+              )}
+
+              {jeu.editeurs && jeu.editeurs.length > 0 && (
+                <div>
+                  <dt className="font-semibold inline">Éditeurs :</dt>{" "}
+                  <dd className="inline">{jeu.editeurs.join(", ")}</dd>
+                </div>
+              )}
+
+              {jeu.lieuPublication && (
+                <div>
+                  <dt className="font-semibold inline">Ville d’édition :</dt>{" "}
+                  <dd className="inline">{jeu.lieuPublication}</dd>
+                </div>
+              )}
+
+              {plateformesSafe.length > 0 && (
+                <div>
+                  <dt className="font-semibold inline">Plateforme :</dt>{" "}
+                  <dd className="inline">{plateformesSafe.join(", ")}</dd>
+                </div>
+              )}
+
+              {jeu.langue && (
+                <div>
+                  <dt className="font-semibold inline">Langues :</dt>{" "}
+                  <dd className="inline">{jeu.langue}</dd>
+                </div>
+              )}
+            </dl>
+
+            {/* Séparateur visuel */}
             <div className="mt-5 h-px bg-gray-100" />
 
+            {/* Bloc “carte projet” plus éditorial */}
+            <div className="mt-4">
+              <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide">
+                Développeur principal
+              </p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-2">
+                {jeu.developpeurs?.[0] ?? "Inconnu"}
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {jeu.anneeSortie
+                  ? `Projet ${jeu.anneeSortie}`
+                  : "Année inconnue"}
+              </p>
+            </div>
+
+            {/* Plateformes sous forme d’icônes */}
             {plateformesSafe.length > 0 && (
               <>
-                <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide mt-5 mb-3">
-                  Plateformes
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {plateformesSafe.map((p, idx) => (
-                    <PlatformIcon key={idx} platformName={p} />
-                  ))}
-                </div>
                 <div className="mt-5 h-px bg-gray-100" />
+                <div className="mt-4">
+                  <p className="text-xs uppercase font-semibold text-gray-400 tracking-wide mb-3">
+                    Plateformes
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {plateformesSafe.map((p, idx) => (
+                      <PlatformIcon key={idx} platformName={p} />
+                    ))}
+                  </div>
+                </div>
               </>
             )}
 
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-6 text-xs text-gray-500 leading-snug">
               Cette fiche présente un jeu québécois archivé dans LUDOV.
             </p>
           </div>
         </aside>
       </div>
-      
 
       {/* Bloc retour en bas (inchangé) */}
       <div className="mx-auto max-w-6xl px-6 pb-16">
