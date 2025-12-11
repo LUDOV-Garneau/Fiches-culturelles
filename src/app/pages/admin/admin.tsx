@@ -45,13 +45,13 @@ export default function Admin() {
       const data = await response.json();
       if (data.success) {
         setJeux((prev) => prev.filter((j) => j._id !== id));
-        alert(`"${titre}" supprimé avec succès.`);
+        console.log(`"${titre}" supprimé avec succès.`);
       } else {
-        alert("Erreur : " + data.message);
+        console.log("Erreur : " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur de suppression côté serveur.");
+      console.log("Erreur de suppression côté serveur.");
     }
   }
 
@@ -75,11 +75,11 @@ export default function Admin() {
           ),
         );
       } else {
-        alert("Erreur : " + data.message);
+        console.log("Erreur : " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour du jeu.");
+      console.log("Erreur lors de la mise à jour du jeu.");
     }
   }
 

@@ -96,3 +96,8 @@ body {
   font-size: 1.875rem;
   font: 200;
 }
+.link
+{
+  color: var(--color-primary-blue);
+  text-decoration: none;
+}
