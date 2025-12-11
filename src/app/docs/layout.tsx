@@ -1,4 +1,5 @@
 import { Outlet, Link } from "react-router";
+import { Sidenav } from "~/components/sidenav";
 
 export default function DocsLayout() {
   return (
