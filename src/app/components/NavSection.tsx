@@ -22,7 +22,6 @@ export function NavSection() {
         style={{ height: BAR_HEIGHT }}
       >
         <div className="flex items-center gap-10">
-
           {/* Icônes */}
           <div className="flex items-center gap-6">
             <a
@@ -60,7 +59,6 @@ export function NavSection() {
 
           {/* Boutons */}
           <div className="flex items-center gap-4">
-
             <a
               href="https://www.ludov.ca/fr/contact/"
               target="_blank"
@@ -103,6 +101,19 @@ export function NavSection() {
               }}
             >
               Login
+            </Link>
+            <Link
+              to="/docs"
+              style={{
+                backgroundColor: PRIMARY,
+                padding: "11px 26px",
+                color: "#333",
+                textDecoration: "none",
+                lineHeight: 1,
+                display: "inline-block",
+              }}
+            >
+              Aide
             </Link>
           </div>
         </div>
