@@ -354,7 +354,7 @@ export default function GameDetail() {
               {genresSafe.length > 0 && (
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                    Genres / Thèmes (MobyGames) [655$a et 655$v]
+                    Genres / Thèmes (MobyGames) 
                   </h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     {genresSafe.map((g, idx) => (
