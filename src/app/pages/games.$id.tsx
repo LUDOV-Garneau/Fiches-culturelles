@@ -269,10 +269,10 @@ export default function GameDetail() {
               <img
                 src={jeu.imageUrl}
                 alt={titreComplet || titrePrincipal || "Image du jeu"}
-                className="h-[400px] w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
               />
             ) : (
-              <div className="flex h-[400px] items-center justify-center text-gray-400 italic">
+              <div className="flex h-full items-center justify-center text-gray-400 italic">
                 (Image à venir)
               </div>
             )}
@@ -627,6 +627,7 @@ export default function GameDetail() {
           </div>
         </aside>
       </div>
+      
 
       {/* Bloc retour en bas (inchangé) */}
       <div className="mx-auto max-w-6xl px-6 pb-16">
