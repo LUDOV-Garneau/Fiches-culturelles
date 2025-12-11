@@ -41,14 +41,11 @@ export default function ModifierJeu() {
       });
       const data = await response.json();
       if (data.success) {
-        alert("Jeu mis à jour avec succès !");
         navigate("/admin");
       } else {
-        alert("Erreur : " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour du jeu.");
     }
   }
   async function toggleChoisi(id: string, estChoisiActuel: boolean) {
@@ -70,11 +67,9 @@ export default function ModifierJeu() {
           )
         );
       } else {
-        alert("Erreur : " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour du jeu.");
     }
   }
   if (loading) return <p className="p-4">Chargement du jeu...</p>;
@@ -99,11 +94,9 @@ export default function ModifierJeu() {
           imageUrl: data.imageUrl,
         }));
       } else {
-        alert("Erreur upload image : " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Impossible d’envoi vers le serveur.");
     }
   }
 
