@@ -1,10 +1,11 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* === Thème global (v4) === */
 @theme {
   --color-primary-blue: #02dade;
 
-  --color-primary-gray: #D0D0D0;
+  --color-primary-gray: #d0d0d0;
 
   --color-primary-blue-90: color-mix(
     in oklab,
