@@ -3,47 +3,78 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [identifiant, setIdentifiant] = useState("");
+  const [motDePasse, setMotDePasse] = useState("");
+  const [erreur, setErreur] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErreur(null);
+    setLoading(true);
 
-    console.log("Tentative de connexion :", email, password);
+    try {
+      const response = await fetch(
+        `http://72.11.148.122/api/auth/admin/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifiant, motDePasse }),
+        }
+      );
 
-    //condition
-    if (email && password) {
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setErreur(data?.message || "Identifiants invalides.");
+        return;
+      }
+      localStorage.setItem("admin_token", data.token);
+
+      localStorage.setItem("admin_info", JSON.stringify(data.admin));
+
       navigate("/admin");
-    } else {
-      alert("Veuillez entrer vos identifiants !");
+    } catch (err) {
+      setErreur("Erreur de connexion au serveur.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-80">
-        <h1 className="text-2xl font-bold text-center mb-4">Connexion</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Connexion admin</h1>
+
+        {erreur && (
+          <div className="mb-3 rounded-md bg-red-100 text-red-700 p-2 text-sm">
+            {erreur}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
-            type="email"
-            placeholder="Adresse courriel"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Courriel ou nom d’utilisateur"
+            value={identifiant}
+            onChange={(e) => setIdentifiant(e.target.value)}
             className="border rounded-md p-2"
             required
           />
+
           <input
             type="password"
             placeholder="Mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={motDePasse}
+            onChange={(e) => setMotDePasse(e.target.value)}
             className="border rounded-md p-2"
             required
           />
-          <button type="submit" className="btn-primary">
-            Se connecter
+
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Connexion..." : "Se connecter"}
           </button>
         </form>
       </div>

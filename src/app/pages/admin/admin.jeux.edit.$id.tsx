@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 
+const API = "http://72.11.148.122/api";
+
+function getAdminToken(): string | null {
+  return localStorage.getItem("admin_token");
+}
+
 export default function ModifierJeu() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -10,9 +16,15 @@ export default function ModifierJeu() {
 
   // Charger les infos du jeu depuis le backend
   useEffect(() => {
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     async function chargerJeu() {
       try {
-        const response = await fetch(`http://72.11.148.122/api/jeux/${id}`);
+        const response = await fetch(`${API}/jeux/${id}`);
         const data = await response.json();
 
         if (data.success && data.data) {
@@ -29,16 +41,34 @@ export default function ModifierJeu() {
     }
 
     chargerJeu();
-  }, [id]);
+  }, [id, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
+      const response = await fetch(`${API}/jeux/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(jeu),
       });
+
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_info");
+        navigate("/login", { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.success) {
         navigate("/admin");
@@ -48,15 +78,30 @@ export default function ModifierJeu() {
       console.error(err);
     }
   }
+
   async function toggleChoisi(id: string, estChoisiActuel: boolean) {
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
+      const response = await fetch(`${API}/jeux/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ estChoisi: !estChoisiActuel }),
       });
+
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_info");
+        navigate("/login", { replace: true });
+        return;
+      }
 
       const data = await response.json();
 
@@ -72,19 +117,36 @@ export default function ModifierJeu() {
       console.error(err);
     }
   }
+
   if (loading) return <p className="p-4">Chargement du jeu...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
   if (!jeu) return null;
 
   async function handleImageUpload(file: File) {
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("image", file);
 
     try {
-      const resp = await fetch("http://72.11.148.122/api/upload", {
+      const resp = await fetch(`${API}/upload`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
+
+      if (resp.status === 401 || resp.status === 403) {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_info");
+        navigate("/login", { replace: true });
+        return;
+      }
 
       const data = await resp.json();
 
@@ -227,7 +289,6 @@ export default function ModifierJeu() {
         </div>
 
         {/* --- IMAGE --- */}
-
         <div>
           <label className="block font-semibold mb-1">Image actuelle</label>
 
@@ -297,7 +358,6 @@ export default function ModifierJeu() {
         <fieldset className="border p-4 rounded">
           <legend className="font-semibold text-lg">Notes du résumé</legend>
           <div className="space-y-6">
-            {/* Crédits */}
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
                 Crédits
@@ -318,7 +378,6 @@ export default function ModifierJeu() {
               />
             </div>
 
-            {/* Autres éditions */}
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
                 Autres éditions
@@ -342,16 +401,13 @@ export default function ModifierJeu() {
               />
             </div>
 
-            {/* Étiquettes génériques */}
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
                 Étiquettes génériques
               </label>
               <textarea
                 placeholder="Entrez les étiquettes (séparées par des virgules)..."
-                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(
-                  ", "
-                )}
+                value={(jeu.resume?.notes?.etiquettesGeneriques || []).join(", ")}
                 onChange={(e) =>
                   setJeu({
                     ...jeu,
@@ -371,7 +427,6 @@ export default function ModifierJeu() {
               />
             </div>
 
-            {/* Liens Québec */}
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
                 Liens Québec

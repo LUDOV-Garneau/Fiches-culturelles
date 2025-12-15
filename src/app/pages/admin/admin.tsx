@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+const API = "http://72.11.148.122/api";
+
+function getAdminToken(): string | null {
+  return localStorage.getItem("admin_token");
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const [jeux, setJeux] = useState<any[]>([]);
@@ -13,9 +19,15 @@ export default function Admin() {
   const jeuxNonChoisis = jeux.filter((j) => !j.estChoisi);
 
   useEffect(() => {
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     async function chargerJeux() {
       try {
-        const response = await fetch("http://72.11.148.122/api/jeux");
+        const response = await fetch(`${API}/jeux`);
         const data = await response.json();
 
         if (data.success) {
@@ -32,15 +44,31 @@ export default function Admin() {
     }
 
     chargerJeux();
-  }, []);
+  }, [navigate]);
 
   async function supprimerJeu(id: string, titre: string) {
     if (!window.confirm(`Supprimer "${titre}" ?`)) return;
 
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
+      const response = await fetch(`${API}/jeux/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_info");
+        navigate("/login", { replace: true });
+        return;
+      }
 
       const data = await response.json();
       if (data.success) {
@@ -56,14 +84,28 @@ export default function Admin() {
   }
 
   async function toggleChoisi(id: string, estChoisiActuel: boolean) {
+    const token = getAdminToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     try {
-      const response = await fetch(`http://72.11.148.122/api/jeux/${id}`, {
+      const response = await fetch(`${API}/jeux/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ estChoisi: !estChoisiActuel }),
       });
+
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_info");
+        navigate("/login", { replace: true });
+        return;
+      }
 
       const data = await response.json();
       console.log(data);
@@ -102,8 +144,6 @@ export default function Admin() {
       </div>
 
       <div className="flex flex-1">
-       
-
         <main className="flex-1 p-6">
           {loading && <p>Chargement des jeux...</p>}
           {error && <p className="text-red-500">{error}</p>}
@@ -234,7 +274,7 @@ export default function Admin() {
                                   jeu._id,
                                   jeu.titreComplet?.sousTitre
                                     ? `${jeu.titreComplet.principal} ${jeu.titreComplet.sousTitre}`
-                                    : jeu.titreComplet.principal
+                                    : jeu.titreComplet.principal,
                                 )
                               }
                               className="flex-1 bg-red-600 text-white text-sm rounded-lg py-2 hover:bg-red-700"
